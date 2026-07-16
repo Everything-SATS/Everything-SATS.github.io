@@ -968,7 +968,7 @@ function setReadingBg(bg){
 }
 function openColourPicker(){ document.getElementById('colourOverlay').classList.add('show'); }
 function closeColourPicker(){ document.getElementById('colourOverlay').classList.remove('show'); }
-document.getElementById('colourOverlay').addEventListener('click', (e) => {
+document.addEventListener('click', (e) => {
   if(e.target.id === 'colourOverlay') closeColourPicker();
 });
 applyReadingBg();
