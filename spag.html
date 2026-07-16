@@ -262,7 +262,7 @@
       <button class="setting-tile" id="calmModeTile" onclick="toggleSetting('calmMode')">🌤️<span>Calm colours</span></button>
       <button class="setting-tile" id="largeTextTile" onclick="toggleSetting('largeText')">🔠<span>Larger text</span></button>
       <button class="setting-tile" onclick="closeSettings();openColourPicker()">🎨<span>Background colour</span></button>
-      <a class="setting-tile" href="mailto:hello.everythingsats@gmail.com?subject=Everything%20SATS%20-%20Question" style="text-decoration:none">❓<span>Got a question?</span></a>
+      <button class="setting-tile" onclick="closeSettings();openHelp()">❓<span>Got a question?</span></button>
     </div>
     <p class="setting-note">There is no timer anywhere in this app, on any setting — take as long as you need.</p>
   </div>
@@ -302,7 +302,7 @@
       <div class="feedback-title" id="feedbackTitle"></div>
       <div id="feedbackBody"></div>
     </div>
-    <button class="btn btn-ghost btn-small" style="width:100%; margin-bottom:10px" onclick="openFrustrationHelp()">😅 Struggling or frustrated? Let's do something different for a moment</button>
+    <button class="btn btn-ghost btn-small" style="width:100%; margin-bottom:10px" onclick="openFrustrationHelp()">🤗 Struggling or frustrated? Let's do something different for a moment</button>
     <div class="modal-actions">
       <button class="btn btn-ghost btn-small" onclick="closeModal()">Stop here</button>
       <button class="btn btn-secondary" id="nextBtn" style="display:none" onclick="nextQuestion()">Next question →</button>
@@ -998,9 +998,18 @@ function setReadingBg(bg){
   applyReadingBg();
 }
 function openColourPicker(){ document.getElementById('colourOverlay').classList.add('show'); }
+function openHelp(){ document.getElementById('helpOverlay').classList.add('show'); }
+function closeHelp(){ document.getElementById('helpOverlay').classList.remove('show'); }
+function copyHelpEmail(){
+  navigator.clipboard.writeText('hello.everythingsats@gmail.com').then(() => {
+    document.getElementById('copyEmailBtn').textContent = '✅ Copied!';
+    setTimeout(() => { document.getElementById('copyEmailBtn').textContent = '📋 Copy email address'; }, 2000);
+  });
+}
 function closeColourPicker(){ document.getElementById('colourOverlay').classList.remove('show'); }
 document.addEventListener('click', (e) => {
   if(e.target.id === 'colourOverlay') closeColourPicker();
+  if(e.target.id === 'helpOverlay') closeHelp();
   if(e.target.id === 'frustrationOverlay') closeFrustrationHelp();
 });
 applyReadingBg();
@@ -1021,7 +1030,7 @@ applyReadingBg();
 <div class="overlay" id="frustrationOverlay">
   <div class="modal">
     <button class="close-x" onclick="closeFrustrationHelp()">✕</button>
-    <h2 style="margin-top:0">😅 That's completely okay</h2>
+    <h2 style="margin-top:0">🤗 That's completely okay</h2>
     <p style="color:var(--ink-soft)">Everyone finds some questions tricky. Here is something totally different to look at for a moment.</p>
     <div style="background:var(--bg); border-radius:14px; padding:18px; font-weight:600; text-align:center; margin:14px 0" id="frustrationFact"></div>
     <div style="display:flex; gap:10px; flex-wrap:wrap">
@@ -1031,6 +1040,19 @@ applyReadingBg();
   </div>
 </div>
 
+
+<div class="overlay" id="helpOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeHelp()">✕</button>
+    <h2 style="margin-top:0">❓ Got a question?</h2>
+    <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6">We read everything — from parents, teachers and kids alike. If the button below doesn't open your email app (that only works if you have one set up on this device), just copy the address instead.</p>
+    <div style="background:var(--bg); border-radius:12px; padding:14px; text-align:center; font-weight:700; font-size:1.05rem; margin:14px 0">hello.everythingsats@gmail.com</div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap">
+      <button class="btn btn-primary" id="copyEmailBtn" style="flex:1" onclick="copyHelpEmail()">📋 Copy email address</button>
+      <a class="btn btn-ghost" style="flex:1; text-align:center" href="mailto:hello.everythingsats@gmail.com?subject=Everything%20SATS%20-%20Question">📧 Open email app</a>
+    </div>
+  </div>
+</div>
 
 <div class="overlay" id="colourOverlay">
   <div class="modal">
