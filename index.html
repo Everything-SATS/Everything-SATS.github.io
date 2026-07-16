@@ -112,6 +112,9 @@
   .cb-label{font-weight:800; font-size:.85rem; white-space:nowrap; color:var(--ink)}
   .curiosity-fact{font-size:.9rem; font-weight:600; flex:1; min-width:200px}
   .cb-source{font-size:.72rem; color:var(--ink-soft); white-space:nowrap; text-decoration:underline}
+  .calm-sound-row{display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:14px}
+  .calm-sound-btn{background:var(--blue-light); color:var(--blue); border:none; border-radius:9px; padding:7px 11px; font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit}
+  .calm-sound-btn.active{background:var(--blue); color:#fff}
   .cb-source:empty{display:none}
   .stat-banner{
     background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%);
@@ -171,6 +174,11 @@
       <div class="ht-icon">🎨</div>
       <div class="ht-title">Reading background colour</div>
       <div class="ht-sub">Find white hard to read? Try cream, blue, green, rose or grey instead.</div>
+    </button>
+    <button class="header-tile clickable" onclick="openCalmSoundPicker()">
+      <div class="ht-icon">🎵</div>
+      <div class="ht-title">Calming sounds</div>
+      <div class="ht-sub">Ocean waves, rain, or gentle noise — play something soft any time you like.</div>
     </button>
     <button class="header-tile clickable" onclick="openWhy()">
       <div class="ht-icon">📖</div>
@@ -479,6 +487,95 @@ function openWhyFree(){ document.getElementById('whyFreeOverlay').classList.add(
 function closeWhyFree(){ document.getElementById('whyFreeOverlay').classList.remove('show'); }
 function openColourPicker(){ document.getElementById('colourOverlay').classList.add('show'); }
 function closeColourPicker(){ document.getElementById('colourOverlay').classList.remove('show'); }
+
+/* ---------- Calming sounds: 5 synthesised ambient sounds, entirely client-side, no downloads ---------- */
+const CALM_SOUNDS = [
+  { id:'waves', label:'🌊 Ocean Waves' },
+  { id:'rain', label:'🌧️ Rain' },
+  { id:'brown', label:'🟤 Brown Noise' },
+  { id:'pink', label:'🩷 Pink Noise' },
+  { id:'white', label:'⚪ White Noise' },
+];
+let calmAudioCtx = null, calmNodes = null, calmActiveType = null;
+
+function buildNoiseBuffer(ctx, color){
+  const bufferSize = 2 * ctx.sampleRate;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const output = buffer.getChannelData(0);
+  if(color === 'brown'){
+    let lastOut = 0;
+    for(let i = 0; i < bufferSize; i++){
+      const white = Math.random() * 2 - 1;
+      output[i] = (lastOut + (0.02 * white)) / 1.02;
+      lastOut = output[i];
+      output[i] *= 3.5;
+    }
+  } else if(color === 'pink'){
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i = 0; i < bufferSize; i++){
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886*b0 + white*0.0555179; b1 = 0.99332*b1 + white*0.0750759;
+      b2 = 0.96900*b2 + white*0.1538520; b3 = 0.86650*b3 + white*0.3104856;
+      b4 = 0.55000*b4 + white*0.5329522; b5 = -0.7616*b5 - white*0.0168980;
+      output[i] = (b0+b1+b2+b3+b4+b5+b6+white*0.5362) * 0.11;
+      b6 = white*0.115926;
+    }
+  } else {
+    for(let i = 0; i < bufferSize; i++){ output[i] = Math.random() * 2 - 1; }
+  }
+  return buffer;
+}
+
+function playCalmSound(type){
+  if(calmActiveType === type){ stopCalmSound(); return; }
+  stopCalmSound();
+  calmAudioCtx = calmAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  const ctx = calmAudioCtx;
+  const color = type === 'waves' ? 'brown' : (type === 'rain' ? 'white' : type);
+  const source = ctx.createBufferSource();
+  source.buffer = buildNoiseBuffer(ctx, color);
+  source.loop = true;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = { brown:500, waves:600, pink:2200, rain:4000, white:9000 }[type];
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0.18;
+
+  let lfo = null;
+  if(type === 'waves' || type === 'rain'){
+    lfo = ctx.createOscillator();
+    lfo.frequency.value = type === 'waves' ? 0.12 : 5.5;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = type === 'waves' ? 0.09 : 0.035;
+    lfo.connect(lfoGain).connect(gain.gain);
+    gain.gain.value = type === 'waves' ? 0.13 : 0.16;
+    lfo.start();
+  }
+
+  source.connect(filter).connect(gain).connect(ctx.destination);
+  source.start();
+
+  calmNodes = { source, lfo };
+  calmActiveType = type;
+  renderCalmButtons();
+}
+function stopCalmSound(){
+  if(calmNodes){
+    calmNodes.source.stop(); calmNodes.source.disconnect();
+    if(calmNodes.lfo){ calmNodes.lfo.stop(); calmNodes.lfo.disconnect(); }
+    calmNodes = null;
+  }
+  calmActiveType = null;
+  renderCalmButtons();
+}
+function renderCalmButtons(){
+  const buttonsHtml = CALM_SOUNDS.map(s => `<button class="calm-sound-btn${calmActiveType===s.id?' active':''}" onclick="playCalmSound('${s.id}')">${s.label}</button>`).join('');
+  document.querySelectorAll('.calm-sound-row').forEach(el => { el.innerHTML = buttonsHtml; });
+}
+function openCalmSoundPicker(){ document.getElementById('calmSoundPickerOverlay').classList.add('show'); renderCalmButtons(); }
+function closeCalmSoundPicker(){ document.getElementById('calmSoundPickerOverlay').classList.remove('show'); }
 function openHelp(){ document.getElementById('helpOverlay').classList.add('show'); }
 function closeHelp(){ document.getElementById('helpOverlay').classList.remove('show'); }
 function copyHelpEmail(){
@@ -491,6 +588,7 @@ document.addEventListener('click', (e) => {
   if(e.target.id === 'whyOverlay') closeWhy();
   if(e.target.id === 'whyFreeOverlay') closeWhyFree();
   if(e.target.id === 'colourOverlay') closeColourPicker();
+  if(e.target.id === 'calmSoundPickerOverlay') closeCalmSoundPicker();
   if(e.target.id === 'helpOverlay') closeHelp();
 });
 
@@ -510,6 +608,15 @@ document.addEventListener('click', (e) => {
     </div>
     <p class="colour-note">Honest note: research on coloured backgrounds and reading is actually mixed — they're not a proven fix for dyslexia specifically, but they're completely harmless and some people genuinely find them more comfortable. Worth trying if white feels too bright or "busy" to read.</p>
     <button class="btn btn-primary" style="width:100%; margin-top:16px" onclick="closeColourPicker()">Done</button>
+  </div>
+</div>
+
+<div class="overlay" id="calmSoundPickerOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeCalmSoundPicker()">✕</button>
+    <h2 style="margin-top:0">🎵 Calming Sounds</h2>
+    <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6">Play a soft background sound any time you like — while revising, or just for a moment of calm.</p>
+    <div class="calm-sound-row"></div>
   </div>
 </div>
 

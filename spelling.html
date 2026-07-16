@@ -319,6 +319,7 @@
       <button class="setting-tile" id="calmModeTile" onclick="toggleSetting('calmMode')">🌤️<span>Calm colours</span></button>
       <button class="setting-tile" id="largeTextTile" onclick="toggleSetting('largeText')">🔠<span>Larger text</span></button>
       <button class="setting-tile" onclick="closeSettings();openColourPicker()">🎨<span>Background colour</span></button>
+      <button class="setting-tile" onclick="closeSettings();openCalmSoundPicker()">🎵<span>Calming sounds</span></button>
       <button class="setting-tile" onclick="closeSettings();openHelp()">❓<span>Got a question?</span></button>
     </div>
     <p class="setting-note">There is no timer anywhere in this app, on any setting — take as long as you need.</p>
@@ -1239,10 +1240,11 @@ function stopCalmSound(){
   renderCalmButtons();
 }
 function renderCalmButtons(){
-  const el = document.getElementById('calmSoundButtons');
-  if(!el) return;
-  el.innerHTML = CALM_SOUNDS.map(s => `<button class="calm-sound-btn${calmActiveType===s.id?' active':''}" onclick="playCalmSound('${s.id}')">${s.label}</button>`).join('');
+  const buttonsHtml = CALM_SOUNDS.map(s => `<button class="calm-sound-btn${calmActiveType===s.id?' active':''}" onclick="playCalmSound('${s.id}')">${s.label}</button>`).join('');
+  document.querySelectorAll('.calm-sound-row').forEach(el => { el.innerHTML = buttonsHtml; });
 }
+function openCalmSoundPicker(){ document.getElementById('calmSoundPickerOverlay').classList.add('show'); renderCalmButtons(); }
+function closeCalmSoundPicker(){ document.getElementById('calmSoundPickerOverlay').classList.remove('show'); }
 
 startWellbeingTimer();
 
@@ -1277,6 +1279,7 @@ document.addEventListener('click', (e) => {
   if(e.target.id === 'helpOverlay') closeHelp();
   if(e.target.id === 'frustrationOverlay') closeFrustrationHelp();
   if(e.target.id === 'statDetailOverlay') closeStatDetail();
+  if(e.target.id === 'calmSoundPickerOverlay') closeCalmSoundPicker();
 });
 applyReadingBg();
 
@@ -1315,6 +1318,15 @@ applyReadingBg();
   <div class="modal">
     <button class="close-x" onclick="closeStatDetail()">✕</button>
     <div id="statDetailBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="calmSoundPickerOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeCalmSoundPicker()">✕</button>
+    <h2 style="margin-top:0">🎵 Calming Sounds</h2>
+    <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6">Play a soft background sound any time — while you're working, not just on a break.</p>
+    <div class="calm-sound-row"></div>
   </div>
 </div>
 
