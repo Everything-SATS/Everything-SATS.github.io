@@ -98,7 +98,13 @@
   .streak-chip{
     background:rgba(255,255,255,0.18); border-radius:999px; padding:6px 14px;
     font-size:.85rem; font-weight:600; display:flex; align-items:center; gap:6px;
+    cursor:pointer; border:none; color:inherit; font-family:inherit; transition:background .15s ease;
   }
+  .streak-chip:hover{background:rgba(255,255,255,0.28)}
+  .stat-detail-title{font-size:1.1rem; font-weight:800; margin:0 0 4px}
+  .stat-detail-number{font-size:2.2rem; font-weight:800; color:var(--blue); margin:10px 0 4px}
+  .stat-detail-sub{font-size:.85rem; color:var(--ink-soft); margin-bottom:14px}
+  .stat-detail-explain{font-size:.9rem; color:var(--ink-soft); line-height:1.6; background:var(--bg); border-radius:12px; padding:14px}
   main{max-width:920px; margin:0 auto; padding:20px 16px}
   .daily-card{
     background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow);
@@ -240,9 +246,9 @@
   <p>Papers 2 & 3 — word problems, geometry, measurement, algebra and statistics. No timer, ever — go at your own pace.</p>
   <button class="home-btn" onclick="location.href='index.html'" aria-label="Back to Everything SATS home">🏠</button>
   <div class="streak-row">
-    <div class="streak-chip">🔥 <span id="streakCount">0</span> day streak</div>
-    <div class="streak-chip">🌟 <span id="sessionStars">0</span> stars this session</div>
-    <div class="streak-chip">⭐ <span id="totalAnswered">0</span> questions answered</div>
+    <div class="streak-chip" onclick="openStatDetail('streak')">🔥 <span id="streakCount">0</span> day streak</div>
+    <div class="streak-chip" onclick="openStatDetail('stars')">🌟 <span id="sessionStars">0</span> stars this session</div>
+    <div class="streak-chip" onclick="openStatDetail('answered')">⭐ <span id="totalAnswered">0</span> questions answered</div>
   </div>
   <div class="difficulty-row">
     <span class="difficulty-label">Level:</span>
@@ -724,6 +730,37 @@ function renderHeaderStats(){
   document.getElementById('totalAnswered').textContent = stats.totalAnswered;
 }
 
+function openStatDetail(type){
+  const body = document.getElementById('statDetailBody');
+  if(type === 'streak'){
+    body.innerHTML = `
+      <div class="stat-detail-title">🔥 Day Streak</div>
+      <div class="stat-detail-number">${stats.streak}</div>
+      <div class="stat-detail-sub">${stats.streak === 1 ? 'day in a row' : 'days in a row'}</div>
+      <div class="stat-detail-explain">Answer at least one question on any subject to keep your streak going. If you miss a day it just resets to 0 — there's no penalty, no lost progress, and you can start building it again any time. No pressure, ever.</div>
+    `;
+  } else if(type === 'stars'){
+    body.innerHTML = `
+      <div class="stat-detail-title">🌟 Stars</div>
+      <div class="stat-detail-number">${sessionStars}</div>
+      <div class="stat-detail-sub">this session · ${loadStarsTotal()} all-time on this device</div>
+      <div class="stat-detail-explain">You get one star every time you answer a question or take a wellbeing break — whether you get it right or wrong. Stars are about showing up and trying, not about being correct. The session count resets when you reload the page; your all-time total is saved on this device.</div>
+    `;
+  } else {
+    const pct = stats.totalAnswered > 0 ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) : 0;
+    body.innerHTML = `
+      <div class="stat-detail-title">⭐ Questions Answered</div>
+      <div class="stat-detail-number">${stats.totalAnswered}</div>
+      <div class="stat-detail-sub">${stats.totalCorrect} correct so far${stats.totalAnswered > 0 ? ` (${pct}%)` : ''}</div>
+      <div class="stat-detail-explain">This is your all-time total for Reasoning on this device. It only counts up — it's a record of how much practice you've put in, not a test score.</div>
+    `;
+  }
+  document.getElementById('statDetailOverlay').classList.add('show');
+}
+function closeStatDetail(){
+  document.getElementById('statDetailOverlay').classList.remove('show');
+}
+
 const CORRECT_MESSAGES = [
   '✅ Correct — great work!',
   '✅ Spot on!',
@@ -1118,6 +1155,7 @@ document.addEventListener('click', (e) => {
   if(e.target.id === 'colourOverlay') closeColourPicker();
   if(e.target.id === 'helpOverlay') closeHelp();
   if(e.target.id === 'frustrationOverlay') closeFrustrationHelp();
+  if(e.target.id === 'statDetailOverlay') closeStatDetail();
 });
 applyReadingBg();
 
@@ -1148,6 +1186,12 @@ applyReadingBg();
   </div>
 </div>
 
+<div class="overlay" id="statDetailOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeStatDetail()">✕</button>
+    <div id="statDetailBody"></div>
+  </div>
+</div>
 
 <div class="overlay" id="helpOverlay">
   <div class="modal">
