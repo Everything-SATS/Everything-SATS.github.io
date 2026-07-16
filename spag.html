@@ -344,6 +344,24 @@ const TOPICS = [
 function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
 function choice(arr){ return arr[randInt(0, arr.length - 1)]; }
 
+/* Shuffled-bag picker: never repeats an item until every item in the pool
+   has been shown once, then reshuffles — so the gap between repeats is
+   always at least the pool size, not luck-of-the-draw like plain random. */
+const _bags = {};
+function bagChoice(key, arr){
+  let bag = _bags[key];
+  if(!bag || bag.length === 0){
+    bag = arr.map((_, i) => i);
+    for(let i = bag.length - 1; i > 0; i--){
+      const j = randInt(0, i);
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    _bags[key] = bag;
+  }
+  const idx = bag.pop();
+  return arr[idx];
+}
+
 /* ---------- Word Classes ----------
    Curriculum source: DfE English Appendix 2 (grammar terminology by year).
    Sentences are built procedurally from word banks so they're always new. */
@@ -368,6 +386,16 @@ const WORDCLASS_BANK = {
     { s:"The hungry fox searched the empty barn.", classes:{ determiner:["The","the"], adjective:["hungry","empty"], noun:["fox","barn"], verb:["searched"] } },
     { s:"The excited children boarded the yellow bus.", classes:{ determiner:["The","the"], adjective:["excited","yellow"], noun:["children","bus"], verb:["boarded"] } },
     { s:"A tall giraffe chewed the green leaves.", classes:{ determiner:["A","the"], adjective:["tall","green"], noun:["giraffe","leaves"], verb:["chewed"] } },
+    { s:"The clever squirrel buried the shiny acorn.", classes:{ determiner:["The","the"], adjective:["clever","shiny"], noun:["squirrel","acorn"], verb:["buried"] } },
+    { s:"A small puppy chased the red ball.", classes:{ determiner:["A","the"], adjective:["small","red"], noun:["puppy","ball"], verb:["chased"] } },
+    { s:"The proud farmer harvested the golden wheat.", classes:{ determiner:["The","the"], adjective:["proud","golden"], noun:["farmer","wheat"], verb:["harvested"] } },
+    { s:"A patient nurse comforted the frightened patient.", classes:{ determiner:["A","the"], adjective:["patient","frightened"], noun:["nurse","patient"], verb:["comforted"] } },
+    { s:"The angry wasp stung the startled camper.", classes:{ determiner:["The","the"], adjective:["angry","startled"], noun:["wasp","camper"], verb:["stung"] } },
+    { s:"A wise owl watched the silent forest.", classes:{ determiner:["A","the"], adjective:["wise","silent"], noun:["owl","forest"], verb:["watched"] } },
+    { s:"The busy bees pollinated the colourful flowers.", classes:{ determiner:["The","the"], adjective:["busy","colourful"], noun:["bees","flowers"], verb:["pollinated"] } },
+    { s:"The kind stranger helped the lost tourist.", classes:{ determiner:["The","the"], adjective:["kind","lost"], noun:["stranger","tourist"], verb:["helped"] } },
+    { s:"A fierce storm damaged the wooden fence.", classes:{ determiner:["A","the"], adjective:["fierce","wooden"], noun:["storm","fence"], verb:["damaged"] } },
+    { s:"The elderly man fed the hungry pigeons.", classes:{ determiner:["The","the"], adjective:["elderly","hungry"], noun:["man","pigeons"], verb:["fed"] } },
   ],
   1: [
     { s:"The nervous puppy hid quietly under the old blanket.", classes:{ determiner:["The","the"], adjective:["nervous","old"], noun:["puppy","blanket"], verb:["hid"], adverb:["quietly"] } },
@@ -375,6 +403,16 @@ const WORDCLASS_BANK = {
     { s:"The tired athlete finished the race slowly but proudly.", classes:{ determiner:["The","the"], adjective:["tired"], noun:["athlete","race"], verb:["finished"], adverb:["slowly","proudly"] } },
     { s:"The clever detective solved the mystery quickly.", classes:{ determiner:["The","the"], adjective:["clever"], noun:["detective","mystery"], verb:["solved"], adverb:["quickly"] } },
     { s:"A shy student answered the question nervously.", classes:{ determiner:["A","the"], adjective:["shy"], noun:["student","question"], verb:["answered"], adverb:["nervously"] } },
+    { s:"The worried mother searched anxiously for her son.", classes:{ determiner:["The"], adjective:["worried"], noun:["mother","son"], verb:["searched"], adverb:["anxiously"] } },
+    { s:"A determined swimmer crossed the lake steadily.", classes:{ determiner:["A","the"], adjective:["determined"], noun:["swimmer","lake"], verb:["crossed"], adverb:["steadily"] } },
+    { s:"The frightened cat climbed swiftly up the tree.", classes:{ determiner:["The","the"], adjective:["frightened"], noun:["cat","tree"], verb:["climbed"], adverb:["swiftly"] } },
+    { s:"The confident speaker addressed the crowd calmly.", classes:{ determiner:["The","the"], adjective:["confident"], noun:["speaker","crowd"], verb:["addressed"], adverb:["calmly"] } },
+    { s:"A curious toddler explored the garden eagerly.", classes:{ determiner:["A","the"], adjective:["curious"], noun:["toddler","garden"], verb:["explored"], adverb:["eagerly"] } },
+    { s:"The exhausted runner crossed the finish line gratefully.", classes:{ determiner:["The","the"], adjective:["exhausted"], noun:["runner","line"], verb:["crossed"], adverb:["gratefully"] } },
+    { s:"The anxious passenger waited nervously for the delayed train.", classes:{ determiner:["The","the"], adjective:["anxious","delayed"], noun:["passenger","train"], verb:["waited"], adverb:["nervously"] } },
+    { s:"A gentle giant lifted the heavy crate effortlessly.", classes:{ determiner:["A","the"], adjective:["gentle","heavy"], noun:["giant","crate"], verb:["lifted"], adverb:["effortlessly"] } },
+    { s:"The stubborn goat blocked the narrow path defiantly.", classes:{ determiner:["The","the"], adjective:["stubborn","narrow"], noun:["goat","path"], verb:["blocked"], adverb:["defiantly"] } },
+    { s:"The talented dancer performed the routine flawlessly.", classes:{ determiner:["The","the"], adjective:["talented"], noun:["dancer","routine"], verb:["performed"], adverb:["flawlessly"] } },
   ],
   2: [
     { s:"The curious fox crept through the quiet garden.", classes:{ determiner:["The","the"], adjective:["curious","quiet"], noun:["fox","garden"], verb:["crept"], preposition:["through"] } },
@@ -382,6 +420,16 @@ const WORDCLASS_BANK = {
     { s:"A small mouse scurried across the wooden floor.", classes:{ determiner:["A","the"], adjective:["small","wooden"], noun:["mouse","floor"], verb:["scurried"], preposition:["across"] } },
     { s:"The excited fans waited outside the stadium gates.", classes:{ determiner:["The","the"], adjective:["excited"], noun:["fans","stadium","gates"], verb:["waited"], preposition:["outside"] } },
     { s:"The old lighthouse stood between two rocky cliffs.", classes:{ determiner:["The"], adjective:["old","rocky"], noun:["lighthouse","cliffs"], verb:["stood"], preposition:["between"] } },
+    { s:"The playful otters slid down the muddy bank.", classes:{ determiner:["The","the"], adjective:["playful","muddy"], noun:["otters","bank"], verb:["slid"], preposition:["down"] } },
+    { s:"The nervous actor stood behind the heavy curtain.", classes:{ determiner:["The","the"], adjective:["nervous","heavy"], noun:["actor","curtain"], verb:["stood"], preposition:["behind"] } },
+    { s:"The tired hikers rested beneath the tall pine.", classes:{ determiner:["The","the"], adjective:["tired","tall"], noun:["hikers","pine"], verb:["rested"], preposition:["beneath"] } },
+    { s:"The eager puppy ran towards the closed gate.", classes:{ determiner:["The","the"], adjective:["eager","closed"], noun:["puppy","gate"], verb:["ran"], preposition:["towards"] } },
+    { s:"The curious children peered inside the dusty attic.", classes:{ determiner:["The","the"], adjective:["curious","dusty"], noun:["children","attic"], verb:["peered"], preposition:["inside"] } },
+    { s:"The frightened deer bolted through the dense woods.", classes:{ determiner:["The","the"], adjective:["frightened","dense"], noun:["deer","woods"], verb:["bolted"], preposition:["through"] } },
+    { s:"The determined climbers pushed beyond the steep ridge.", classes:{ determiner:["The","the"], adjective:["determined","steep"], noun:["climbers","ridge"], verb:["pushed"], preposition:["beyond"] } },
+    { s:"The sleepy cat curled up on the warm windowsill.", classes:{ determiner:["The","the"], adjective:["sleepy","warm"], noun:["cat","windowsill"], verb:["curled"], preposition:["on"] } },
+    { s:"The proud captain sailed beyond the rocky headland.", classes:{ determiner:["The","the"], adjective:["proud","rocky"], noun:["captain","headland"], verb:["sailed"], preposition:["beyond"] } },
+    { s:"The anxious swimmer floated near the wooden pier.", classes:{ determiner:["The","the"], adjective:["anxious","wooden"], noun:["swimmer","pier"], verb:["floated"], preposition:["near"] } },
   ],
   3: [
     { s:"She waited patiently because the bus was late.", classes:{ pronoun:["She"], adjective:["late"], noun:["bus"], verb:["waited"], adverb:["patiently"], conjunction:["because"] } },
@@ -389,11 +437,21 @@ const WORDCLASS_BANK = {
     { s:"They explored the cave although it was dark.", classes:{ pronoun:["They","it"], adjective:["dark"], noun:["cave"], verb:["explored"], conjunction:["although"] } },
     { s:"We stayed inside while the storm raged.", classes:{ pronoun:["We"], noun:["storm"], verb:["stayed","raged"], conjunction:["while"] } },
     { s:"She smiled when she opened her present.", classes:{ pronoun:["She","she"], noun:["present"], verb:["smiled","opened"], conjunction:["when"] } },
+    { s:"He apologised quickly because he had made a mistake.", classes:{ pronoun:["He","he"], noun:["mistake"], verb:["apologised","made"], adverb:["quickly"], conjunction:["because"] } },
+    { s:"She packed an umbrella since rain was forecast.", classes:{ pronoun:["She"], noun:["umbrella","rain"], verb:["packed","was"], conjunction:["since"] } },
+    { s:"They cheered loudly when their team scored.", classes:{ pronoun:["They"], noun:["team"], verb:["cheered","scored"], adverb:["loudly"], conjunction:["when"] } },
+    { s:"We left early so we would avoid the traffic.", classes:{ pronoun:["We","we"], noun:["traffic"], verb:["left","avoid"], adverb:["early"], conjunction:["so"] } },
+    { s:"He trained every day until he mastered the routine.", classes:{ pronoun:["He","he"], noun:["day","routine"], verb:["trained","mastered"], conjunction:["until"] } },
+    { s:"She whispered quietly because the baby was sleeping.", classes:{ pronoun:["She"], noun:["baby"], verb:["whispered","was"], adverb:["quietly"], conjunction:["because"] } },
+    { s:"They stayed calm although the alarm was ringing.", classes:{ pronoun:["They"], noun:["alarm"], verb:["stayed","was"], conjunction:["although"] } },
+    { s:"He finished first even though he started last.", classes:{ pronoun:["He","he"], verb:["finished","started"], conjunction:["though"] } },
+    { s:"We waited patiently while the mechanic fixed the car.", classes:{ pronoun:["We"], noun:["mechanic","car"], verb:["waited","fixed"], adverb:["patiently"], conjunction:["while"] } },
+    { s:"She smiled proudly because she won the prize.", classes:{ pronoun:["She","she"], noun:["prize"], verb:["smiled","won"], adverb:["proudly"], conjunction:["because"] } },
   ],
 };
 
 function genWordClass(diff){
-  const item = choice(WORDCLASS_BANK[diff]);
+  const item = bagChoice('wordclass-' + diff, WORDCLASS_BANK[diff]);
   const classNames = Object.keys(item.classes);
   const targetClass = choice(classNames);
   const options = item.classes[targetClass];
@@ -413,10 +471,10 @@ function genWordClass(diff){
 
 /* ---------- Sentence Types (statement / question / exclamation / command) ---------- */
 const SENTENCE_BANK = {
-  statement: ["The kettle is boiling on the stove.", "Our class visited the science museum yesterday.", "Rain fell steadily throughout the afternoon.", "The old lighthouse still guides ships safely to harbour.", "Several dolphins swam alongside the boat."],
-  question: ["Have you finished your homework yet?", "Why does the moon change shape?", "Where did you leave your football boots?", "Could you pass me the map, please?", "What time does the train leave?"],
-  exclamation: ["What an incredible sunset that was!", "How brave those firefighters were!", "That was such an unexpected surprise!", "What a mess this kitchen is!"],
-  command: ["Close the door quietly behind you.", "Please hand in your books by Friday.", "Take your seats and settle down.", "Remember to bring your PE kit tomorrow.", "Look both ways before you cross."],
+  statement: ["The kettle is boiling on the stove.", "Our class visited the science museum yesterday.", "Rain fell steadily throughout the afternoon.", "The old lighthouse still guides ships safely to harbour.", "Several dolphins swam alongside the boat.", "The bakery sells fresh bread every morning.", "My grandfather grows vegetables in his allotment.", "The train arrived exactly on time.", "A gentle breeze drifted through the open window.", "The museum recently added a new dinosaur exhibit.", "Autumn leaves covered the entire playground.", "The choir practises every Tuesday evening.", "Our neighbours are building a new garden shed.", "The river flows gently past the old mill.", "Scientists discovered a new species of frog."],
+  question: ["Have you finished your homework yet?", "Why does the moon change shape?", "Where did you leave your football boots?", "Could you pass me the map, please?", "What time does the train leave?", "Do you know the way to the station?", "Why did the dinosaurs become extinct?", "Has anyone seen my library book?", "Which bus goes to the town centre?", "Can we visit the zoo this weekend?", "How far is it to the nearest beach?", "Who left this jacket on the chair?", "Did you remember to feed the fish?", "What causes the tides to change?", "Would you like to join our team?"],
+  exclamation: ["What an incredible sunset that was!", "How brave those firefighters were!", "That was such an unexpected surprise!", "What a mess this kitchen is!", "What a fantastic goal that was!", "How enormous that whale is!", "What a terrifying storm that turned out to be!", "How wonderful this cake tastes!", "What a brilliant idea you've had!", "How quickly the time has gone!", "What an astonishing view this is!", "How clever that trick was!", "What a disaster this morning has been!", "How proud we all are of you!", "What a spectacular firework display that was!"],
+  command: ["Close the door quietly behind you.", "Please hand in your books by Friday.", "Take your seats and settle down.", "Remember to bring your PE kit tomorrow.", "Look both ways before you cross.", "Wash your hands before dinner.", "Please switch off the lights when you leave.", "Line up quietly outside the hall.", "Hand in your permission slips today.", "Keep off the grass near the flowerbeds.", "Turn to page twenty in your workbook.", "Please lower your voice in the library.", "Fasten your seatbelt before we set off.", "Bring an umbrella in case it rains.", "Finish your work before the bell rings."],
 };
 const SENTENCE_TIP = {
   statement: "Statements tell you something and end with a full stop.",
@@ -427,7 +485,7 @@ const SENTENCE_TIP = {
 function genSentenceType(diff){
   const types = diff <= 1 ? ['statement','question'] : ['statement','question','exclamation','command'];
   const type = choice(types);
-  const sentence = choice(SENTENCE_BANK[type]);
+  const sentence = bagChoice('sentencetype-' + type, SENTENCE_BANK[type]);
   return {
     text: `Is this sentence a statement, question, exclamation, or command? — "${sentence}"`,
     answer: type,
@@ -436,14 +494,14 @@ function genSentenceType(diff){
 }
 
 /* ---------- Apostrophes (contractions and possession) ---------- */
-const CONTRACTIONS = [["do not","don't"],["cannot","can't"],["I am","I'm"],["they are","they're"],["it is","it's"],["did not","didn't"],["we will","we'll"],["should not","shouldn't"],["you are","you're"],["I will","I'll"]];
-const SING_POSSESSION = [["dog","Sam"],["bike","Ellie"],["coat","the teacher"],["homework","Ravi"],["kite","the boy"]];
-const PLURAL_S_POSSESSION = [["toys","the girls"],["boots","the players"],["books","the students"],["lunches","the workers"]];
-const IRREGULAR_PLURAL_POSSESSION = [["coats","the children"],["shoes","the men"],["tails","the mice"]];
+const CONTRACTIONS = [["do not","don't"],["cannot","can't"],["I am","I'm"],["they are","they're"],["it is","it's"],["did not","didn't"],["we will","we'll"],["should not","shouldn't"],["you are","you're"],["I will","I'll"],["is not","isn't"],["are not","aren't"],["was not","wasn't"],["were not","weren't"],["has not","hasn't"],["have not","haven't"],["had not","hadn't"],["would not","wouldn't"],["could not","couldn't"],["will not","won't"],["let us","let's"],["that is","that's"],["who is","who's"],["does not","doesn't"]];
+const SING_POSSESSION = [["dog","Sam"],["bike","Ellie"],["coat","the teacher"],["homework","Ravi"],["kite","the boy"],["pencil case","Aisha"],["scarf","Grandad"],["football","Leo"],["backpack","Mrs Patel"],["umbrella","the girl"],["notebook","Oliver"],["hat","Grandma"],["guitar","Jamal"],["phone","the doctor"],["lunchbox","Sophie"]];
+const PLURAL_S_POSSESSION = [["toys","the girls"],["boots","the players"],["books","the students"],["lunches","the workers"],["bikes","the twins"],["coats","the nurses"],["desks","the teachers"],["shoes","the dancers"],["kits","the athletes"],["bags","the tourists"],["tickets","the passengers"],["badges","the scouts"]];
+const IRREGULAR_PLURAL_POSSESSION = [["coats","the children"],["shoes","the men"],["scarves","the women"],["tails","the mice"],["feathers","the geese"],["backpacks","the people"],["horns","the oxen"],["collars","the sheep"],["gills","the fish"],["antlers","the deer"]];
 
 function genApostrophes(diff){
   if(diff === 0){
-    const [full, contracted] = choice(CONTRACTIONS);
+    const [full, contracted] = bagChoice('apo-contractions', CONTRACTIONS);
     return {
       text: `Write "${full}" as a contraction (using an apostrophe).`,
       answer: contracted,
@@ -452,10 +510,10 @@ function genApostrophes(diff){
   }
   if(diff === 1){
     if(Math.random() < 0.5){
-      const [full, contracted] = choice(CONTRACTIONS);
+      const [full, contracted] = bagChoice('apo-contractions', CONTRACTIONS);
       return { text: `Write "${full}" as a contraction.`, answer: contracted, steps: [`"${full}" becomes "${contracted}".`] };
     }
-    const [item, owner] = choice(SING_POSSESSION);
+    const [item, owner] = bagChoice('apo-sing', SING_POSSESSION);
     return {
       text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe.`,
       answer: `${owner}'s ${item}`,
@@ -463,14 +521,14 @@ function genApostrophes(diff){
     };
   }
   if(diff === 2){
-    const [item, owner] = choice(PLURAL_S_POSSESSION);
+    const [item, owner] = bagChoice('apo-plurals', PLURAL_S_POSSESSION);
     return {
       text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe. (${owner} already ends in 's'.)`,
       answer: `${owner}' ${item}`,
       steps: [ `${owner} is already plural and ends in 's', so just add an apostrophe after the s — no extra s needed.`, `So it becomes "${owner}' ${item}".` ],
     };
   }
-  const [item, owner] = choice(IRREGULAR_PLURAL_POSSESSION);
+  const [item, owner] = bagChoice('apo-irregular', IRREGULAR_PLURAL_POSSESSION);
   return {
     text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe. (${owner} is an irregular plural — it doesn't end in 's'.)`,
     answer: `${owner}'s ${item}`,
@@ -485,27 +543,72 @@ const PUNCT_BANK = {
     { s:"We packed towels{{b}}sun cream and hats for the beach.", mark:",", why:"Commas separate items in a list." },
     { s:"The shop sells pens{{b}}pencils and rulers.", mark:",", why:"Commas separate items in a list." },
     { s:"Grandad grows carrots{{b}}potatoes and onions in his garden.", mark:",", why:"Commas separate items in a list." },
+    { s:"She bought apples{{b}}bananas and grapes.", mark:",", why:"Commas separate items in a list." },
+    { s:"The zoo has lions{{b}}tigers and bears.", mark:",", why:"Commas separate items in a list." },
+    { s:"He packed a torch{{b}}a map and some snacks.", mark:",", why:"Commas separate items in a list." },
+    { s:"We saw horses{{b}}cows and sheep in the field.", mark:",", why:"Commas separate items in a list." },
+    { s:"The recipe needs flour{{b}}sugar and butter.", mark:",", why:"Commas separate items in a list." },
+    { s:"My bag has a book{{b}}a pencil case and a water bottle.", mark:",", why:"Commas separate items in a list." },
+    { s:"The garden grows roses{{b}}tulips and daffodils.", mark:",", why:"Commas separate items in a list." },
+    { s:"She collects stamps{{b}}coins and postcards.", mark:",", why:"Commas separate items in a list." },
+    { s:"The team needs a goalkeeper{{b}}defenders and strikers.", mark:",", why:"Commas separate items in a list." },
+    { s:"We visited London{{b}}Paris and Rome on our trip.", mark:",", why:"Commas separate items in a list." },
+    { s:"The box contained crayons{{b}}paints and brushes.", mark:",", why:"Commas separate items in a list." },
   ],
   1: [
     { s:'The teacher said{{b}} "Please sit down."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
     { s:'Mia shouted{{b}} "Look out!"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
     { s:'The captain announced{{b}} "We are ready to sail."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'Dad whispered{{b}} "Don\'t wake the baby."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'The coach called out{{b}} "Well played, everyone!"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'She asked{{b}} "What time is it?"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'The guide explained{{b}} "This castle is 800 years old."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'He muttered{{b}} "This isn\'t going to work."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'The referee shouted{{b}} "Foul!"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'Grandma said{{b}} "Dinner is ready."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'The pilot announced{{b}} "We are beginning our descent."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'He warned{{b}} "Watch your step."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'The presenter began{{b}} "Welcome to the show."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'The vet explained{{b}} "Your dog just needs some rest."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
+    { s:'The scientist announced{{b}} "We\'ve made an incredible discovery."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
   ],
   2: [
     { s:"Later that day{{b}} I heard the surprising news.", mark:",", why:"A comma goes after a fronted adverbial (a phrase moved to the front of the sentence)." },
     { s:"After the long journey{{b}} the tired explorers reached camp.", mark:",", why:"A comma goes after a fronted adverbial." },
     { s:"Without a map{{b}} the hikers quickly became lost.", mark:",", why:"A comma goes after a fronted adverbial." },
     { s:"Eventually{{b}} the storm passed and the sun came out.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Suddenly{{b}} the lights went out.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Before the match started{{b}} the players warmed up.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"In the distance{{b}} thunder rumbled ominously.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Despite the rain{{b}} the fete went ahead as planned.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"After a moment's hesitation{{b}} she knocked on the door.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Meanwhile{{b}} back at the camp, the fire was dying out.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Within minutes{{b}} the whole street had lost power.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Against all odds{{b}} the team fought back to win.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Early the next morning{{b}} we set off for the coast.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"Without warning{{b}} the ground began to shake.", mark:",", why:"A comma goes after a fronted adverbial." },
+    { s:"By the end of the day{{b}} everyone was exhausted.", mark:",", why:"A comma goes after a fronted adverbial." },
   ],
   3: [
     { s:"It's raining{{b}} I'm fed up.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
     { s:"She had one goal{{b}} to win the race.", mark:":", why:"A colon introduces an explanation or elaboration of what came before it." },
     { s:"You will need the following items{{b}} a torch, a map and some water.", mark:":", why:"A colon introduces a list." },
     { s:"The forecast was clear{{b}} sunshine all afternoon.", mark:":", why:"A colon introduces an explanation of what came before it." },
+    { s:"The exam was difficult{{b}} nobody finished on time.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
+    { s:"He had only one wish{{b}} to see his family again.", mark:":", why:"A colon introduces an explanation or elaboration of what came before it." },
+    { s:"Pack these essentials{{b}} wellies, a raincoat and a torch.", mark:":", why:"A colon introduces a list." },
+    { s:"The results were clear{{b}} our team had won.", mark:":", why:"A colon introduces an explanation of what came before it." },
+    { s:"I was exhausted{{b}} I had barely slept all week.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
+    { s:"There was only one explanation{{b}} someone had left the gate open.", mark:":", why:"A colon introduces an explanation of what came before it." },
+    { s:"The weather turned quickly{{b}} dark clouds rolled in within minutes.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
+    { s:"Bring the right kit{{b}} boots, gloves and a warm coat.", mark:":", why:"A colon introduces a list." },
+    { s:"The verdict was final{{b}} the match would be replayed.", mark:":", why:"A colon introduces an explanation of what came before it." },
+    { s:"She had made her decision{{b}} she was staying.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
+    { s:"The instructions were simple{{b}} follow the path and turn left.", mark:":", why:"A colon introduces an explanation of what came before it." },
   ],
 };
 function genPunctuation(diff){
-  const item = choice(PUNCT_BANK[diff]);
+  const item = bagChoice('punct-' + diff, PUNCT_BANK[diff]);
   const collapse = s => s.replace(/ {2,}/g, ' ');
   const displaySentence = collapse(item.s.replace('{{b}}', ' ___ '));
   return {
@@ -522,28 +625,72 @@ const CLAUSE_BANK = {
     { s:"We stayed inside because it was raining heavily.", conj:"because" },
     { s:"She packed an umbrella because rain was forecast.", conj:"because" },
     { s:"He tidied his room because his friends were visiting.", conj:"because" },
+    { s:"I switched on the light because the room was dark.", conj:"because" },
+    { s:"He wore a coat because it was cold outside.", conj:"because" },
+    { s:"We cancelled the picnic because it started to rain.", conj:"because" },
+    { s:"She was tired because she had woken up early.", conj:"because" },
+    { s:"They stayed indoors because the wind was strong.", conj:"because" },
+    { s:"I laughed because the joke was funny.", conj:"because" },
+    { s:"We hurried because we were running late.", conj:"because" },
+    { s:"He was proud because he had scored a goal.", conj:"because" },
+    { s:"She smiled because she had passed her test.", conj:"because" },
+    { s:"The dog barked because a stranger knocked on the door.", conj:"because" },
+    { s:"We celebrated because our team had won.", conj:"because" },
   ],
   1: [
     { s:"We can go to the park if the weather stays fine.", conj:"if" },
     { s:"I will wait here until you finish your homework.", conj:"until" },
     { s:"They set off early so they would arrive on time.", conj:"so" },
     { s:"She practised every day so she would improve.", conj:"so" },
+    { s:"You can borrow my book if you promise to return it.", conj:"if" },
+    { s:"I'll save you a seat if you hurry.", conj:"if" },
+    { s:"We won't leave until everyone is ready.", conj:"until" },
+    { s:"He kept training until he felt confident.", conj:"until" },
+    { s:"She spoke slowly so everyone could understand.", conj:"so" },
+    { s:"They arrived early so they could get good seats.", conj:"so" },
+    { s:"You'll catch a cold if you stay out in the rain.", conj:"if" },
+    { s:"I'll call you if anything changes.", conj:"if" },
+    { s:"We packed extra food so nobody would go hungry.", conj:"so" },
+    { s:"Wait here until the rain stops.", conj:"until" },
+    { s:"He saved his pocket money so he could buy a bike.", conj:"so" },
   ],
   2: [
     { s:"Although the match was cancelled, the team still trained together.", conj:"although" },
     { s:"While the cake was baking, we cleaned the kitchen.", conj:"while" },
     { s:"Since you asked so nicely, I'll help you with it.", conj:"since" },
     { s:"Whenever it snows, the whole town seems to slow down.", conj:"whenever" },
+    { s:"Although it was raining, the race went ahead.", conj:"although" },
+    { s:"While the adults chatted, the children played outside.", conj:"while" },
+    { s:"Since the bridge was closed, we had to take a detour.", conj:"since" },
+    { s:"Whenever she visits, she brings a gift for everyone.", conj:"whenever" },
+    { s:"Although he was nervous, he gave a confident speech.", conj:"although" },
+    { s:"While the bread was rising, she prepared the filling.", conj:"while" },
+    { s:"Since the shop had closed early, we went home empty-handed.", conj:"since" },
+    { s:"Whenever the bell rings, the dog starts barking.", conj:"whenever" },
+    { s:"Although the film was long, nobody wanted it to end.", conj:"although" },
+    { s:"While the plane was landing, the passengers fastened their seatbelts.", conj:"while" },
+    { s:"Since nobody answered the door, we left a note.", conj:"since" },
   ],
   3: [
     { s:"The scientist who discovered the fossil worked at the museum.", conj:"who" },
     { s:"The bridge, which was built in 1920, is still standing today.", conj:"which" },
     { s:"This is the house where I grew up.", conj:"where" },
     { s:"That's the reason why the trip was postponed.", conj:"why" },
+    { s:"The author who wrote this book visited our school.", conj:"who" },
+    { s:"The car, which was completely rebuilt, looked brand new.", conj:"which" },
+    { s:"This is the park where we used to play.", conj:"where" },
+    { s:"That's the reason why she was late this morning.", conj:"why" },
+    { s:"The dentist who treated me was very gentle.", conj:"who" },
+    { s:"The painting, which hangs in the hallway, is over a century old.", conj:"which" },
+    { s:"This is the beach where the shipwreck was found.", conj:"where" },
+    { s:"That's the reason why the concert was cancelled.", conj:"why" },
+    { s:"The teacher who inspired me the most retired last year.", conj:"who" },
+    { s:"The statue, which stands in the square, honours local heroes.", conj:"which" },
+    { s:"This is the classroom where we had our first lesson.", conj:"where" },
   ],
 };
 function genClauses(diff){
-  const item = choice(CLAUSE_BANK[diff]);
+  const item = bagChoice('clause-' + diff, CLAUSE_BANK[diff]);
   const kind = diff === 3 ? "relative pronoun that starts the relative clause" : "conjunction that joins the two clauses";
   return {
     text: `What is the ${kind} in this sentence? — "${item.s}"`,
@@ -567,22 +714,53 @@ const SYN_ANT_BANK = [
   ["tired","exhausted","energetic"],
   ["brave","courageous","cowardly"],
   ["generous","kind","selfish"],
+  ["difficult","challenging","simple"],
+  ["ancient","old","modern"],
+  ["beautiful","gorgeous","hideous"],
+  ["dangerous","risky","safe"],
+  ["delicious","tasty","disgusting"],
+  ["gloomy","miserable","cheerful"],
+  ["huge","enormous","miniature"],
+  ["polite","courteous","rude"],
+  ["wealthy","rich","poor"],
+  ["narrow","slim","wide"],
 ];
 const STANDARD_ENGLISH_BANK = [
   { s:"We was late for the bus.", wrong:"was", correct:"were" },
   { s:"I done my homework already.", wrong:"done", correct:"did" },
   { s:"They was playing in the garden.", wrong:"was", correct:"were" },
   { s:"She never done nothing wrong.", wrong:"done", correct:"did" },
+  { s:"He don't like vegetables.", wrong:"don't", correct:"doesn't" },
+  { s:"There's less biscuits in the tin than yesterday.", wrong:"less", correct:"fewer" },
+  { s:"She is the goodest player on the team.", wrong:"goodest", correct:"best" },
+  { s:"We done really well in the match.", wrong:"done", correct:"did" },
+  { s:"I seen that film already.", wrong:"seen", correct:"saw" },
+  { s:"She writes good.", wrong:"good", correct:"well" },
+  { s:"I have went there before.", wrong:"went", correct:"gone" },
+  { s:"He should of asked first.", wrong:"of", correct:"have" },
+  { s:"There is many reasons to celebrate.", wrong:"is", correct:"are" },
+  { s:"Them shoes are mine.", wrong:"Them", correct:"Those" },
 ];
 const VOICE_BANK = [
   { active:"The dog chased the cat.", passive:"The cat was chased by the dog." },
   { active:"The wind knocked down the fence.", passive:"The fence was knocked down by the wind." },
   { active:"A famous artist painted this mural.", passive:"This mural was painted by a famous artist." },
   { active:"The council will repair the bridge.", passive:"The bridge will be repaired by the council." },
+  { active:"The chef prepared a delicious meal.", passive:"A delicious meal was prepared by the chef." },
+  { active:"Lightning struck the old oak tree.", passive:"The old oak tree was struck by lightning." },
+  { active:"The librarian organised the bookshelves.", passive:"The bookshelves were organised by the librarian." },
+  { active:"A huge wave capsized the small boat.", passive:"The small boat was capsized by a huge wave." },
+  { active:"The gardener planted hundreds of tulips.", passive:"Hundreds of tulips were planted by the gardener." },
+  { active:"The company will launch the new product next month.", passive:"The new product will be launched by the company next month." },
+  { active:"Thousands of fans cheered the winning team.", passive:"The winning team was cheered by thousands of fans." },
+  { active:"The architect designed the new library.", passive:"The new library was designed by the architect." },
+  { active:"Volunteers cleaned the entire beach.", passive:"The entire beach was cleaned by volunteers." },
+  { active:"The teacher praised the whole class.", passive:"The whole class was praised by the teacher." },
+  { active:"A sudden storm delayed the flight.", passive:"The flight was delayed by a sudden storm." },
 ];
 function genStandardEnglish(diff){
   if(diff === 0 || diff === 1){
-    const [word, syn, ant] = choice(SYN_ANT_BANK);
+    const [word, syn, ant] = bagChoice('synant', SYN_ANT_BANK);
     if(diff === 1 && Math.random() < 0.5){
       return {
         text: `Which word means the OPPOSITE of "${word}": "${syn}" or "${ant}"?`,
@@ -597,14 +775,14 @@ function genStandardEnglish(diff){
     };
   }
   if(diff === 2){
-    const item = choice(STANDARD_ENGLISH_BANK);
+    const item = bagChoice('stdeng', STANDARD_ENGLISH_BANK);
     return {
       text: `This sentence uses informal, non-Standard English: "${item.s}" — which word should replace "${item.wrong}" in Standard English?`,
       answer: item.correct,
       steps: [ `In Standard English, "${item.wrong}" should be "${item.correct}" here.`, `Correct sentence: "${item.s.replace(item.wrong, item.correct)}"` ],
     };
   }
-  const item = choice(VOICE_BANK);
+  const item = bagChoice('voice', VOICE_BANK);
   const showActive = Math.random() < 0.5;
   if(showActive){
     return {
