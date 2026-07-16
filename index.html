@@ -157,11 +157,11 @@
   <h1>Everything SATS</h1>
   <p class="tagline">UK Year 6 SATs revision, done properly — every paper, every level, built for every kind of learner.</p>
   <div class="header-tiles">
-    <div class="header-tile">
+    <button class="header-tile clickable" onclick="openWhyFree()">
       <div class="ht-icon">💛</div>
       <div class="ht-title">Free. All of it. Forever.</div>
       <div class="ht-sub">Nothing to buy, no sign-up, no catch — every child deserves the same shot at doing well.</div>
-    </div>
+    </button>
     <button class="header-tile clickable" onclick="openColourPicker()">
       <div class="ht-icon">🎨</div>
       <div class="ht-title">Reading background colour</div>
@@ -470,6 +470,8 @@ document.getElementById('starsTotal').textContent = localStorage.getItem('sats_s
 
 function openWhy(){ document.getElementById('whyOverlay').classList.add('show'); }
 function closeWhy(){ document.getElementById('whyOverlay').classList.remove('show'); }
+function openWhyFree(){ document.getElementById('whyFreeOverlay').classList.add('show'); }
+function closeWhyFree(){ document.getElementById('whyFreeOverlay').classList.remove('show'); }
 function openColourPicker(){ document.getElementById('colourOverlay').classList.add('show'); }
 function closeColourPicker(){ document.getElementById('colourOverlay').classList.remove('show'); }
 function openHelp(){ document.getElementById('helpOverlay').classList.add('show'); }
@@ -482,6 +484,7 @@ function copyHelpEmail(){
 }
 document.addEventListener('click', (e) => {
   if(e.target.id === 'whyOverlay') closeWhy();
+  if(e.target.id === 'whyFreeOverlay') closeWhyFree();
   if(e.target.id === 'colourOverlay') closeColourPicker();
   if(e.target.id === 'helpOverlay') closeHelp();
 });
@@ -525,6 +528,16 @@ document.addEventListener('click', (e) => {
     <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6">A lot of SATs revision costs money — some sites charge £20 a month. That's not fair on families who can't afford it, so everything here is free, for good.</p>
     <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6">Kids learn differently. Some are autistic, some have ADHD, some are dyslexic, some are just starting out, some are ready to be pushed further — so there are four difficulty levels, no timers anywhere, gentle break reminders, and a reading colour option for anyone who finds white pages hard to read.</p>
     <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6; margin-bottom:0">None of it is a cure or a trick. It's just trying to make sure a child never looks at a page and thinks "I can't do this" before they've even started.</p>
+  </div>
+</div>
+
+<div class="overlay" id="whyFreeOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeWhyFree()">✕</button>
+    <h2 style="margin-top:0">💛 Why free, forever</h2>
+    <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6">Some SATs revision sites charge around £20 a month. That means how much practice a child gets can depend on what their family can afford, not on how much they need it — and that gap shows up in the exam hall. We didn't think that was fair, so there's no price tag here at all.</p>
+    <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6">A child who leaves primary school confident with numbers, reading and grammar carries that forward for years — it shapes secondary school, further study, and eventually the working world. Educated children become adults who can think clearly, make good decisions and contribute more, whatever path they take. That benefits all of us, not just the individual child — so it's worth investing in properly, for everyone, not just those who can pay.</p>
+    <p style="color:var(--ink-soft); font-size:.92rem; line-height:1.6; margin-bottom:0">There are no ads here, and nothing is sold — see the <a href="privacy.html">privacy notice</a> for exactly what that means. This site costs nothing to run at scale because it's just HTML and JavaScript with no backend, so there's no subscription to eventually introduce. It's free because it should be, and that isn't changing.</p>
   </div>
 </div>
 
