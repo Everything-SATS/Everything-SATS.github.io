@@ -488,10 +488,14 @@ function genWordClass(diff){
 
 /* ---------- Sentence Types (statement / question / exclamation / command) ---------- */
 const SENTENCE_BANK = {
-  statement: ["The kettle is boiling on the stove.", "Our class visited the science museum yesterday.", "Rain fell steadily throughout the afternoon.", "The old lighthouse still guides ships safely to harbour.", "Several dolphins swam alongside the boat.", "The bakery sells fresh bread every morning.", "My grandfather grows vegetables in his allotment.", "The train arrived exactly on time.", "A gentle breeze drifted through the open window.", "The museum recently added a new dinosaur exhibit.", "Autumn leaves covered the entire playground.", "The choir practises every Tuesday evening.", "Our neighbours are building a new garden shed.", "The river flows gently past the old mill.", "Scientists discovered a new species of frog."],
-  question: ["Have you finished your homework yet?", "Why does the moon change shape?", "Where did you leave your football boots?", "Could you pass me the map, please?", "What time does the train leave?", "Do you know the way to the station?", "Why did the dinosaurs become extinct?", "Has anyone seen my library book?", "Which bus goes to the town centre?", "Can we visit the zoo this weekend?", "How far is it to the nearest beach?", "Who left this jacket on the chair?", "Did you remember to feed the fish?", "What causes the tides to change?", "Would you like to join our team?"],
-  exclamation: ["What an incredible sunset that was!", "How brave those firefighters were!", "That was such an unexpected surprise!", "What a mess this kitchen is!", "What a fantastic goal that was!", "How enormous that whale is!", "What a terrifying storm that turned out to be!", "How wonderful this cake tastes!", "What a brilliant idea you've had!", "How quickly the time has gone!", "What an astonishing view this is!", "How clever that trick was!", "What a disaster this morning has been!", "How proud we all are of you!", "What a spectacular firework display that was!"],
-  command: ["Close the door quietly behind you.", "Please hand in your books by Friday.", "Take your seats and settle down.", "Remember to bring your PE kit tomorrow.", "Look both ways before you cross.", "Wash your hands before dinner.", "Please switch off the lights when you leave.", "Line up quietly outside the hall.", "Hand in your permission slips today.", "Keep off the grass near the flowerbeds.", "Turn to page twenty in your workbook.", "Please lower your voice in the library.", "Fasten your seatbelt before we set off.", "Bring an umbrella in case it rains.", "Finish your work before the bell rings."],
+  statement: ["The kettle is boiling on the stove.", "Our class visited the science museum yesterday.", "Rain fell steadily throughout the afternoon.", "The old lighthouse still guides ships safely to harbour.", "Several dolphins swam alongside the boat.", "The bakery sells fresh bread every morning.", "My grandfather grows vegetables in his allotment.", "The train arrived exactly on time.", "A gentle breeze drifted through the open window.", "The museum recently added a new dinosaur exhibit.", "Autumn leaves covered the entire playground.", "The choir practises every Tuesday evening.", "Our neighbours are building a new garden shed.", "The river flows gently past the old mill.", "Scientists discovered a new species of frog.",
+    "The library closes early on Sundays.", "A flock of geese flew over the field.", "The bridge was repaired last month.", "My sister collects postcards from every country she visits.", "The farmer harvested the wheat before the storm arrived.", "Snow settled on the hills overnight.", "The orchestra performed for nearly two hours.", "Our cat sleeps on the windowsill every afternoon.", "The bakery on the corner sells the best bread in town.", "Volunteers cleared litter from the beach at the weekend.", "The play starts at seven o'clock.", "A spider had spun a web across the doorway.", "The recipe calls for three eggs and a cup of flour.", "The postman delivers our mail just after nine.", "The tide comes in quickly along this stretch of coast.", "Our school football team won their first match of the season.", "The old clock in the hallway keeps perfect time.", "A rainbow appeared after the storm passed.", "The museum's newest exhibit features ancient Egyptian artefacts.", "The garden was full of butterflies in the warm weather.", "The bus was ten minutes late this morning.", "Several new shops have opened on the high street.", "The baker starts work before dawn every day.", "The children built an enormous sandcastle on the beach.", "The forecast predicts sunshine for the rest of the week.", "Our neighbour's dog barks whenever the doorbell rings.", "The theatre was fully booked for opening night.", "A gentle stream runs through the bottom of the valley.", "The teacher wrote the homework on the whiteboard.", "The bakery smells of fresh bread every morning.", "The mountain peak was covered in cloud all day.", "Thousands of starlings gathered above the pier at dusk.", "The library added over two hundred new books this year.", "The train was delayed because of engineering works.", "Our allotment produced more tomatoes than we could eat."],
+  question: ["Have you finished your homework yet?", "Why does the moon change shape?", "Where did you leave your football boots?", "Could you pass me the map, please?", "What time does the train leave?", "Do you know the way to the station?", "Why did the dinosaurs become extinct?", "Has anyone seen my library book?", "Which bus goes to the town centre?", "Can we visit the zoo this weekend?", "How far is it to the nearest beach?", "Who left this jacket on the chair?", "Did you remember to feed the fish?", "What causes the tides to change?", "Would you like to join our team?",
+    "Where did you put the car keys?", "Why is the sky blue?", "Have you ever been abroad?", "Could you help me carry these bags?", "What's the capital of France?", "Do you want chips or rice with that?", "Why did the meeting get cancelled?", "Has the postman been yet?", "Which one do you prefer?", "Can you hear that noise?", "How long does the flight take?", "Who's coming to the party on Saturday?", "Did you lock the back door?", "What happened to your bike?", "Would you rather walk or take the bus?", "Where does this road lead?", "Why won't the printer work?", "Have you met our new neighbours?", "Could this be the right address?", "What should we do if it rains?", "Do you remember her name?", "Why is everyone so quiet?", "Has your sister started school yet?", "Which way is the wind blowing?", "Can I borrow your umbrella?", "How much does this cost?", "Who wrote this poem?", "Did the parcel arrive today?", "What's for dinner tonight?", "Would you like a hand with that?", "Where were you at lunchtime?"],
+  exclamation: ["What an incredible sunset that was!", "How brave those firefighters were!", "That was such an unexpected surprise!", "What a mess this kitchen is!", "What a fantastic goal that was!", "How enormous that whale is!", "What a terrifying storm that turned out to be!", "How wonderful this cake tastes!", "What a brilliant idea you've had!", "How quickly the time has gone!", "What an astonishing view this is!", "How clever that trick was!", "What a disaster this morning has been!", "How proud we all are of you!", "What a spectacular firework display that was!",
+    "What a beautiful garden this is!", "How exhausted I am after that walk!", "What an enormous crowd turned up!", "How delicious this soup smells!", "What a relief that is!", "How strange that sounds!", "What a magnificent castle that was!", "How generous of you that was!", "What a shame we missed the bus!", "How lucky we are to see this!", "What a ridiculous thing to say!", "How marvellous the fireworks were!", "What a peculiar noise that was!", "How thrilling that ride was!", "What an awful smell that is!", "How impressive her painting is!", "What a wonderful surprise this is!", "How dreadful that storm sounded!", "What a triumph that performance was!", "How incredible the view is from up here!"],
+  command: ["Close the door quietly behind you.", "Please hand in your books by Friday.", "Take your seats and settle down.", "Remember to bring your PE kit tomorrow.", "Look both ways before you cross.", "Wash your hands before dinner.", "Please switch off the lights when you leave.", "Line up quietly outside the hall.", "Hand in your permission slips today.", "Keep off the grass near the flowerbeds.", "Turn to page twenty in your workbook.", "Please lower your voice in the library.", "Fasten your seatbelt before we set off.", "Bring an umbrella in case it rains.", "Finish your work before the bell rings.",
+    "Tidy your desk before you leave.", "Please walk, don't run, in the corridor.", "Sharpen your pencil before the lesson starts.", "Put your hand up if you have a question.", "Take off your shoes at the door.", "Feed the cat before you go to school.", "Please recycle the paper in the blue bin.", "Sit with your partner for this activity.", "Bring your reading book every day.", "Switch your phone to silent during the film.", "Water the plants twice a week.", "Read the instructions carefully before you start.", "Stay behind the white line, please.", "Hang your coat on the peg.", "Keep your voice down in the museum.", "Return your library book by next Monday.", "Wear your helmet when you ride your bike.", "Check your work before you hand it in.", "Please queue quietly at the counter.", "Save your work before you close the laptop.", "Wipe your feet before you come inside.", "Pack your bag the night before.", "Hold the handrail on the stairs.", "Set the table before dinner is ready.", "Wait for the green light before crossing."],
 };
 const SENTENCE_TIP = {
   statement: "Statements tell you something and end with a full stop.",
@@ -762,6 +766,28 @@ const SYN_ANT_BANK = [
   ["polite","courteous","rude"],
   ["wealthy","rich","poor"],
   ["narrow","slim","wide"],
+  ["strong","powerful","weak"],
+  ["bright","brilliant","dim"],
+  ["loud","noisy","quiet"],
+  ["fast","speedy","sluggish"],
+  ["clean","spotless","filthy"],
+  ["fresh","new","stale"],
+  ["strange","odd","ordinary"],
+  ["fierce","ferocious","gentle"],
+  ["tiny","minuscule","gigantic"],
+  ["cheerful","jolly","gloomy"],
+  ["clever","intelligent","foolish"],
+  ["cruel","harsh","kind"],
+  ["dull","boring","exciting"],
+  ["eager","keen","reluctant"],
+  ["fair","just","unfair"],
+  ["fragile","delicate","sturdy"],
+  ["gentle","tender","rough"],
+  ["honest","truthful","dishonest"],
+  ["mighty","powerful","feeble"],
+  ["nervous","anxious","relaxed"],
+  ["obedient","compliant","rebellious"],
+  ["silent","hushed","noisy"],
 ];
 const STANDARD_ENGLISH_BANK = [
   { s:"We was late for the bus.", wrong:"was", correct:"were" },
@@ -778,24 +804,45 @@ const STANDARD_ENGLISH_BANK = [
   { s:"He should of asked first.", wrong:"of", correct:"have" },
   { s:"There is many reasons to celebrate.", wrong:"is", correct:"are" },
   { s:"Them shoes are mine.", wrong:"Them", correct:"Those" },
+  { s:"She don't know the answer.", wrong:"don't", correct:"doesn't" },
+  { s:"He runs quicker than what I do.", wrong:"than what I do", correct:"than I do" },
+  { s:"I could of helped if you'd asked.", wrong:"could of", correct:"could have" },
+  { s:"That's the bestest present ever.", wrong:"bestest", correct:"best" },
+  { s:"She sings beautiful.", wrong:"beautiful", correct:"beautifully" },
+  { s:"He plays football good.", wrong:"good", correct:"well" },
+  { s:"They was late again.", wrong:"was", correct:"were" },
+  { s:"We seen the film last week.", wrong:"seen", correct:"saw" },
+  { s:"I have wrote a letter to my cousin.", wrong:"wrote", correct:"written" },
+  { s:"This is more better than the last one.", wrong:"more better", correct:"better" },
+  { s:"He is the most tallest boy in the class.", wrong:"most tallest", correct:"tallest" },
+  { s:"I never done my chores this morning.", wrong:"done", correct:"did" },
+  { s:"She has less friends than she used to.", wrong:"less", correct:"fewer" },
+  { s:"We was hoping to win the match.", wrong:"was", correct:"were" },
+  { s:"He don't want no dinner.", wrong:"don't want no", correct:"doesn't want any" },
+  { s:"That book is more interesting than what this one is.", wrong:"than what this one is", correct:"than this one" },
 ];
-const VOICE_BANK = [
-  { active:"The dog chased the cat.", passive:"The cat was chased by the dog." },
-  { active:"The wind knocked down the fence.", passive:"The fence was knocked down by the wind." },
-  { active:"A famous artist painted this mural.", passive:"This mural was painted by a famous artist." },
-  { active:"The council will repair the bridge.", passive:"The bridge will be repaired by the council." },
-  { active:"The chef prepared a delicious meal.", passive:"A delicious meal was prepared by the chef." },
-  { active:"Lightning struck the old oak tree.", passive:"The old oak tree was struck by lightning." },
-  { active:"The librarian organised the bookshelves.", passive:"The bookshelves were organised by the librarian." },
-  { active:"A huge wave capsized the small boat.", passive:"The small boat was capsized by a huge wave." },
-  { active:"The gardener planted hundreds of tulips.", passive:"Hundreds of tulips were planted by the gardener." },
-  { active:"The company will launch the new product next month.", passive:"The new product will be launched by the company next month." },
-  { active:"Thousands of fans cheered the winning team.", passive:"The winning team was cheered by thousands of fans." },
-  { active:"The architect designed the new library.", passive:"The new library was designed by the architect." },
-  { active:"Volunteers cleaned the entire beach.", passive:"The entire beach was cleaned by volunteers." },
-  { active:"The teacher praised the whole class.", passive:"The whole class was praised by the teacher." },
-  { active:"A sudden storm delayed the flight.", passive:"The flight was delayed by a sudden storm." },
-];
+/* Voice is fully combinatorial and mechanically correct: passive-voice
+   transformation is a deterministic grammar rule (subject and object swap,
+   "was/were [verb] by" is inserted), not something that needs semantic
+   matching, so any subject+verb+object combination transforms correctly. */
+const VOICE_SUBJECTS = ["The dog","The wind","A famous artist","The chef","Lightning","The librarian","A huge wave","The gardener","A sudden storm","The architect","Volunteers","The teacher","A talented photographer","The council","An experienced pilot","The scientist","A local charity","The builder","An enthusiastic crowd","The postman"];
+const VOICE_VERBS = ["chased","knocked down","painted","prepared","struck","organised","capsized","planted","designed","cleaned","delayed","repaired","cheered","praised","launched","damaged","rescued","discovered","protected","inspected"];
+/* Deliberately all singular ("the cat", not "the cats") -- passive voice
+   needs "was" vs "were" to agree with whichever noun becomes the new
+   subject, and keeping every object singular sidesteps that agreement
+   entirely rather than risking it. */
+const VOICE_OBJECTS = ["the cat","the fence","this mural","a delicious meal","the old oak tree","the bookshelf","the small boat","the flower bed","the new library","the entire street","the whole class","a rare butterfly","the ancient statue","the flooded field","the injured bird","the missing treasure","the wildlife reserve","the historic bridge","the local team","the abandoned house"];
+function capFirst(w){ return w.charAt(0).toUpperCase() + w.slice(1); }
+function lowerFirst(w){ return w.charAt(0).toLowerCase() + w.slice(1); }
+function genVoicePair(){
+  const subject = bagChoice('voice-subj', VOICE_SUBJECTS);
+  const verb = bagChoice('voice-verb', VOICE_VERBS);
+  const object = bagChoice('voice-obj', VOICE_OBJECTS);
+  return {
+    active: `${subject} ${verb} ${object}.`,
+    passive: `${capFirst(object)} was ${verb} by ${lowerFirst(subject)}.`,
+  };
+}
 function genStandardEnglish(diff){
   if(diff === 0 || diff === 1){
     const [word, syn, ant] = bagChoice('synant', SYN_ANT_BANK);
@@ -820,7 +867,7 @@ function genStandardEnglish(diff){
       steps: [ `In Standard English, "${item.wrong}" should be "${item.correct}" here.`, `Correct sentence: "${item.s.replace(item.wrong, item.correct)}"` ],
     };
   }
-  const item = bagChoice('voice', VOICE_BANK);
+  const item = genVoicePair();
   const showActive = Math.random() < 0.5;
   if(showActive){
     return {
