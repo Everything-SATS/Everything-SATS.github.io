@@ -81,11 +81,15 @@
   .tile.external{border-color:var(--line)}
   .tile.external .external-badge{background:var(--gold-light,#FCF1DD); color:#B8860B}
   .section-note{font-size:.84rem; color:var(--ink-soft); margin:-8px 0 14px}
-  .curiosity-card{
-    background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow);
-    padding:26px; text-align:center;
+  .curiosity-banner{
+    max-width:960px; margin:14px auto 0; padding:12px 20px; background:var(--bg-alt);
+    border-radius:var(--radius); box-shadow:var(--shadow); display:flex; align-items:center;
+    gap:14px; flex-wrap:wrap;
   }
-  .curiosity-fact{font-size:1.1rem; font-weight:600; line-height:1.5; margin-bottom:18px; min-height:2.2em}
+  .cb-label{font-weight:800; font-size:.85rem; white-space:nowrap; color:var(--ink)}
+  .curiosity-fact{font-size:.9rem; font-weight:600; flex:1; min-width:200px}
+  .cb-source{font-size:.72rem; color:var(--ink-soft); white-space:nowrap; text-decoration:underline}
+  .cb-source:empty{display:none}
   .stat-banner{
     background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%);
     color:#fff; text-align:center; padding:28px 16px; margin-top:10px;
@@ -163,8 +167,25 @@
       <div class="ht-title">Got a question?</div>
       <div class="ht-sub">Email us — we read everything, from parents, teachers and kids alike.</div>
     </a>
+    <a class="header-tile clickable" href="https://www.young-enterprise.org.uk/what-we-do/resources" target="_blank" rel="noopener">
+      <div class="ht-icon">💰</div>
+      <div class="ht-title">Money Basics</div>
+      <div class="ht-sub">Free real-world money skills for school-age kids, from the UK charity Young Enterprise.</div>
+    </a>
+    <a class="header-tile clickable" href="https://www.childline.org.uk/" target="_blank" rel="noopener">
+      <div class="ht-icon">💚</div>
+      <div class="ht-title">Feeling stressed?</div>
+      <div class="ht-sub">Free, confidential support from Childline, any time, about anything.</div>
+    </a>
   </div>
 </header>
+
+<div class="curiosity-banner">
+  <span class="cb-label">🎲 Curiosity Corner</span>
+  <span class="curiosity-fact" id="curiosityFact">Tap for a random fact!</span>
+  <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
+  <button class="btn btn-primary btn-small" onclick="showRandomFact()">Give me a fact</button>
+</div>
 
 <main>
   <section>
@@ -297,15 +318,6 @@
   </section>
 
   <section>
-    <div class="section-title">Curiosity Corner</div>
-    <p class="section-note">One random fact, on demand — no reason needed.</p>
-    <div class="curiosity-card">
-      <div class="curiosity-fact" id="curiosityFact">Tap the button for a random fact!</div>
-      <button class="btn btn-primary" onclick="showRandomFact()">🎲 Give me a fact</button>
-    </div>
-  </section>
-
-  <section>
     <div class="section-title">Feeling stressed about exams?</div>
     <p class="section-note">That's really common, and it's okay to ask for help. These are real, free, confidential services — not exam practice, just people to talk to.</p>
     <div class="tiles-grid">
@@ -356,52 +368,57 @@
     .then(data => { document.getElementById('visitCount').textContent = data.count; })
     .catch(() => { document.querySelector('.stat-banner').style.display = 'none'; });
 
-/* ---------- Reading background colour (site-wide, shared preference) ---------- */
-/* ---------- Curiosity Corner: a random fun fact, no login needed ---------- */
+/* ---------- Curiosity Corner: a random fun fact, each checked against a
+   real named source (fixed 2026-07-16 -- the original list was written
+   from general knowledge with nothing to link to; several were also
+   corrected or dropped here after checking, e.g. "60% DNA shared with
+   bananas" and "koala fingerprints fool detectives" are popular but
+   debunked/misleading claims, so they're excluded rather than repeated). ---------- */
 const FUN_FACTS = [
-  "A bolt of lightning is hotter than the surface of the Sun.",
-  "Honey never goes off — archaeologists have found pots of edible honey in ancient Egyptian tombs.",
-  "Octopuses have three hearts and blue blood.",
-  "A single fluffy cloud can weigh more than a million kilograms.",
-  "Sharks have been around longer than trees — sharks appeared over 400 million years ago, trees around 350 million years ago.",
-  "Your body has enough iron in it to make a small nail.",
-  "A group of flamingos is called a 'flamboyance'.",
-  "You can't actually see the Great Wall of China from space with the naked eye — that's a myth.",
-  "Bananas are naturally very slightly radioactive, because of the potassium inside them — completely harmless to eat.",
-  "A day on Venus is longer than a year on Venus.",
-  "Wombat poo comes out cube-shaped.",
-  "Some turtles can breathe through their bottoms.",
-  "The tallest mountain in the whole solar system, Olympus Mons, is on Mars — almost three times taller than Mount Everest.",
-  "There are more possible ways to shuffle a deck of cards than there are atoms on Earth.",
-  "A group of crows is called a 'murder'.",
-  "Butterflies taste with their feet.",
-  "The Eiffel Tower actually grows a little taller in summer, as the metal expands in the heat.",
-  "Some species of jellyfish are biologically immortal.",
-  "An ostrich's eye is bigger than its brain.",
-  "Giant sequoia trees can live for over 3,000 years.",
-  "Venus is the hottest planet in our solar system, even though Mercury is closer to the Sun.",
-  "Humans share roughly 60% of their DNA with bananas.",
-  "One of the shortest wars in recorded history lasted well under an hour, between Britain and Zanzibar in 1896.",
-  "Starfish don't have a brain or blood.",
-  "A single strand of spider silk is stronger, weight for weight, than steel.",
-  "The Antarctic ice sheet holds around 70% of all the fresh water on Earth.",
-  "Koalas have fingerprints so similar to humans' that they've occasionally confused crime scene investigators.",
-  "Scientists believe it may 'rain' diamonds deep inside Neptune and Uranus.",
-  "The human nose can remember around 50,000 different smells.",
-  "Sea otters hold hands while they sleep, so they don't drift apart.",
-  "The world's oldest known living tree is thought to be over 4,800 years old.",
-  "Mount Everest grows about 4mm taller every year.",
-  "A blue whale's heart is roughly the size of a small car.",
-  "Some parts of the Sahara Desert have never once recorded rainfall.",
-  "Cows can form close friendships with other cows, and get stressed when separated from them.",
-  "Hot water can, in certain conditions, freeze faster than cold water — this odd effect is called the Mpemba effect.",
+  { text:"A single bolt of lightning can heat the air around it to roughly five times the temperature of the Sun's surface.", source:"US National Weather Service", url:"https://www.weather.gov/safety/lightning-temperature" },
+  { text:"Octopuses have three hearts and blue blood.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/octopuses-keep-surprising-us-here-are-eight-examples-how.html" },
+  { text:"Honey never spoils — archaeologists have found 3,000-year-old pots of honey in Egyptian tombs that are still edible.", source:"Smithsonian Magazine", url:"https://www.smithsonianmag.com/science-nature/the-science-behind-honeys-eternal-shelf-life-1218690/" },
+  { text:"A group of flamingos is called a 'flamboyance'.", source:"Dictionary.com", url:"https://www.dictionary.com/e/s/flamboyance-flamingos-brilliant-bird-groups/" },
+  { text:"Wombat poo comes out cube-shaped, thanks to their unusual intestines.", source:"Smithsonian Magazine", url:"https://www.smithsonianmag.com/smart-news/scientists-have-solved-mystery-how-wombats-poop-cubes-180976898/" },
+  { text:"A few species of freshwater turtle can breathe through their bottoms while hibernating underwater.", source:"PBS News", url:"https://www.pbs.org/newshour/science/the-secret-to-turtle-hibernation-butt-breathing" },
+  { text:"An ostrich's eye is bigger than its brain.", source:"Smithsonian's National Zoo", url:"https://nationalzoo.si.edu/animals/ostrich" },
+  { text:"There are more possible ways to shuffle a deck of cards than there are atoms on Earth.", source:"McGill Office for Science and Society", url:"https://www.mcgill.ca/oss/article/did-you-know-infographics/there-are-more-ways-arrange-deck-cards-there-are-atoms-earth" },
+  { text:"Butterflies taste things using sensors on their feet.", source:"National Geographic", url:"https://www.nationalgeographic.com/animals/article/insects-butterflies-anatomy-senses-animals" },
+  { text:"The Eiffel Tower grows a few millimetres taller in summer, as the heat makes its metal expand.", source:"Official Eiffel Tower site", url:"https://www.toureiffel.paris/en/news/history-and-culture/why-does-eiffel-tower-change-size" },
+  { text:"One species of jellyfish can reverse its own ageing process, making it biologically immortal.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/immortal-jellyfish-secret-to-cheating-death.html" },
+  { text:"Olympus Mons on Mars is around two and a half times taller than Mount Everest — one of the tallest mountains in the whole solar system.", source:"Britannica", url:"https://www.britannica.com/place/Olympus-Mons" },
+  { text:"You can't actually see the Great Wall of China from space with the naked eye — that's a myth.", source:"NASA", url:"https://www.nasa.gov/image-article/great-wall/" },
+  { text:"Bananas are naturally very slightly radioactive, because of the potassium inside them — completely harmless to eat.", source:"US Department of Energy", url:"https://www.energy.gov/ne/articles/5-radioactive-products-we-use-every-day" },
+  { text:"A day on Venus (one full spin) actually lasts longer than a year on Venus (one full orbit of the Sun).", source:"NASA", url:"https://science.nasa.gov/venus/venus-facts/" },
+  { text:"Venus is the hottest planet in the solar system, even though Mercury is closer to the Sun.", source:"NASA", url:"https://science.nasa.gov/venus/venus-facts/" },
+  { text:"Giant sequoia trees can live for more than 3,000 years.", source:"US National Park Service", url:"https://www.nps.gov/seki/learn/nature/bigtrees.htm" },
+  { text:"One of the shortest wars in recorded history, between Britain and Zanzibar in 1896, lasted only about 38 minutes.", source:"History Hit", url:"https://www.historyhit.com/the-anglo-zanzibar-war-the-shortest-war-in-history-which-lasted-38-minutes/" },
+  { text:"Starfish have no brain and no blood — they use seawater instead.", source:"Smithsonian Ocean", url:"https://ocean.si.edu/ocean-life/invertebrates/sea-stars-urchins-and-relatives" },
+  { text:"Weight for weight, spider silk is around five times stronger than steel.", source:"BBC Discover Wildlife", url:"https://www.discoverwildlife.com/animal-facts/insects-invertebrates/how-strong-is-spider-silk" },
+  { text:"Antarctica's ice sheet holds a huge share of all the fresh water on Earth — commonly estimated at around 70%.", source:"British Antarctic Survey", url:"https://www.bas.ac.uk/about/antarctica/geography/ice/" },
+  { text:"Koalas have fingerprints that look remarkably similar to human fingerprints.", source:"PBS NOVA", url:"https://www.pbs.org/wgbh/nova/article/koala-fingerprints/" },
+  { text:"Scientists have recreated 'diamond rain' in the lab — the conditions thought to exist deep inside Neptune and Uranus.", source:"Lawrence Livermore National Laboratory", url:"https://www.llnl.gov/article/43621/scientists-create-diamond-rain-forms-interior-icy-giant-planets-neptune" },
+  { text:"The human nose can detect over a trillion different odours.", source:"Scientific American", url:"https://www.scientificamerican.com/article/human-nose-can-detect-1-trillion-odors/" },
+  { text:"Sea otter mothers hold paws with their pups while sleeping, so they don't drift apart.", source:"Seattle Aquarium", url:"https://www.seattleaquarium.org/animal/sea-otter/" },
+  { text:"The world's oldest known living tree, a bristlecone pine called Methuselah, is about 4,800 years old.", source:"US Department of Agriculture", url:"https://www.usda.gov/about-usda/news/blog/methuselah-bristlecone-pine-thought-be-oldest-living-organism-earth" },
+  { text:"Mount Everest grows about 4mm taller every year.", source:"Smithsonian Magazine", url:"https://www.smithsonianmag.com/smart-news/geologists-reveal-a-surprising-reason-why-mount-everest-grows-taller-each-year-180985175/" },
+  { text:"A blue whale's heart weighs about as much as a small studio piano — roughly 180kg.", source:"NOAA Fisheries", url:"https://www.fisheries.noaa.gov/feature-story/big-hearted-blue-whale" },
+  { text:"Some parts of the Sahara Desert can go years without a single drop of rain.", source:"National Geographic Education", url:"https://education.nationalgeographic.org/resource/desert/" },
+  { text:"Cows form close friendships with particular other cows, and get stressed when separated from them.", source:"The Humane League", url:"https://thehumaneleague.org/article/do-cows-have-best-friends" },
+  { text:"A group of crows is called a 'murder'.", source:"Ornitheology", url:"https://www.ornitheology.com/post/murder-of-crows-collective-bird-names" },
+  { text:"An average fluffy cumulus cloud weighs around 500,000 kilograms.", source:"US Geological Survey", url:"https://www.usgs.gov/water-science-school/science/how-much-does-a-cloud-weigh" },
+  { text:"Sharks have been around for roughly 400 million years — tens of millions of years before the first trees appeared.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/shark-evolution-a-450-million-year-timeline.html" },
 ];
 let lastFactIndex = -1;
 function showRandomFact(){
   let i;
   do { i = Math.floor(Math.random() * FUN_FACTS.length); } while(i === lastFactIndex && FUN_FACTS.length > 1);
   lastFactIndex = i;
-  document.getElementById('curiosityFact').textContent = FUN_FACTS[i];
+  const fact = FUN_FACTS[i];
+  document.getElementById('curiosityFact').textContent = fact.text;
+  const sourceEl = document.getElementById('curiositySource');
+  sourceEl.textContent = `Expand on this — ${fact.source}`;
+  sourceEl.href = fact.url;
 }
 
 function loadReadingBg(){ return localStorage.getItem('sats_reading_bg') || 'white'; }
