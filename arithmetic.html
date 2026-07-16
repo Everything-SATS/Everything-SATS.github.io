@@ -301,6 +301,7 @@
       <div class="feedback-title" id="feedbackTitle"></div>
       <div id="feedbackBody"></div>
     </div>
+    <button class="btn btn-ghost btn-small" style="width:100%; margin-bottom:10px" onclick="openFrustrationHelp()">😅 Struggling or frustrated? Let's do something different for a moment</button>
     <div class="modal-actions">
       <button class="btn btn-ghost btn-small" onclick="closeModal()">Stop here</button>
       <button class="btn btn-secondary" id="nextBtn" style="display:none" onclick="nextQuestion()">Next question →</button>
@@ -1135,6 +1136,31 @@ function awardStar(){
   if(el) el.textContent = sessionStars;
 }
 
+const QUICK_FACTS = [
+  "A bolt of lightning is hotter than the surface of the Sun.",
+  "Octopuses have three hearts and blue blood.",
+  "Honey never goes off — archaeologists have found edible honey in ancient Egyptian tombs.",
+  "A group of flamingos is called a flamboyance.",
+  "Wombat poo comes out cube-shaped.",
+  "Some turtles can breathe through their bottoms.",
+  "An ostrich's eye is bigger than its brain.",
+  "There are more ways to shuffle a deck of cards than there are atoms on Earth.",
+  "Butterflies taste with their feet.",
+  "A day on Venus is longer than a year on Venus.",
+  "Sea otters hold hands while they sleep so they do not drift apart.",
+  "Mount Everest grows about 4mm taller every year.",
+  "A blue whale's heart is roughly the size of a small car.",
+  "Koalas have fingerprints so similar to humans that they have occasionally confused crime scene investigators.",
+  "The tallest mountain in the solar system, Olympus Mons, is on Mars.",
+];
+function openFrustrationHelp(){
+  document.getElementById('frustrationFact').textContent = choice(QUICK_FACTS);
+  document.getElementById('frustrationOverlay').classList.add('show');
+}
+function closeFrustrationHelp(){
+  document.getElementById('frustrationOverlay').classList.remove('show');
+}
+
 startWellbeingTimer();
 
 
@@ -1156,6 +1182,7 @@ function openColourPicker(){ document.getElementById('colourOverlay').classList.
 function closeColourPicker(){ document.getElementById('colourOverlay').classList.remove('show'); }
 document.addEventListener('click', (e) => {
   if(e.target.id === 'colourOverlay') closeColourPicker();
+  if(e.target.id === 'frustrationOverlay') closeFrustrationHelp();
 });
 applyReadingBg();
 
@@ -1171,6 +1198,19 @@ applyReadingBg();
   </div>
 </div>
 <div class="break-timer-badge" id="breakTimerBadge">⏳ <span id="breakTimeLeft">5:00</span> — enjoy your break</div>
+
+<div class="overlay" id="frustrationOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeFrustrationHelp()">✕</button>
+    <h2 style="margin-top:0">😅 That's completely okay</h2>
+    <p style="color:var(--ink-soft)">Everyone finds some questions tricky. Here is something totally different to look at for a moment.</p>
+    <div style="background:var(--bg); border-radius:14px; padding:18px; font-weight:600; text-align:center; margin:14px 0" id="frustrationFact"></div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap">
+      <button class="btn btn-primary" style="flex:1" onclick="closeFrustrationHelp()">🙂 Back to my question</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeFrustrationHelp(); showBreakReminder();">☕ Take a proper break instead</button>
+    </div>
+  </div>
+</div>
 
 
 <div class="overlay" id="colourOverlay">
