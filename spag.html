@@ -574,85 +574,93 @@ function genApostrophes(diff){
   };
 }
 
-/* ---------- Punctuation marks (commas, direct speech, semicolon/colon) ---------- */
-const PUNCT_BANK = {
-  0: [
-    { s:"For breakfast I had toast{{b}}cereal and orange juice.", mark:",", why:"Commas separate items in a list." },
-    { s:"We packed towels{{b}}sun cream and hats for the beach.", mark:",", why:"Commas separate items in a list." },
-    { s:"The shop sells pens{{b}}pencils and rulers.", mark:",", why:"Commas separate items in a list." },
-    { s:"Grandad grows carrots{{b}}potatoes and onions in his garden.", mark:",", why:"Commas separate items in a list." },
-    { s:"She bought apples{{b}}bananas and grapes.", mark:",", why:"Commas separate items in a list." },
-    { s:"The zoo has lions{{b}}tigers and bears.", mark:",", why:"Commas separate items in a list." },
-    { s:"He packed a torch{{b}}a map and some snacks.", mark:",", why:"Commas separate items in a list." },
-    { s:"We saw horses{{b}}cows and sheep in the field.", mark:",", why:"Commas separate items in a list." },
-    { s:"The recipe needs flour{{b}}sugar and butter.", mark:",", why:"Commas separate items in a list." },
-    { s:"My bag has a book{{b}}a pencil case and a water bottle.", mark:",", why:"Commas separate items in a list." },
-    { s:"The garden grows roses{{b}}tulips and daffodils.", mark:",", why:"Commas separate items in a list." },
-    { s:"She collects stamps{{b}}coins and postcards.", mark:",", why:"Commas separate items in a list." },
-    { s:"The team needs a goalkeeper{{b}}defenders and strikers.", mark:",", why:"Commas separate items in a list." },
-    { s:"We visited London{{b}}Paris and Rome on our trip.", mark:",", why:"Commas separate items in a list." },
-    { s:"The box contained crayons{{b}}paints and brushes.", mark:",", why:"Commas separate items in a list." },
-  ],
-  1: [
-    { s:'The teacher said{{b}} "Please sit down."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'Mia shouted{{b}} "Look out!"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The captain announced{{b}} "We are ready to sail."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'Dad whispered{{b}} "Don\'t wake the baby."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The coach called out{{b}} "Well played, everyone!"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'She asked{{b}} "What time is it?"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The guide explained{{b}} "This castle is 800 years old."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'He muttered{{b}} "This isn\'t going to work."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The referee shouted{{b}} "Foul!"', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'Grandma said{{b}} "Dinner is ready."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The pilot announced{{b}} "We are beginning our descent."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'He warned{{b}} "Watch your step."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The presenter began{{b}} "Welcome to the show."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The vet explained{{b}} "Your dog just needs some rest."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-    { s:'The scientist announced{{b}} "We\'ve made an incredible discovery."', mark:",", why:"A comma goes after the reporting clause, before the spoken words begin." },
-  ],
-  2: [
-    { s:"Later that day{{b}} I heard the surprising news.", mark:",", why:"A comma goes after a fronted adverbial (a phrase moved to the front of the sentence)." },
-    { s:"After the long journey{{b}} the tired explorers reached camp.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Without a map{{b}} the hikers quickly became lost.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Eventually{{b}} the storm passed and the sun came out.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Suddenly{{b}} the lights went out.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Before the match started{{b}} the players warmed up.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"In the distance{{b}} thunder rumbled ominously.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Despite the rain{{b}} the fete went ahead as planned.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"After a moment's hesitation{{b}} she knocked on the door.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Meanwhile{{b}} back at the camp, the fire was dying out.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Within minutes{{b}} the whole street had lost power.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Against all odds{{b}} the team fought back to win.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Early the next morning{{b}} we set off for the coast.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"Without warning{{b}} the ground began to shake.", mark:",", why:"A comma goes after a fronted adverbial." },
-    { s:"By the end of the day{{b}} everyone was exhausted.", mark:",", why:"A comma goes after a fronted adverbial." },
-  ],
-  3: [
-    { s:"It's raining{{b}} I'm fed up.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
-    { s:"She had one goal{{b}} to win the race.", mark:":", why:"A colon introduces an explanation or elaboration of what came before it." },
-    { s:"You will need the following items{{b}} a torch, a map and some water.", mark:":", why:"A colon introduces a list." },
-    { s:"The forecast was clear{{b}} sunshine all afternoon.", mark:":", why:"A colon introduces an explanation of what came before it." },
-    { s:"The exam was difficult{{b}} nobody finished on time.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
-    { s:"He had only one wish{{b}} to see his family again.", mark:":", why:"A colon introduces an explanation or elaboration of what came before it." },
-    { s:"Pack these essentials{{b}} wellies, a raincoat and a torch.", mark:":", why:"A colon introduces a list." },
-    { s:"The results were clear{{b}} our team had won.", mark:":", why:"A colon introduces an explanation of what came before it." },
-    { s:"I was exhausted{{b}} I had barely slept all week.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
-    { s:"There was only one explanation{{b}} someone had left the gate open.", mark:":", why:"A colon introduces an explanation of what came before it." },
-    { s:"The weather turned quickly{{b}} dark clouds rolled in within minutes.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
-    { s:"Bring the right kit{{b}} boots, gloves and a warm coat.", mark:":", why:"A colon introduces a list." },
-    { s:"The verdict was final{{b}} the match would be replayed.", mark:":", why:"A colon introduces an explanation of what came before it." },
-    { s:"She had made her decision{{b}} she was staying.", mark:";", why:"A semicolon can join two independent clauses that are closely related, instead of starting a new sentence." },
-    { s:"The instructions were simple{{b}} follow the path and turn left.", mark:":", why:"A colon introduces an explanation of what came before it." },
-  ],
-};
+/* ---------- Punctuation marks (commas, direct speech, semicolon/colon) ----------
+   Tiers 0-2 are combinatorial: a real sentence frame crossed with a bank of
+   context-matched items/clauses, so every combination stays sensible (a zoo
+   only ever gets animals, a shop only ever gets stationery, etc). Tier 3's
+   semicolon/colon-explanation questions need two clauses that are actually
+   related in meaning, which isn't something you can safely mix-and-match --
+   those stay as a larger curated list; the colon-list part is combinatorial. */
+function sample3(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){ const j = randInt(0,i); [a[i],a[j]] = [a[j],a[i]]; }
+  return [a[0], a[1], a[2]];
+}
+const PUNCT_T0_FLAVOURS = [
+  { frame:(i) => `For breakfast ${bagChoice('p0-name', PUNCT_NAMES)} had ${i[0]}{{b}}${i[1]} and ${i[2]}.`, items:["toast","cereal","orange juice","scrambled eggs","porridge","yoghurt","pancakes","a banana","boiled eggs","jam on toast","fruit salad","waffles","hot chocolate","apple juice","cornflakes","a croissant"] },
+  { frame:(i) => `The shop sells ${i[0]}{{b}}${i[1]} and ${i[2]}.`, items:["pens","pencils","rulers","notebooks","erasers","felt tips","glue sticks","scissors","staplers","paperclips","folders","highlighters","rubbers","calculators","sharpeners","crayons"] },
+  { frame:(i) => `The zoo has ${i[0]}{{b}}${i[1]} and ${i[2]}.`, items:["lions","tigers","bears","elephants","giraffes","zebras","monkeys","penguins","wolves","foxes","otters","seals","flamingos","camels","kangaroos","meerkats","gorillas","crocodiles"] },
+  { frame:(i) => `The garden grows ${i[0]}{{b}}${i[1]} and ${i[2]}.`, items:["roses","tulips","daffodils","sunflowers","daisies","lilies","poppies","bluebells","carnations","orchids","peonies","marigolds","pansies","lavender","foxgloves"] },
+  { frame:(i) => `${bagChoice('p0-name2', PUNCT_NAMES)}'s bag has ${i[0]}{{b}}${i[1]} and ${i[2]}.`, items:["a book","a pencil case","a water bottle","a lunchbox","a calculator","a diary","headphones","a jumper","a ruler","an umbrella","a notebook","a rubber","a phone","a sandwich box"] },
+];
+const PUNCT_NAMES = ["Sam","Ellie","Leo","Aisha","Oliver","Sophie","Jamal","Priya","Noah","Grandad"];
+const PUNCT_SPEAKERS = ["The teacher","Mia","The captain","Dad","The coach","She","The guide","He","The referee","Grandma","The pilot","The presenter","The vet","The scientist","Mum"];
+const PUNCT_REPORT_VERBS = ["said","shouted","announced","whispered","called out","asked","explained","muttered","warned","began"];
+const PUNCT_QUOTES = ["Please sit down.","Look out!","We are ready to sail.","Don't wake the baby.","Well played, everyone!","What time is it?","This castle is 800 years old.","This isn't going to work.","Foul!","Dinner is ready.","We are beginning our descent.","Watch your step.","Welcome to the show.","Your dog just needs some rest.","We've made an incredible discovery.","Stand back, please.","It's time to go.","Hold on tight!","Follow me.","Well done, team!"];
+const PUNCT_ADVERBIALS = ["Later that day","After the long journey","Without a map","Eventually","Suddenly","Before the match started","In the distance","Despite the rain","After a moment's hesitation","Meanwhile","Within minutes","Against all odds","Early the next morning","Without warning","By the end of the day","After a while","Before long","In the end","Just then","All of a sudden"];
+const PUNCT_MAIN_CLAUSES = ["I heard the surprising news","the tired explorers reached camp","the hikers quickly became lost","the storm passed and the sun came out","the lights went out","the players warmed up","thunder rumbled ominously","the fete went ahead as planned","she knocked on the door","the fire was dying out back at the camp","the whole street had lost power","the team fought back to win","we set off for the coast","the ground began to shake","everyone was exhausted","the rain finally stopped","the truth came out","we found the answer","the alarm went off","the crowd cheered"];
+const PUNCT_KIT_SETUPS = ["Pack these essentials","Bring the right kit","You will need the following items","Remember to bring","The bag should contain","Take these things","Don't forget to pack","The kit list includes","You must bring","Make sure you have"];
+const PUNCT_KIT_ITEMS = ["wellies","a raincoat","a torch","a compass","a whistle","a map","spare batteries","a first aid kit","sun cream","a water bottle","walking boots","a waterproof jacket","gloves","a hat","snacks"];
+const PUNCT_COLON_PAIRS = [
+  ["She had one goal","to win the race"], ["The forecast was clear","sunshine all afternoon"], ["He had only one wish","to see his family again"],
+  ["The results were clear","our team had won"], ["There was only one explanation","someone had left the gate open"], ["The verdict was final","the match would be replayed"],
+  ["The instructions were simple","follow the path and turn left"], ["She had made her decision","she was staying"], ["The message was short","meet me at noon"],
+  ["The rule was strict","no phones in class"], ["His plan was simple","save enough for a new bike"], ["The warning was clear","stay away from the cliff edge"],
+  ["The choice was obvious","take the safer route"], ["Her excuse was the same as always","she had forgotten the time"], ["The prize was better than anyone expected","a trip to the science museum"],
+  ["The recipe had one secret ingredient","a pinch of cinnamon"], ["The coach had one rule","always warm up first"], ["The letter contained good news","she had won the competition"],
+  ["The map revealed something odd","a second path nobody had noticed"], ["His reason was simple","he wanted to help"],
+];
+const PUNCT_SEMICOLON_PAIRS = [
+  ["It's raining","I'm fed up"], ["The exam was difficult","nobody finished on time"], ["I was exhausted","I had barely slept all week"],
+  ["The weather turned quickly","dark clouds rolled in within minutes"], ["The match was cancelled","the pitch was flooded"], ["She trained every day","her hard work paid off"],
+  ["The shop had closed early","we had to go home empty-handed"], ["He knew the answer","he stayed quiet anyway"], ["The queue was long","nobody seemed to mind"],
+  ["The bridge was closed","traffic backed up for miles"], ["The cake looked perfect","it tasted even better"], ["The power went out","the whole street fell silent"],
+  ["We arrived early","the doors were still locked"], ["The dog barked loudly","nobody came to the door"], ["The film was long","it never felt boring"],
+  ["The path was steep","the view from the top was worth it"], ["She practised for months","the performance was flawless"], ["The room was silent","everyone was holding their breath"],
+  ["The tide came in fast","the footprints disappeared within minutes"], ["He forgot his lines","the audience never noticed"],
+];
+
 function genPunctuation(diff){
-  const item = bagChoice('punct-' + diff, PUNCT_BANK[diff]);
   const collapse = s => s.replace(/ {2,}/g, ' ');
-  const displaySentence = collapse(item.s.replace('{{b}}', ' ___ '));
+  let s, mark, why;
+  if(diff === 0){
+    const flavour = choice(PUNCT_T0_FLAVOURS);
+    const items = sample3(flavour.items);
+    s = flavour.frame(items);
+    mark = ','; why = "Commas separate items in a list.";
+  } else if(diff === 1){
+    const speaker = bagChoice('p1-speaker', PUNCT_SPEAKERS);
+    const verb = bagChoice('p1-verb', PUNCT_REPORT_VERBS);
+    const quote = bagChoice('p1-quote', PUNCT_QUOTES);
+    s = `${speaker} ${verb}{{b}} "${quote}"`;
+    mark = ','; why = "A comma goes after the reporting clause, before the spoken words begin.";
+  } else if(diff === 2){
+    const adverbial = bagChoice('p2-adverbial', PUNCT_ADVERBIALS);
+    const main = bagChoice('p2-main', PUNCT_MAIN_CLAUSES);
+    s = `${adverbial}{{b}} ${main}.`;
+    mark = ','; why = "A comma goes after a fronted adverbial (a phrase moved to the front of the sentence).";
+  } else {
+    const kind = choice(['list','colon','semicolon']);
+    if(kind === 'list'){
+      const setup = bagChoice('p3-kitsetup', PUNCT_KIT_SETUPS);
+      const items = sample3(PUNCT_KIT_ITEMS);
+      s = `${setup}{{b}} ${items[0]}, ${items[1]} and ${items[2]}.`;
+      mark = ':'; why = "A colon introduces a list.";
+    } else if(kind === 'colon'){
+      const [c1, c2] = bagChoice('p3-colonpair', PUNCT_COLON_PAIRS);
+      s = `${c1}{{b}} ${c2}.`;
+      mark = ':'; why = "A colon introduces an explanation or elaboration of what came before it.";
+    } else {
+      const [c1, c2] = bagChoice('p3-semicolonpair', PUNCT_SEMICOLON_PAIRS);
+      s = `${c1}{{b}} ${c2}.`;
+      mark = ';'; why = "A semicolon can join two independent clauses that are closely related, instead of starting a new sentence.";
+    }
+  }
+  const displaySentence = collapse(s.replace('{{b}}', ' ___ '));
   return {
     text: `What punctuation mark belongs in the gap? — "${displaySentence}"`,
-    answer: item.mark,
-    steps: [ item.why, `The full sentence reads: "${collapse(item.s.replace('{{b}}', item.mark + ' '))}"` ],
+    answer: mark,
+    steps: [ why, `The full sentence reads: "${collapse(s.replace('{{b}}', mark + ' '))}"` ],
   };
 }
 
