@@ -973,8 +973,8 @@ function submitAnswer(){
   const box = document.getElementById('feedbackBox');
   box.className = 'feedback-box show ' + (correct ? 'correct' : 'incorrect');
   document.getElementById('feedbackTitle').innerHTML = correct
-    ? choice(CORRECT_MESSAGES)
-    : choice(INCORRECT_MESSAGES);
+    ? bagChoice('correct-msg', CORRECT_MESSAGES)
+    : bagChoice('incorrect-msg', INCORRECT_MESSAGES);
   const stepsHtml = q.steps.map(s => `<li>${s}</li>`).join('');
   document.getElementById('feedbackBody').innerHTML = `
     ${correct ? '' : `<p style="margin:0 0 10px">Here’s the working for full marks — have a read through, then try one like it again in a bit:</p>`}
@@ -1107,7 +1107,7 @@ function startWellbeingTimer(){
 }
 
 function showBreakReminder(){
-  const tip = WELLBEING_TIPS[Math.floor(Math.random()*WELLBEING_TIPS.length)];
+  const tip = bagChoice('wellbeing-tips', WELLBEING_TIPS);
   document.getElementById('breakIcon').textContent = tip.icon;
   document.getElementById('breakTitle').textContent = tip.title;
   document.getElementById('breakText').textContent = tip.text;
@@ -1194,7 +1194,7 @@ const FUN_FACTS = [
   { text:"Sharks have been around for roughly 400 million years — tens of millions of years before the first trees appeared.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/shark-evolution-a-450-million-year-timeline.html" },
 ];
 function openFrustrationHelp(){
-  const fact = choice(FUN_FACTS);
+  const fact = bagChoice('frustration-facts', FUN_FACTS);
   document.getElementById('frustrationFact').innerHTML = `${fact.text}<br><a href="${fact.url}" target="_blank" rel="noopener" style="display:inline-block; margin-top:8px; font-size:.8rem; font-weight:700; color:var(--blue)">Read more — ${fact.source} ↗</a>`;
   document.getElementById('frustrationOverlay').classList.add('show');
 }

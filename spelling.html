@@ -643,6 +643,19 @@ const SENTENCES = {
 
 function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
 function choice(arr){ return arr[randInt(0, arr.length - 1)]; }
+const _bags = {};
+function bagChoice(key, arr){
+  let bag = _bags[key];
+  if(!bag || bag.length === 0){
+    bag = arr.map((_, i) => i);
+    for(let i = bag.length - 1; i > 0; i--){
+      const j = randInt(0, i);
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    _bags[key] = bag;
+  }
+  return arr[bag.pop()];
+}
 
 const BANDS = [
   { id:"y34", name:"Years 3–4 Word List", icon:"📗", sub:"100 statutory words", color:"blue" },
@@ -841,8 +854,8 @@ function submitAnswer(){
   const box = document.getElementById('feedbackBox');
   box.className = 'feedback-box show ' + (correct ? 'correct' : 'incorrect');
   document.getElementById('feedbackTitle').innerHTML = correct
-    ? choice(CORRECT_MESSAGES)
-    : choice(INCORRECT_MESSAGES);
+    ? bagChoice('correct-msg', CORRECT_MESSAGES)
+    : bagChoice('incorrect-msg', INCORRECT_MESSAGES);
   const tip = TIPS[word];
   document.getElementById('feedbackBody').innerHTML = `
     ${correct ? '' : `<p style="margin:0 0 10px">Here's the correct spelling — the letters you got right are green, the ones to look again at are red:</p>`}
@@ -866,7 +879,7 @@ const CORRECT_POPUP_MESSAGES = ['✅ Correct!', '🌟 Nailed it!', '✅ Spot on!
 const INCORRECT_POPUP_MESSAGES = ['💪 Good try!', '💪 Keep going!', '💪 Nearly there!', '💪 Have a look below'];
 function showAnswerPopup(correct){
   const el = document.getElementById('answerPopup');
-  el.textContent = choice(correct ? CORRECT_POPUP_MESSAGES : INCORRECT_POPUP_MESSAGES);
+  el.textContent = correct ? bagChoice('correct-popup', CORRECT_POPUP_MESSAGES) : bagChoice('incorrect-popup', INCORRECT_POPUP_MESSAGES);
   el.className = 'answer-popup show ' + (correct ? 'correct' : 'incorrect');
   clearTimeout(showAnswerPopup._t);
   showAnswerPopup._t = setTimeout(() => el.classList.remove('show'), 900);
@@ -1005,7 +1018,7 @@ function startWellbeingTimer(){
 }
 
 function showBreakReminder(){
-  const tip = WELLBEING_TIPS[Math.floor(Math.random()*WELLBEING_TIPS.length)];
+  const tip = bagChoice('wellbeing-tips', WELLBEING_TIPS);
   document.getElementById('breakIcon').textContent = tip.icon;
   document.getElementById('breakTitle').textContent = tip.title;
   document.getElementById('breakText').textContent = tip.text;
@@ -1088,7 +1101,7 @@ const FUN_FACTS = [
   { text:"Sharks have been around for roughly 400 million years — tens of millions of years before the first trees appeared.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/shark-evolution-a-450-million-year-timeline.html" },
 ];
 function openFrustrationHelp(){
-  const fact = choice(FUN_FACTS);
+  const fact = bagChoice('frustration-facts', FUN_FACTS);
   document.getElementById('frustrationFact').innerHTML = `${fact.text}<br><a href="${fact.url}" target="_blank" rel="noopener" style="display:inline-block; margin-top:8px; font-size:.8rem; font-weight:700; color:var(--blue)">Read more — ${fact.source} ↗</a>`;
   document.getElementById('frustrationOverlay').classList.add('show');
 }

@@ -748,8 +748,21 @@ function startWellbeingTimer(){
   }, 60000);
 }
 
+const _bags = {};
+function bagChoice(key, arr){
+  let bag = _bags[key];
+  if(!bag || bag.length === 0){
+    bag = arr.map((_, i) => i);
+    for(let i = bag.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    _bags[key] = bag;
+  }
+  return arr[bag.pop()];
+}
 function showBreakReminder(){
-  const tip = WELLBEING_TIPS[Math.floor(Math.random()*WELLBEING_TIPS.length)];
+  const tip = bagChoice('wellbeing-tips', WELLBEING_TIPS);
   document.getElementById('breakIcon').textContent = tip.icon;
   document.getElementById('breakTitle').textContent = tip.title;
   document.getElementById('breakText').textContent = tip.text;

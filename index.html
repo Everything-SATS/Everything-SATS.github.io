@@ -430,12 +430,21 @@ const FUN_FACTS = [
   { text:"An average fluffy cumulus cloud weighs around 500,000 kilograms.", source:"US Geological Survey", url:"https://www.usgs.gov/water-science-school/science/how-much-does-a-cloud-weigh" },
   { text:"Sharks have been around for roughly 400 million years — tens of millions of years before the first trees appeared.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/shark-evolution-a-450-million-year-timeline.html" },
 ];
-let lastFactIndex = -1;
+const _bags = {};
+function bagChoice(key, arr){
+  let bag = _bags[key];
+  if(!bag || bag.length === 0){
+    bag = arr.map((_, i) => i);
+    for(let i = bag.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    _bags[key] = bag;
+  }
+  return arr[bag.pop()];
+}
 function showRandomFact(){
-  let i;
-  do { i = Math.floor(Math.random() * FUN_FACTS.length); } while(i === lastFactIndex && FUN_FACTS.length > 1);
-  lastFactIndex = i;
-  const fact = FUN_FACTS[i];
+  const fact = bagChoice('curiosity-facts', FUN_FACTS);
   document.getElementById('curiosityFact').textContent = fact.text;
   const sourceEl = document.getElementById('curiositySource');
   sourceEl.textContent = `Expand on this — ${fact.source}`;
