@@ -237,9 +237,22 @@
   .technique-tip{font-size:.8rem; background:var(--purple-light); border-radius:8px; padding:8px 10px; color:var(--ink)}
   .reading-view{max-width:820px; margin:0 auto}
   .hidden{display:none !important}
-  .passage-text-card{background:var(--bg-alt); border-radius:16px; box-shadow:var(--shadow); padding:24px; margin-bottom:20px; position:sticky; top:12px; max-height:40vh; overflow-y:auto}
+  .passage-teaser-card{background:var(--bg-alt); border-radius:16px; box-shadow:var(--shadow); padding:24px; margin-bottom:20px}
   .passage-text-title{font-weight:800; font-size:1.2rem; margin-bottom:12px}
-  .passage-text{font-size:.98rem; line-height:1.8; white-space:pre-line}
+  .passage-teaser-note{color:var(--ink-soft); font-size:.86rem; line-height:1.5; margin:0 0 16px}
+  .passage-open-btn{
+    display:block; width:100%; background:var(--blue); color:#fff; border:none; border-radius:14px;
+    padding:16px; font-weight:800; font-size:1.05rem; cursor:pointer; font-family:inherit; box-shadow:var(--shadow);
+  }
+  .passage-fullpage{ position:fixed; inset:0; background:var(--bg); z-index:80; overflow-y:auto; display:none; }
+  .passage-fullpage.show{ display:block; }
+  .passage-fullpage-inner{ max-width:720px; margin:0 auto; padding:20px 18px 50px; }
+  .passage-fullpage-close{
+    display:block; width:100%; background:var(--blue); color:#fff; border:none; border-radius:12px;
+    padding:14px 22px; font-weight:800; font-size:.95rem; cursor:pointer; font-family:inherit; box-shadow:var(--shadow);
+  }
+  .passage-fullpage-title{font-weight:800; font-size:1.5rem; margin:20px 0 16px}
+  .passage-fullpage-text{font-size:1.15rem; line-height:2; white-space:pre-line}
   .q-card{background:var(--bg-alt); border-radius:16px; box-shadow:var(--shadow); padding:18px; margin-bottom:14px}
   .q-domain-tag{display:inline-block; font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; padding:3px 9px; border-radius:999px; background:var(--purple-light); color:var(--purple); margin-bottom:10px}
   .q-text{font-weight:700; font-size:1rem; margin-bottom:12px}
@@ -298,7 +311,7 @@
 
   <div class="library-card">
     <h2 style="margin-top:0">📗 Want to read whole books, free?</h2>
-    <p style="color:var(--ink-soft); font-size:.9rem">This tool practises the exam skill using short passages — but nothing beats reading real books for getting better at reading overall. Every UK library offers free ebooks and audiobooks with just a library card (which is itself free) through apps like <b>BorrowBox</b> and <b>Libby</b>. <a href="https://www.booktrust.org.uk/booklists/" target="_blank" rel="noopener">BookTrust's recommended reading lists</a> are a genuine free place to find what to read next.</p>
+    <p style="color:var(--ink-soft); font-size:.9rem">This tool practises the exam skill using short passages — but nothing beats reading real books for getting better at reading overall. Every UK library offers free ebooks and audiobooks with just a library card (which is itself free) through apps like <a href="https://www.borrowbox.com/" target="_blank" rel="noopener"><b>BorrowBox</b></a> and <a href="https://libbyapp.com/" target="_blank" rel="noopener"><b>Libby</b></a>. <a href="https://www.booktrust.org.uk/booklists/" target="_blank" rel="noopener">BookTrust's recommended reading lists</a> are a genuine free place to find what to read next.</p>
   </div>
 
   <div class="daily-card" style="margin-top:22px">
@@ -312,12 +325,22 @@
 
 <main id="passageView" class="reading-view hidden">
   <button class="btn btn-ghost btn-small" onclick="closePassage()" style="margin-bottom:16px">← Back to all passages</button>
-  <div class="passage-text-card">
+  <div class="passage-teaser-card">
     <div class="passage-text-title" id="passageTitle"></div>
-    <div class="passage-text" id="passageText"></div>
+    <p class="passage-teaser-note">Open the passage any time to read or re-read it — it stays open until you close it, so it's easy to check back while you answer.</p>
+    <button class="passage-open-btn" onclick="openPassageFullpage()">📖 Open passage to read</button>
   </div>
   <div id="questionsList"></div>
 </main>
+
+<div class="passage-fullpage" id="passageFullpage">
+  <div class="passage-fullpage-inner">
+    <button class="passage-fullpage-close" onclick="closePassageFullpage()">✕ Close and go to the questions</button>
+    <div class="passage-fullpage-title" id="fpTitle"></div>
+    <div class="passage-fullpage-text" id="fpText"></div>
+    <button class="passage-fullpage-close" style="margin-top:20px" onclick="closePassageFullpage()">✕ Close and go to the questions</button>
+  </div>
+</div>
 
 <script>
 /* ---------- Technique guide: the 8 official KS2 reading content-domain
@@ -451,14 +474,23 @@ function openPassage(id){
   document.getElementById('homeView').classList.add('hidden');
   document.getElementById('passageView').classList.remove('hidden');
   document.getElementById('passageTitle').textContent = `${currentPassage.genre === 'Fiction' ? '📖' : '📰'} ${currentPassage.title}`;
-  document.getElementById('passageText').textContent = currentPassage.text;
   renderQuestions();
   window.scrollTo(0,0);
+  openPassageFullpage();
 }
 function closePassage(){
   document.getElementById('homeView').classList.remove('hidden');
   document.getElementById('passageView').classList.add('hidden');
+  closePassageFullpage();
   renderPassages();
+}
+function openPassageFullpage(){
+  document.getElementById('fpTitle').textContent = `${currentPassage.genre === 'Fiction' ? '📖' : '📰'} ${currentPassage.title}`;
+  document.getElementById('fpText').textContent = currentPassage.text;
+  document.getElementById('passageFullpage').classList.add('show');
+}
+function closePassageFullpage(){
+  document.getElementById('passageFullpage').classList.remove('show');
 }
 
 function renderQuestions(){
