@@ -664,88 +664,80 @@ function genPunctuation(diff){
   };
 }
 
-/* ---------- Clauses & connectives ---------- */
-const CLAUSE_BANK = {
-  0: [
-    { s:"I wanted to play outside because the sun was shining.", conj:"because" },
-    { s:"We stayed inside because it was raining heavily.", conj:"because" },
-    { s:"She packed an umbrella because rain was forecast.", conj:"because" },
-    { s:"He tidied his room because his friends were visiting.", conj:"because" },
-    { s:"I switched on the light because the room was dark.", conj:"because" },
-    { s:"He wore a coat because it was cold outside.", conj:"because" },
-    { s:"We cancelled the picnic because it started to rain.", conj:"because" },
-    { s:"She was tired because she had woken up early.", conj:"because" },
-    { s:"They stayed indoors because the wind was strong.", conj:"because" },
-    { s:"I laughed because the joke was funny.", conj:"because" },
-    { s:"We hurried because we were running late.", conj:"because" },
-    { s:"He was proud because he had scored a goal.", conj:"because" },
-    { s:"She smiled because she had passed her test.", conj:"because" },
-    { s:"The dog barked because a stranger knocked on the door.", conj:"because" },
-    { s:"We celebrated because our team had won.", conj:"because" },
-  ],
-  1: [
-    { s:"We can go to the park if the weather stays fine.", conj:"if" },
-    { s:"I will wait here until you finish your homework.", conj:"until" },
-    { s:"They set off early so they would arrive on time.", conj:"so" },
-    { s:"She practised every day so she would improve.", conj:"so" },
-    { s:"You can borrow my book if you promise to return it.", conj:"if" },
-    { s:"I'll save you a seat if you hurry.", conj:"if" },
-    { s:"We won't leave until everyone is ready.", conj:"until" },
-    { s:"He kept training until he felt confident.", conj:"until" },
-    { s:"She spoke slowly so everyone could understand.", conj:"so" },
-    { s:"They arrived early so they could get good seats.", conj:"so" },
-    { s:"You'll catch a cold if you stay out in the rain.", conj:"if" },
-    { s:"I'll call you if anything changes.", conj:"if" },
-    { s:"We packed extra food so nobody would go hungry.", conj:"so" },
-    { s:"Wait here until the rain stops.", conj:"until" },
-    { s:"He saved his pocket money so he could buy a bike.", conj:"so" },
-  ],
-  2: [
-    { s:"Although the match was cancelled, the team still trained together.", conj:"although" },
-    { s:"While the cake was baking, we cleaned the kitchen.", conj:"while" },
-    { s:"Since you asked so nicely, I'll help you with it.", conj:"since" },
-    { s:"Whenever it snows, the whole town seems to slow down.", conj:"whenever" },
-    { s:"Although it was raining, the race went ahead.", conj:"although" },
-    { s:"While the adults chatted, the children played outside.", conj:"while" },
-    { s:"Since the bridge was closed, we had to take a detour.", conj:"since" },
-    { s:"Whenever she visits, she brings a gift for everyone.", conj:"whenever" },
-    { s:"Although he was nervous, he gave a confident speech.", conj:"although" },
-    { s:"While the bread was rising, she prepared the filling.", conj:"while" },
-    { s:"Since the shop had closed early, we went home empty-handed.", conj:"since" },
-    { s:"Whenever the bell rings, the dog starts barking.", conj:"whenever" },
-    { s:"Although the film was long, nobody wanted it to end.", conj:"although" },
-    { s:"While the plane was landing, the passengers fastened their seatbelts.", conj:"while" },
-    { s:"Since nobody answered the door, we left a note.", conj:"since" },
-  ],
-  3: [
-    { s:"The scientist who discovered the fossil worked at the museum.", conj:"who" },
-    { s:"The bridge, which was built in 1920, is still standing today.", conj:"which" },
-    { s:"This is the house where I grew up.", conj:"where" },
-    { s:"That's the reason why the trip was postponed.", conj:"why" },
-    { s:"The author who wrote this book visited our school.", conj:"who" },
-    { s:"The car, which was completely rebuilt, looked brand new.", conj:"which" },
-    { s:"This is the park where we used to play.", conj:"where" },
-    { s:"That's the reason why she was late this morning.", conj:"why" },
-    { s:"The dentist who treated me was very gentle.", conj:"who" },
-    { s:"The painting, which hangs in the hallway, is over a century old.", conj:"which" },
-    { s:"This is the beach where the shipwreck was found.", conj:"where" },
-    { s:"That's the reason why the concert was cancelled.", conj:"why" },
-    { s:"The teacher who inspired me the most retired last year.", conj:"who" },
-    { s:"The statue, which stands in the square, honours local heroes.", conj:"which" },
-    { s:"This is the classroom where we had our first lesson.", conj:"where" },
-  ],
-};
+/* ---------- Clauses & connectives ----------
+   Combinatorial: an actions bank crossed with a reasons/conditions bank per
+   conjunction. The grammar being tested (identifying the conjunction) holds
+   regardless of the specific pairing, same principle as the other rebuilt
+   generators -- some pairings are more surprising than others, but none
+   are nonsensical or ungrammatical. */
+const CL_ACTIONS = ["I wanted to play outside","We stayed inside","She packed an umbrella","He tidied his room","I switched on the light","He wore a coat","We cancelled the picnic","She felt tired","They stayed indoors","I laughed","We hurried","He felt proud","She smiled","The dog barked","We celebrated","She left early","He hurried home","They waited outside","I made a cup of tea","She apologised","He called his friend","We looked out of the window","She checked her phone","He locked the door","They turned back"];
+const CL_BECAUSE_REASONS = ["the sun was shining","it was raining heavily","rain was forecast","his friends were visiting","the room was dark","it was cold outside","it started to rain","she had woken up early","the wind was strong","the joke was funny","we were running late","he had scored a goal","she had passed her test","a stranger knocked on the door","our team had won","the shop was closing","he had forgotten his keys","the bus didn't come","he had homework to finish","they wanted to help","the phone rang","something felt wrong","the battery was low","it was getting late","she felt unwell"];
+const CL_IF_CONDITIONS = ["the weather stays fine","you promise to return it","you hurry","you stay out in the rain","anything changes","we finish our homework first","it doesn't rain","you ask nicely","there's time afterwards","the shop is still open","you remember your kit","the bus is on time","she agrees","the ground isn't too muddy","we leave early enough"];
+const CL_UNTIL_CONDITIONS = ["you finish your homework","everyone is ready","he felt confident","the rain stops","the bell rings","she arrives","the game ends","the paint dries","the storm passes","dinner is ready","the guests leave","she calls back","the lesson finishes","the bus comes","it gets dark"];
+const CL_SO_PURPOSES = ["they would arrive on time","she would improve","everyone could understand","they could get good seats","nobody would go hungry","he could buy a bike","she wouldn't be late","they could see better","he wouldn't forget","everyone could join in","the team could practise","she could finish in time","he could catch the bus","they could keep warm","nobody would get lost"];
+const CL_ALTHOUGH_CLAUSES = ["the match was cancelled","it was raining","he was nervous","the film was long","she was exhausted","the queue was long","the journey was tiring","the room was crowded","the test was hard","he was younger than the others","the weather was cold","she had never done it before","the instructions were confusing","the path was steep","it was getting late"];
+const CL_WHILE_CLAUSES = ["the cake was baking","the adults chatted","the bread was rising","the plane was landing","she waited","the kettle boiled","the rain fell","the match was on","he practised his lines","the paint dried","the sun set","they queued outside","the film played","the class worked quietly","the storm passed"];
+const CL_SINCE_CLAUSES = ["you asked so nicely","the bridge was closed","the shop had closed early","nobody answered the door","the weather had improved","she was already awake","the tickets sold out","he had finished early","the road was blocked","everyone agreed","the rain had stopped","the shop was empty","the bus was late","she offered to help","the lesson had ended"];
+const CL_WHENEVER_CLAUSES = ["it snows","she visits","the bell rings","the tide comes in","he tells that joke","the holidays start","the team scores","it rains at the weekend","the post arrives","the market opens","a storm rolls in","the leaves start falling","she plays that song","the bus is late","the shop has a sale"];
+const CL_WHENEVER_RESULTS = ["the whole town seems to slow down","she brings a gift for everyone","the dog starts barking","the beach empties quickly","everyone groans","the shops get busy","the crowd goes wild","the roads get slippery","the whole street gets excited","the car park fills up fast","people rush indoors","the garden looks beautiful","the whole class sings along","tempers get short","there's a queue out the door"];
+const CL_WHO_PEOPLE = ["scientist","author","dentist","teacher","artist","firefighter","pilot","doctor","gardener","librarian","builder","vet","chef","coach","postman"];
+const CL_WHO_DEEDS = ["discovered the fossil","wrote this book","treated me last week","inspired me the most","painted this mural","rescued the kitten","flew us to Spain","gave me the injection","planted these roses","recommended this book","built the treehouse","looked after our dog","cooked the school dinners","trained the team","delivered the parcel"];
+const CL_WHO_RESULTS = ["worked at the museum","visited our school","was very gentle","retired last year","won a prize for it","became a local hero","had flown for twenty years","specialises in animals","has the best garden on the street","knows every book by heart","learned the trade from her father","volunteers every weekend","trained in Paris","used to play professionally","has done the job for years"];
+const CL_WHICH_THINGS = ["The bridge","The car","The painting","The statue","The clock tower","The library","The theatre","The stadium","The lighthouse","The castle","The garden","The fountain","The mural","The windmill","The tower"];
+const CL_WHICH_DESCRIPTIONS = ["was built in 1920","was completely rebuilt","hangs in the hallway","stands in the square","stopped working years ago","opened last summer","was designed by a famous architect","survived the fire","took ten years to build","was recently restored","is the oldest in the country","was donated by a local family","was damaged in the storm","attracts visitors from miles around","was painted over a century ago"];
+const CL_WHICH_RESULTS = ["is still standing today","looked brand new","is over a century old","honours local heroes","is now a popular landmark","remains a mystery to historians","is visited by thousands each year","has become the town's symbol","is protected by law","still works perfectly","was featured in a documentary","is the pride of the village","draws crowds every weekend","is now fully restored","stands exactly where it always has"];
+const CL_WHERE_PLACES = ["house","park","beach","classroom","garden","street","village","forest","harbour","school","farm","bridge","cottage","market","library"];
+const CL_WHERE_CONNECTIONS = ["I grew up","we used to play","the shipwreck was found","we had our first lesson","my grandparents met","the treasure was buried","the accident happened","she learned to swim","the festival takes place","the dog got lost","they filmed the movie","the battle was fought","we first met","the fire started","the concert was held"];
+const CL_WHY_REASONS = ["the trip was postponed","she was late this morning","the concert was cancelled","the match was delayed","he missed the bus","the shop closed early","the picnic was moved indoors","she couldn't come","the flight was grounded","the game was abandoned","they turned back early","the lesson overran","the parcel never arrived","the road was closed","the event sold out"];
+
 function genClauses(diff){
-  const item = bagChoice('clause-' + diff, CLAUSE_BANK[diff]);
-  const kind = diff === 3 ? "relative pronoun that starts the relative clause" : "conjunction that joins the two clauses";
+  if(diff === 0){
+    const action = bagChoice('cl0-action', CL_ACTIONS);
+    const reason = bagChoice('cl0-because', CL_BECAUSE_REASONS);
+    return clauseResult(`${action} because ${reason}.`, 'because', false);
+  }
+  if(diff === 1){
+    const kind = choice(['if','until','so']);
+    let s;
+    if(kind === 'if'){ s = `${bagChoice('cl1-action-if', CL_ACTIONS)} if ${bagChoice('cl1-if', CL_IF_CONDITIONS)}.`; }
+    else if(kind === 'until'){ s = `${bagChoice('cl1-action-until', CL_ACTIONS)} until ${bagChoice('cl1-until', CL_UNTIL_CONDITIONS)}.`; }
+    else { s = `${bagChoice('cl1-action-so', CL_ACTIONS)} so ${bagChoice('cl1-so', CL_SO_PURPOSES)}.`; }
+    return clauseResult(s, kind, false);
+  }
+  if(diff === 2){
+    const kind = choice(['although','while','since','whenever']);
+    let s;
+    const lowerFirst = w => w.charAt(0).toLowerCase() + w.slice(1);
+    if(kind === 'although'){ s = `Although ${bagChoice('cl2-although', CL_ALTHOUGH_CLAUSES)}, ${lowerFirst(bagChoice('cl2-action-although', CL_ACTIONS))}.`; }
+    else if(kind === 'while'){ s = `While ${bagChoice('cl2-while', CL_WHILE_CLAUSES)}, ${lowerFirst(bagChoice('cl2-action-while', CL_ACTIONS))}.`; }
+    else if(kind === 'since'){ s = `Since ${bagChoice('cl2-since', CL_SINCE_CLAUSES)}, ${lowerFirst(bagChoice('cl2-action-since', CL_ACTIONS))}.`; }
+    else { s = `Whenever ${bagChoice('cl2-whenever', CL_WHENEVER_CLAUSES)}, ${bagChoice('cl2-whenever-result', CL_WHENEVER_RESULTS)}.`; }
+    return clauseResult(s, kind, false);
+  }
+  const kind = choice(['who','which','where','why']);
+  let s;
+  if(kind === 'who'){
+    const person = bagChoice('cl3-who-person', CL_WHO_PEOPLE);
+    s = `The ${person} who ${bagChoice('cl3-who-deed', CL_WHO_DEEDS)} ${bagChoice('cl3-who-result', CL_WHO_RESULTS)}.`;
+  } else if(kind === 'which'){
+    s = `${bagChoice('cl3-which-thing', CL_WHICH_THINGS)}, which ${bagChoice('cl3-which-desc', CL_WHICH_DESCRIPTIONS)}, ${bagChoice('cl3-which-result', CL_WHICH_RESULTS)}.`;
+  } else if(kind === 'where'){
+    s = `This is the ${bagChoice('cl3-where-place', CL_WHERE_PLACES)} where ${bagChoice('cl3-where-conn', CL_WHERE_CONNECTIONS)}.`;
+  } else {
+    s = `That's the reason why ${bagChoice('cl3-why-reason', CL_WHY_REASONS)}.`;
+  }
+  return clauseResult(s, kind, true);
+}
+function clauseResult(s, conj, isRelative){
+  const kind = isRelative ? "relative pronoun that starts the relative clause" : "conjunction that joins the two clauses";
   return {
-    text: `What is the ${kind} in this sentence? — "${item.s}"`,
-    answer: item.conj,
+    text: `What is the ${kind} in this sentence? — "${s}"`,
+    answer: conj,
     steps: [
-      diff === 3
+      isRelative
         ? `A relative clause gives extra information about a noun, and starts with a relative pronoun like who, which, where or why.`
         : `This sentence has a main clause and a subordinate clause, joined by a conjunction.`,
-      `"${item.conj}" is the answer here.`,
+      `"${conj}" is the answer here.`,
     ],
   };
 }
