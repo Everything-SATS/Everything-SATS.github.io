@@ -738,6 +738,40 @@ function awardStar(){
   if(el) el.textContent = sessionStars;
 }
 
+/* ---------- Calming sound: synthesised brown noise, entirely client-side ---------- */
+let calmAudioCtx = null, calmNoiseSource = null;
+function toggleCalmSound(){
+  if(calmNoiseSource){ stopCalmSound(); return; }
+  calmAudioCtx = calmAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  const bufferSize = 2 * calmAudioCtx.sampleRate;
+  const buffer = calmAudioCtx.createBuffer(1, bufferSize, calmAudioCtx.sampleRate);
+  const output = buffer.getChannelData(0);
+  let lastOut = 0;
+  for(let i = 0; i < bufferSize; i++){
+    const white = Math.random() * 2 - 1;
+    output[i] = (lastOut + (0.02 * white)) / 1.02;
+    lastOut = output[i];
+    output[i] *= 3.5;
+  }
+  calmNoiseSource = calmAudioCtx.createBufferSource();
+  calmNoiseSource.buffer = buffer;
+  calmNoiseSource.loop = true;
+  const filter = calmAudioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 700;
+  const gain = calmAudioCtx.createGain();
+  gain.gain.value = 0.18;
+  calmNoiseSource.connect(filter).connect(gain).connect(calmAudioCtx.destination);
+  calmNoiseSource.start();
+  const btn = document.getElementById('calmSoundBtn');
+  if(btn) btn.textContent = '🔇 Stop calming sound';
+}
+function stopCalmSound(){
+  if(calmNoiseSource){ calmNoiseSource.stop(); calmNoiseSource.disconnect(); calmNoiseSource = null; }
+  const btn = document.getElementById('calmSoundBtn');
+  if(btn) btn.textContent = '🎵 Play a calming sound';
+}
+
 startWellbeingTimer();
 
 
@@ -779,6 +813,7 @@ applyReadingBg();
     <h2 id="breakTitle">Time for a quick break!</h2>
     <p id="breakText">You've been working for 15 minutes — brilliant focus. Get a drink of water, then have a short walk around before you come back.</p>
     <button class="btn btn-primary" onclick="startBreakCountdown()">Start a 5-minute break</button>
+    <div style="margin-top:10px"><button class="btn btn-ghost btn-small" id="calmSoundBtn" onclick="toggleCalmSound()">🎵 Play a calming sound</button></div>
     <div style="margin-top:10px"><button class="btn btn-ghost btn-small" onclick="dismissBreak()">I'll take a break in a moment</button></div>
   </div>
 </div>
