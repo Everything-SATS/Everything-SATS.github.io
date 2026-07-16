@@ -65,29 +65,18 @@
     border-radius:999px; padding:6px 14px; font-size:.82rem; font-weight:700; cursor:pointer; font-family:inherit;
   }
   .difficulty-tabs button.active{ background:#fff; color:var(--blue); border-color:#fff }
-  .setting-row{
-    display:flex; justify-content:space-between; align-items:center; gap:14px;
-    padding:14px 0; border-bottom:1px solid var(--line);
+  .setting-tile-label{ font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin:18px 0 10px }
+  .setting-tile-label:first-of-type{ margin-top:6px }
+  .settings-tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px }
+  .setting-tile{
+    display:flex; flex-direction:column; align-items:center; gap:4px; background:var(--bg);
+    border:2px solid var(--line); border-radius:14px; padding:14px 8px; cursor:pointer;
+    font-family:inherit; font-size:1.3rem; font-weight:800; color:var(--ink);
   }
-  .setting-title{ font-weight:700; font-size:.92rem }
-  .setting-sub{ font-size:.78rem; color:var(--ink-soft); margin-top:2px }
+  .setting-tile span{ font-size:.68rem; font-weight:600; color:var(--ink-soft); text-align:center }
+  .setting-tile.active{ background:var(--blue-light); border-color:var(--blue) }
+  .setting-tile.active span{ color:var(--blue) }
   .setting-note{ font-size:.8rem; color:var(--ink-soft); margin-top:16px; text-align:center }
-  select{
-    font-family:inherit; font-size:.9rem; padding:6px 10px; border-radius:8px;
-    border:2px solid var(--line); background:var(--bg-alt); color:var(--ink);
-  }
-  .switch{ position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0 }
-  .switch input{ opacity:0; width:0; height:0 }
-  .slider{
-    position:absolute; cursor:pointer; inset:0; background:var(--line);
-    border-radius:999px; transition:background .15s ease;
-  }
-  .slider::before{
-    content:""; position:absolute; height:18px; width:18px; left:3px; bottom:3px;
-    background:#fff; border-radius:50%; transition:transform .15s ease;
-  }
-  .switch input:checked + .slider{ background:var(--blue) }
-  .switch input:checked + .slider::before{ transform:translateX(20px) }
   :root[data-large-text="true"] .question-text{ font-size:1.7rem }
   :root[data-large-text="true"] .answer-row input{ font-size:1.5rem }
   .brand-tag{font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; opacity:.85; margin-bottom:2px}
@@ -188,6 +177,43 @@
   .empty-note{color:var(--ink-soft); text-align:center; padding:30px}
 
   @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+  .break-overlay{position:fixed; inset:0; background:rgba(15,20,30,0.55); display:none; align-items:center; justify-content:center; padding:16px; z-index:70}
+  .break-overlay.show{display:flex}
+  .break-modal{background:var(--bg-alt); border-radius:20px; max-width:420px; width:100%; padding:28px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3)}
+  .break-modal .big-icon{font-size:2.6rem; margin-bottom:8px}
+  .break-modal h2{margin:0 0 10px; font-size:1.3rem}
+  .break-modal p{margin:0 0 18px; color:var(--ink-soft); font-size:.92rem; line-height:1.5}
+  .break-timer-badge{
+    position:fixed; bottom:18px; right:18px; background:var(--green); color:#fff;
+    border-radius:999px; padding:10px 18px; font-weight:800; font-size:.9rem;
+    box-shadow:0 6px 16px rgba(47,168,107,0.4); z-index:60; display:none; align-items:center; gap:8px;
+  }
+  .break-timer-badge.show{display:flex}
+
+  /* Reading background colour -- overrides --bg-alt (what every card/passage
+     sits on) site-wide once a preference is chosen. Framed honestly: a
+     comfort option, not a claimed reading-skill fix -- see the research
+     note in the picker copy. */
+  :root[data-reading-bg="cream"]{ --bg-alt:#FDF6E3; }
+  :root[data-reading-bg="blue"]{ --bg-alt:#E8F2FB; }
+  :root[data-reading-bg="green"]{ --bg-alt:#EAF7EC; }
+  :root[data-reading-bg="rose"]{ --bg-alt:#FCEAEF; }
+  :root[data-reading-bg="grey"]{ --bg-alt:#EDEEF0; }
+
+  .colour-overlay-btn{
+    display:block; width:100%; text-align:left; background:linear-gradient(120deg,var(--blue-light,#E3ECFB) 0%,var(--purple-light,#F0E7FA) 100%);
+    border:2px solid var(--blue); border-radius:16px; box-shadow:var(--shadow); padding:16px 20px; margin-bottom:20px; cursor:pointer; font-family:inherit;
+  }
+  .colour-overlay-btn .cb-title{font-weight:800; font-size:1rem; margin-bottom:2px; color:var(--ink)}
+  .colour-overlay-btn .cb-sub{font-size:.82rem; color:var(--ink-soft)}
+  .colour-swatches{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0}
+  .colour-swatch{
+    width:66px; height:66px; border-radius:12px; cursor:pointer; border:3px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; color:#333; text-align:center;
+  }
+  .colour-swatch.active{border-color:var(--blue); border-width:3px}
+  .colour-note{font-size:.8rem; color:var(--ink-soft); line-height:1.5; margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -206,6 +232,7 @@
   <div class="difficulty-row">
     <span class="difficulty-label">Level:</span>
     <div class="difficulty-tabs" id="difficultyTabs">
+      <button data-level="0" onclick="setDifficulty(0)">Pre-SATS (Y3-4)</button>
       <button data-level="1" onclick="setDifficulty(1)">Foundation</button>
       <button data-level="2" onclick="setDifficulty(2)">Expected Standard</button>
       <button data-level="3" onclick="setDifficulty(3)">Greater Depth</button>
@@ -217,38 +244,19 @@
   <div class="modal">
     <button class="close-x" onclick="closeSettings()">✕</button>
     <h2 style="margin-top:0">⚙️ Settings</h2>
-    <div class="setting-row">
-      <div>
-        <div class="setting-title">Questions per Daily Practice session</div>
-        <div class="setting-sub">Shorter sessions can help if long stretches of focus are hard.</div>
-      </div>
-      <select id="sessionLengthSelect" onchange="saveSettings()">
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-        <option value="20">20</option>
-      </select>
+    <div class="setting-tile-label">Session length</div>
+    <div class="settings-tiles" id="sessionLengthTiles">
+      <button class="setting-tile" data-len="5" onclick="setSessionLength(5)">5<span>questions</span></button>
+      <button class="setting-tile" data-len="10" onclick="setSessionLength(10)">10<span>questions</span></button>
+      <button class="setting-tile" data-len="15" onclick="setSessionLength(15)">15<span>questions</span></button>
+      <button class="setting-tile" data-len="20" onclick="setSessionLength(20)">20<span>questions</span></button>
     </div>
-    <div class="setting-row">
-      <div>
-        <div class="setting-title">Reduce animation</div>
-        <div class="setting-sub">Turns off all movement/transition effects, even if your device allows them.</div>
-      </div>
-      <label class="switch"><input type="checkbox" id="reduceMotionToggle" onchange="saveSettings()"><span class="slider"></span></label>
-    </div>
-    <div class="setting-row">
-      <div>
-        <div class="setting-title">Calm colours</div>
-        <div class="setting-sub">Softer, lower-contrast colours and no background gradient.</div>
-      </div>
-      <label class="switch"><input type="checkbox" id="calmModeToggle" onchange="saveSettings()"><span class="slider"></span></label>
-    </div>
-    <div class="setting-row">
-      <div>
-        <div class="setting-title">Larger text</div>
-        <div class="setting-sub">Increases question and answer text size.</div>
-      </div>
-      <label class="switch"><input type="checkbox" id="largeTextToggle" onchange="saveSettings()"><span class="slider"></span></label>
+    <div class="setting-tile-label">Comfort options</div>
+    <div class="settings-tiles">
+      <button class="setting-tile" id="reduceMotionTile" onclick="toggleSetting('reduceMotion')">🎞️<span>Reduce animation</span></button>
+      <button class="setting-tile" id="calmModeTile" onclick="toggleSetting('calmMode')">🌤️<span>Calm colours</span></button>
+      <button class="setting-tile" id="largeTextTile" onclick="toggleSetting('largeText')">🔠<span>Larger text</span></button>
+      <button class="setting-tile" onclick="closeSettings();openColourPicker()">🎨<span>Background colour</span></button>
     </div>
     <p class="setting-note">There is no timer anywhere in this app, on any setting — take as long as you need.</p>
   </div>
@@ -321,7 +329,7 @@ function commas(n){ return n.toLocaleString('en-GB'); }
 
 function genAddSub(diff){
   const op = choice(["+","-"]);
-  const ranges = { 1:[100,999,50,899], 2:[1234,98765,234,87654], 3:[123456,987654,50000,900000] };
+  const ranges = { 0:[20,299,10,199], 1:[100,999,50,899], 2:[1234,98765,234,87654], 3:[123456,987654,50000,900000] };
   const [aMin,aMax,bMin,bMax] = ranges[diff];
   if(op === "+"){
     let a = randInt(aMin, aMax), b = randInt(bMin, bMax);
@@ -364,6 +372,19 @@ function genAddSub(diff){
 }
 
 function genMult(diff){
+  if(diff === 0){
+    // Y3/4: times-tables recall (3/4/8 in Y3, up to 12x12 by Y4) and simple
+    // 2-digit x 1-digit -- no long multiplication yet, that's Y5+.
+    if(Math.random() < 0.6){
+      const a = randInt(2,12), b = randInt(2,12);
+      return { text:`${a} × ${b} = ?`, answer:a*b,
+        steps:[`Recall your times table for ${a} (or ${b}).`, `${a} × ${b} = ${a*b}`] };
+    }
+    const a = randInt(11,49), b = randInt(2,9);
+    const product = a*b;
+    return { text:`${a} × ${b} = ?`, answer:product,
+      steps:[`Multiply each digit of ${a} by ${b}, starting from the ones column, carrying as needed.`, `${a} × ${b} = ${product}`] };
+  }
   const long = diff === 1 ? Math.random() < 0.15 : Math.random() < 0.5;
   if(long){
     const ranges = { 1:[12,99,2,9], 2:[123,987,23,89], 3:[1234,9876,23,97] };
@@ -398,6 +419,17 @@ function genMult(diff){
 }
 
 function genDiv(diff){
+  if(diff === 0){
+    // Y3/4: division facts from known times tables, no long division (Y6 only)
+    const divisor = randInt(2,12);
+    const quotient = randInt(2,12);
+    const remainder = Math.random() < 0.3 ? randInt(1, divisor-1) : 0;
+    const dividend = divisor*quotient + remainder;
+    const ansStr = remainder === 0 ? `${quotient}` : `${quotient} remainder ${remainder}`;
+    return { text:`${dividend} ÷ ${divisor} = ?`, answer:ansStr,
+      answerAliases: remainder === 0 ? [String(quotient)] : [`${quotient} r ${remainder}`, `${quotient}r${remainder}`],
+      steps:[`Think of your ${divisor} times table: how many ${divisor}s make ${dividend - remainder}?`, `${dividend} ÷ ${divisor} = ${quotient}${remainder ? ` remainder ${remainder}` : ""}`] };
+  }
   const long = diff === 1 ? Math.random() < 0.1 : Math.random() < 0.5;
   if(long){
     const ranges = { 1:[11,20], 2:[12,45], 3:[23,89] };
@@ -438,6 +470,14 @@ function genDiv(diff){
 }
 
 function genBodmas(diff){
+  if(diff === 0){
+    // Formal order-of-operations is Y6-only in the curriculum -- this is a
+    // gentle, much smaller-numbers first taste of combining two operations.
+    const a = randInt(2,5), b = randInt(2,5), c = randInt(2,10);
+    const result = c + a*b;
+    return { text:`${c} + ${a} × ${b} = ?`, answer:result,
+      steps:[`Do the × first: ${a} × ${b} = ${a*b}.`, `Then add: ${c} + ${a*b} = ${result}.`] };
+  }
   const small = diff === 1;
   const a = randInt(2, small?6:12), b = randInt(2, small?6:12), c = randInt(2, small?10:20), d = randInt(2, small?5:9);
   const forms2op = [
@@ -491,6 +531,20 @@ function genBodmas(diff){
 }
 
 function genFractions(diff){
+  if(diff === 0){
+    // Y3/4: same-denominator add/subtract only, small denominators --
+    // different denominators, multiply/divide, mixed numbers are Y5/6.
+    const d = randInt(3,8);
+    const n1 = randInt(1,d-1), n2 = randInt(1,Math.min(n1,d-n1)||1);
+    const op = Math.random() < 0.5 && n1 > n2 ? "-" : "+";
+    if(op === "+"){
+      const sumN = n1+n2;
+      return { text:`${fmtFrac(n1,d)} + ${fmtFrac(n2,d)} = ?`, answer:fmtFrac(sumN,d),
+        steps:[`The denominators match (${d}), so just add the numerators: ${n1} + ${n2} = ${sumN}.`, `Answer: ${fmtFrac(sumN,d)}`] };
+    }
+    return { text:`${fmtFrac(n1,d)} − ${fmtFrac(n2,d)} = ?`, answer:fmtFrac(n1-n2,d),
+      steps:[`The denominators match (${d}), so just subtract the numerators: ${n1} − ${n2} = ${n1-n2}.`, `Answer: ${fmtFrac(n1-n2,d)}`] };
+  }
   const kinds = diff === 1 ? ["addsame","addsame","adddiff"]
               : diff === 3 ? ["adddiff","mult","divwhole","mixed"]
               : ["addsame","adddiff","mult","divwhole"];
@@ -577,6 +631,15 @@ function genFractions(diff){
 }
 
 function genDecimals(diff){
+  if(diff === 0){
+    // Y3/4: tenths only, simple add/subtract -- multiply/divide by decimals
+    // and hundredths-level work is Y5/6.
+    const op = choice(["+","-"]);
+    const a = (randInt(20,99)/10).toFixed(1), b = (randInt(10,49)/10).toFixed(1);
+    const result = op === "+" ? parseFloat(a)+parseFloat(b) : parseFloat(a)-parseFloat(b);
+    return { text:`${a} ${op} ${b} = ?`, answer:result.toFixed(1),
+      steps:[`Line up the decimal points, then ${op==='+'?'add':'subtract'} as normal.`, `${a} ${op} ${b} = ${result.toFixed(1)}`] };
+  }
   const kinds = diff === 1 ? ["addsub","addsub","scale"] : diff === 3 ? ["addsub","mult","div","scale"] : ["addsub","mult","div","scale"];
   const kind = choice(kinds);
   if(kind === "addsub"){
@@ -633,6 +696,15 @@ function genDecimals(diff){
 }
 
 function genPercent(diff){
+  if(diff === 0){
+    // Percentages are Y5/6-only in the curriculum -- this builds the
+    // precursor skill (halving/quartering) that percentages are built on.
+    const half = Math.random() < 0.5;
+    const amount = half ? randInt(1,50)*2 : randInt(1,25)*4;
+    const result = half ? amount/2 : amount/4;
+    return { text:`What is ${half?'half':'a quarter'} of ${amount}?`, answer:result,
+      steps: half ? [`Halving means dividing by 2.`, `${amount} ÷ 2 = ${result}`] : [`A quarter means dividing by 4 (or halving twice).`, `${amount} ÷ 4 = ${result}`] };
+  }
   if(diff === 3 && Math.random() < 0.5){
     // Greater Depth: less-friendly percentages, larger amounts
     const pct = choice([17,23,35,42,65,85,12,8]);
@@ -663,6 +735,15 @@ function genPercent(diff){
 }
 
 function genNegatives(diff){
+  if(diff === 0){
+    // Y4 introduces counting through zero (4N5) -- simple, small-range
+    // counting/comparison rather than full addition/subtraction word problems.
+    const a = randInt(-8,-1);
+    const steps = randInt(2,6);
+    const result = a + steps;
+    return { text:`Start at ${a} and count up ${steps}. What number do you land on?`, answer:result,
+      steps:[`Picture a number line, starting at ${a}.`, `Count up ${steps}: ${a} + ${steps} = ${result}.`] };
+  }
   const kind = diff === 1 ? "addsub" : choice(["addsub","interval"]);
   const ranges = { 1:[-10,5,1,10], 2:[-20,15,1,25], 3:[-50,30,10,60] };
   const [aMin,aMax,bMin,bMax] = ranges[diff];
@@ -929,7 +1010,6 @@ function applySettings(){
   document.documentElement.setAttribute('data-large-text', appSettings.largeText ? 'true' : 'false');
   document.documentElement.setAttribute('data-calm', appSettings.calmMode ? 'true' : 'false');
   if(appSettings.reduceMotion){
-    document.documentElement.style.setProperty('--force-no-motion', '1');
     const styleTag = document.getElementById('forceMotionStyle') || document.createElement('style');
     styleTag.id = 'forceMotionStyle';
     styleTag.textContent = '*{ transition:none !important; animation:none !important; }';
@@ -938,19 +1018,22 @@ function applySettings(){
     const styleTag = document.getElementById('forceMotionStyle');
     if(styleTag) styleTag.remove();
   }
-  document.getElementById('sessionLengthSelect').value = String(appSettings.sessionLength);
-  document.getElementById('reduceMotionToggle').checked = appSettings.reduceMotion;
-  document.getElementById('calmModeToggle').checked = appSettings.calmMode;
-  document.getElementById('largeTextToggle').checked = appSettings.largeText;
+  document.querySelectorAll('#sessionLengthTiles .setting-tile').forEach(t => {
+    t.classList.toggle('active', Number(t.dataset.len) === appSettings.sessionLength);
+  });
+  document.getElementById('reduceMotionTile').classList.toggle('active', appSettings.reduceMotion);
+  document.getElementById('calmModeTile').classList.toggle('active', appSettings.calmMode);
+  document.getElementById('largeTextTile').classList.toggle('active', appSettings.largeText);
 }
 
-function saveSettings(){
-  appSettings = {
-    sessionLength: Number(document.getElementById('sessionLengthSelect').value),
-    reduceMotion: document.getElementById('reduceMotionToggle').checked,
-    calmMode: document.getElementById('calmModeToggle').checked,
-    largeText: document.getElementById('largeTextToggle').checked,
-  };
+function setSessionLength(n){
+  appSettings.sessionLength = n;
+  localStorage.setItem('sats_arith_settings', JSON.stringify(appSettings));
+  applySettings();
+}
+
+function toggleSetting(key){
+  appSettings[key] = !appSettings[key];
   localStorage.setItem('sats_arith_settings', JSON.stringify(appSettings));
   applySettings();
 }
@@ -965,6 +1048,126 @@ renderTopics();
 renderHeaderStats();
 renderDifficultyTabs();
 applySettings();
+
+/* ---------- Wellbeing: break reminders ----------
+   Not a pressure timer on questions (there is never one of those) -- this
+   is the opposite: a gentle nudge to STOP after sustained use. Checks once
+   a minute; after 15 minutes of the page being open, shows a dismissible
+   reminder. Never blocks anything, never counts down against the user. */
+const WELLBEING_TIPS = [
+  { icon:"💧", title:"Time for a quick break!", text:"You've been working for 15 minutes — brilliant focus. Get a drink of water, then have a short walk around before you come back." },
+  { icon:"🚶", title:"Stretch your legs!", text:"15 minutes of focused work — well done. Stand up, walk around for a few minutes, and let your brain rest before the next bit." },
+  { icon:"🧘", title:"Take a breather", text:"You've earned a break. Try a few slow breaths — in for 4, hold for 4, out for 4 — then come back when you're ready." },
+  { icon:"👀", title:"Rest your eyes", text:"Look at something far away for 20 seconds, get a drink of water, and have a short walk before your next session." },
+  { icon:"🎨", title:"Do something different", text:"Great focus for 15 minutes. Go do something completely different for a few minutes — draw, play, read something fun — then come back." },
+];
+
+let wellbeingMinutes = 0;
+let breakCountdownInterval = null;
+
+function startWellbeingTimer(){
+  setInterval(() => {
+    if(document.getElementById('breakOverlay').classList.contains('show')) return;
+    if(breakCountdownInterval) return;
+    wellbeingMinutes += 1;
+    if(wellbeingMinutes >= 15){
+      showBreakReminder();
+      wellbeingMinutes = 0;
+    }
+  }, 60000);
+}
+
+function showBreakReminder(){
+  const tip = WELLBEING_TIPS[Math.floor(Math.random()*WELLBEING_TIPS.length)];
+  document.getElementById('breakIcon').textContent = tip.icon;
+  document.getElementById('breakTitle').textContent = tip.title;
+  document.getElementById('breakText').textContent = tip.text;
+  document.getElementById('breakOverlay').classList.add('show');
+}
+
+function dismissBreak(){
+  document.getElementById('breakOverlay').classList.remove('show');
+}
+
+function startBreakCountdown(){
+  document.getElementById('breakOverlay').classList.remove('show');
+  const badge = document.getElementById('breakTimerBadge');
+  badge.classList.add('show');
+  let secondsLeft = 5*60;
+  breakCountdownInterval = setInterval(() => {
+    secondsLeft -= 1;
+    const mins = Math.floor(secondsLeft/60), secs = secondsLeft%60;
+    document.getElementById('breakTimeLeft').textContent = `${mins}:${String(secs).padStart(2,'0')}`;
+    if(secondsLeft <= 0){
+      clearInterval(breakCountdownInterval);
+      breakCountdownInterval = null;
+      badge.classList.remove('show');
+      showWelcomeBack();
+    }
+  }, 1000);
+}
+
+function showWelcomeBack(){
+  document.getElementById('breakIcon').textContent = "👋";
+  document.getElementById('breakTitle').textContent = "Welcome back!";
+  document.getElementById('breakText').textContent = "Hope that break helped. Ready to carry on whenever you are.";
+  document.getElementById('breakOverlay').classList.add('show');
+}
+
+startWellbeingTimer();
+
+
+/* ---------- Reading background colour (site-wide, shared preference) ---------- */
+function loadReadingBg(){ return localStorage.getItem('sats_reading_bg') || 'white'; }
+function applyReadingBg(){
+  const bg = loadReadingBg();
+  if(bg === 'white'){ document.documentElement.removeAttribute('data-reading-bg'); }
+  else { document.documentElement.setAttribute('data-reading-bg', bg); }
+  document.querySelectorAll('.colour-swatch').forEach(el => {
+    el.classList.toggle('active', el.dataset.bg === bg);
+  });
+}
+function setReadingBg(bg){
+  localStorage.setItem('sats_reading_bg', bg);
+  applyReadingBg();
+}
+function openColourPicker(){ document.getElementById('colourOverlay').classList.add('show'); }
+function closeColourPicker(){ document.getElementById('colourOverlay').classList.remove('show'); }
+document.getElementById('colourOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'colourOverlay') closeColourPicker();
+});
+applyReadingBg();
+
 </script>
+
+<div class="break-overlay" id="breakOverlay">
+  <div class="break-modal">
+    <div class="big-icon" id="breakIcon">💧</div>
+    <h2 id="breakTitle">Time for a quick break!</h2>
+    <p id="breakText">You've been working for 15 minutes — brilliant focus. Get a drink of water, then have a short walk around before you come back.</p>
+    <button class="btn btn-primary" onclick="startBreakCountdown()">Start a 5-minute break</button>
+    <div style="margin-top:10px"><button class="btn btn-ghost btn-small" onclick="dismissBreak()">I'll take a break in a moment</button></div>
+  </div>
+</div>
+<div class="break-timer-badge" id="breakTimerBadge">⏳ <span id="breakTimeLeft">5:00</span> — enjoy your break</div>
+
+
+<div class="overlay" id="colourOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeColourPicker()">✕</button>
+    <h2 style="margin-top:0">🎨 Reading Background Colour</h2>
+    <p style="color:var(--ink-soft); font-size:.88rem; line-height:1.5">Some people find a different background colour more comfortable to read on than white — the same idea as coloured overlays or tinted exercise books some schools use. Try one and see what feels best for you. There's no wrong answer, and you can change back any time.</p>
+    <div class="colour-swatches">
+      <div class="colour-swatch" style="background:#FFFFFF" onclick="setReadingBg('white')" data-bg="white">White</div>
+      <div class="colour-swatch" style="background:#FDF6E3" onclick="setReadingBg('cream')" data-bg="cream">Cream</div>
+      <div class="colour-swatch" style="background:#E8F2FB" onclick="setReadingBg('blue')" data-bg="blue">Blue</div>
+      <div class="colour-swatch" style="background:#EAF7EC" onclick="setReadingBg('green')" data-bg="green">Green</div>
+      <div class="colour-swatch" style="background:#FCEAEF" onclick="setReadingBg('rose')" data-bg="rose">Rose</div>
+      <div class="colour-swatch" style="background:#EDEEF0" onclick="setReadingBg('grey')" data-bg="grey">Grey</div>
+    </div>
+    <p class="colour-note">Honest note: research on coloured backgrounds and reading is actually mixed — they're not a proven fix for dyslexia specifically, but they're completely harmless and some people genuinely find them more comfortable. Worth trying if white feels too bright or "busy" to read.</p>
+  </div>
+</div>
+
 </body>
 </html>
