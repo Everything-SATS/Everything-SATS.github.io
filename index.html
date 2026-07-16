@@ -88,6 +88,7 @@
   .stat-banner{
     background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%);
     color:#fff; text-align:center; padding:28px 16px; margin-top:10px;
+    display:flex; flex-wrap:wrap; justify-content:center; gap:40px;
   }
   .stat-number{font-size:2.2rem; font-weight:800; font-variant-numeric:tabular-nums}
   .stat-label{font-size:.8rem; opacity:.9; margin-top:4px}
@@ -274,8 +275,14 @@
 </main>
 
 <div class="stat-banner">
-  <div class="stat-number" id="visitCount">—</div>
-  <div class="stat-label">page views since launch, tracked with no cookies and no personal data</div>
+  <div>
+    <div class="stat-number" id="visitCount">—</div>
+    <div class="stat-label">page views since launch, tracked with no cookies and no personal data</div>
+  </div>
+  <div>
+    <div class="stat-number" id="starsTotal">0</div>
+    <div class="stat-label">⭐ stars collected on this device</div>
+  </div>
 </div>
 
 <footer>
@@ -356,6 +363,8 @@ function setReadingBg(bg){
   applyReadingBg();
 }
 applyReadingBg();
+
+document.getElementById('starsTotal').textContent = localStorage.getItem('sats_stars_total') || '0';
 
 function openWhy(){ document.getElementById('whyOverlay').classList.add('show'); }
 function closeWhy(){ document.getElementById('whyOverlay').classList.remove('show'); }

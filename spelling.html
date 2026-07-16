@@ -256,6 +256,7 @@
   <button class="home-btn" onclick="location.href='index.html'" aria-label="Back to Everything SATS home">🏠</button>
   <div class="streak-row">
     <div class="streak-chip">🔥 <span id="streakCount">0</span> day streak</div>
+    <div class="streak-chip">🌟 <span id="sessionStars">0</span> stars this session</div>
     <div class="streak-chip">⭐ <span id="totalAnswered">0</span> words practised</div>
   </div>
   <div class="difficulty-row">
@@ -811,6 +812,7 @@ function submitAnswer(){
   saveStats();
   renderHeaderStats();
   renderTopics();
+  awardStar();
 
   session.results.push({ word, given: input.value.trim(), correct });
   showAnswerPopup(correct);
@@ -989,6 +991,7 @@ function dismissBreak(){
 
 function startBreakCountdown(){
   document.getElementById('breakOverlay').classList.remove('show');
+  awardStar();
   const badge = document.getElementById('breakTimerBadge');
   badge.classList.add('show');
   let secondsLeft = 5*60;
@@ -1010,6 +1013,16 @@ function showWelcomeBack(){
   document.getElementById('breakTitle').textContent = "Welcome back!";
   document.getElementById('breakText').textContent = "Hope that break helped. Ready to carry on whenever you are.";
   document.getElementById('breakOverlay').classList.add('show');
+}
+
+/* ---------- Stars: a simple, non-manipulative collectible ---------- */
+let sessionStars = 0;
+function loadStarsTotal(){ return Number(localStorage.getItem('sats_stars_total') || '0'); }
+function awardStar(){
+  sessionStars += 1;
+  localStorage.setItem('sats_stars_total', String(loadStarsTotal() + 1));
+  const el = document.getElementById('sessionStars');
+  if(el) el.textContent = sessionStars;
 }
 
 startWellbeingTimer();
