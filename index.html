@@ -60,6 +60,12 @@
   .tile.external{border-color:var(--line)}
   .tile.external .external-badge{background:var(--gold-light,#FCF1DD); color:#B8860B}
   .section-note{font-size:.84rem; color:var(--ink-soft); margin:-8px 0 14px}
+  .stat-banner{
+    background:linear-gradient(120deg,var(--blue) 0%,var(--purple) 100%);
+    color:#fff; text-align:center; padding:28px 16px; margin-top:10px;
+  }
+  .stat-number{font-size:2.2rem; font-weight:800; font-variant-numeric:tabular-nums}
+  .stat-label{font-size:.8rem; opacity:.9; margin-top:4px}
   footer{max-width:960px; margin:20px auto 0; padding:0 16px; text-align:center; color:var(--ink-soft); font-size:.8rem; line-height:1.6}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
 </style>
@@ -168,9 +174,27 @@
   </section>
 </main>
 
+<div class="stat-banner">
+  <div class="stat-number" id="visitCount">—</div>
+  <div class="stat-label">page views since launch, tracked with no cookies and no personal data</div>
+</div>
+
 <footer>
   Built to make sure a paywall never stands between a kid and doing well in these exams.
 </footer>
+
+<script>
+  // GoatCounter public counter -- privacy-friendly, no cookies, no personal
+  // data. Replace GOATCOUNTER_CODE below with the real site code once the
+  // account exists (goatcounter.com), and enable "Allow adding visitor
+  // counts on your website" in that site's settings for this to return
+  // real numbers instead of failing silently.
+  const GOATCOUNTER_CODE = "everything-sats"; // <- placeholder, update once the account is created
+  fetch(`https://${GOATCOUNTER_CODE}.goatcounter.com/counter/TOTAL.json`)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => { document.getElementById('visitCount').textContent = data.count; })
+    .catch(() => { document.querySelector('.stat-banner').style.display = 'none'; });
+</script>
 
 </body>
 </html>
