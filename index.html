@@ -34,7 +34,7 @@
   .tagline{margin:6px auto 0; opacity:.92; font-size:1.28rem; max-width:560px; line-height:1.4}
   .header-tiles{
     display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;
-    margin:14px auto 0; max-width:920px; text-align:left;
+    margin:14px auto 0; max-width:928px; text-align:left;
   }
   @media (max-width: 640px){ .header-tiles{ grid-template-columns:repeat(2, 1fr); } }
   .header-tile{
@@ -100,13 +100,16 @@
   .tile.external .external-badge{background:var(--gold-light,#FCF1DD); color:#B8860B}
   .section-note{font-size:.84rem; color:var(--ink-soft); margin:-8px 0 14px}
   .curiosity-banner{
-    max-width:960px; margin:14px auto 0; padding:12px 20px; background:var(--bg-alt);
+    width:calc(100% - 32px); max-width:928px; margin:14px auto 0; padding:14px 20px; background:var(--bg-alt);
     border-radius:var(--radius); box-shadow:var(--shadow); display:flex; align-items:center;
-    gap:14px; flex-wrap:wrap;
+    gap:16px; flex-wrap:wrap;
   }
-  .cb-label{font-weight:800; font-size:.85rem; white-space:nowrap; color:var(--ink)}
-  .curiosity-fact{font-size:.9rem; font-weight:600; flex:1; min-width:200px}
-  .cb-source{font-size:.72rem; color:var(--ink-soft); white-space:nowrap; text-decoration:underline}
+  .cb-label-stack{display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left}
+  .cb-icon{font-size:1.4rem; line-height:1}
+  .cb-text{font-weight:800; font-size:.78rem; white-space:nowrap; color:var(--ink); text-transform:uppercase; letter-spacing:.03em}
+  .cb-content{flex:1; min-width:200px; display:flex; flex-direction:column; gap:4px}
+  .curiosity-fact{font-family:Georgia,'Times New Roman',serif; font-size:1.05rem; font-weight:700; color:var(--purple); line-height:1.4}
+  .cb-source{font-size:.72rem; color:var(--ink-soft); text-decoration:underline}
   .cb-source:empty{display:none}
   .stat-banner{
     background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%);
@@ -201,9 +204,14 @@
 </header>
 
 <div class="curiosity-banner">
-  <span class="cb-label">🎲 Curiosity Corner</span>
-  <span class="curiosity-fact" id="curiosityFact">Tap for a random fact!</span>
-  <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
+  <div class="cb-label-stack">
+    <span class="cb-icon">🎲</span>
+    <span class="cb-text">Curiosity Corner</span>
+  </div>
+  <div class="cb-content">
+    <span class="curiosity-fact" id="curiosityFact">Tap for a random fact!</span>
+    <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
+  </div>
   <button class="btn btn-primary btn-small" onclick="showRandomFact()">Give me a fact</button>
 </div>
 
