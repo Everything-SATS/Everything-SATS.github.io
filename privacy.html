@@ -41,6 +41,7 @@
   .notice-card p:last-child{ margin-bottom:0 }
   .notice-card ul{ margin:0 0 12px; padding-left:20px; color:var(--ink-soft); font-size:.92rem; line-height:1.7 }
   .updated-note{ text-align:center; color:var(--ink-soft); font-size:.78rem; margin-top:20px }
+  .copy-email-btn{ background:none; border:none; padding:0; font:inherit; color:var(--blue); text-decoration:underline; cursor:pointer; }
   footer{max-width:640px; margin:0 auto; padding:24px 20px 12px; text-align:center; color:var(--ink-soft); font-size:.78rem; line-height:1.7}
   footer a{color:var(--ink-soft)}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
@@ -96,7 +97,7 @@
 
   <div class="notice-card">
     <h2>Questions?</h2>
-    <p>Email <a href="mailto:everythingsats@yahoo.com">everythingsats@yahoo.com</a> any time — we'll answer honestly.</p>
+    <p>Email <a href="mailto:everythingsats@yahoo.com">everythingsats@yahoo.com</a> any time — we'll answer honestly. If that link doesn't open a mail app for you, <button class="copy-email-btn" id="copyEmailBtn2" onclick="copyPrivacyEmail()">📋 tap here to copy the address</button> instead.</p>
   </div>
 
   <p class="updated-note">Last updated 16 July 2026.</p>
@@ -114,6 +115,14 @@ function applyReadingBg(){
   else { document.documentElement.setAttribute('data-reading-bg', bg); }
 }
 applyReadingBg();
+
+function copyPrivacyEmail(){
+  navigator.clipboard.writeText('everythingsats@yahoo.com').then(() => {
+    const btn = document.getElementById('copyEmailBtn2');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = '📋 tap here to copy the address'; }, 2000);
+  });
+}
 </script>
 </body>
 </html>

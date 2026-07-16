@@ -180,7 +180,7 @@
     margin-top:10px; font-weight:700; font-size:.95rem; background:var(--bg-alt);
     border-radius:10px; padding:8px 12px; display:inline-block;
   }
-  .modal-actions{display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:10px}
+  .modal-actions{display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px}
   .close-x{
     position:absolute; top:14px; right:18px; background:none; border:none; font-size:1.3rem;
     cursor:pointer; color:var(--ink-soft);
@@ -341,7 +341,7 @@
       <div class="spelling-word-display" id="wordDisplay"></div>
       <p id="wordSentence" style="text-align:center; font-style:italic; color:var(--ink-soft); font-size:.9rem; margin:0 0 14px"></p>
       <p style="color:var(--ink-soft); font-size:.9rem; margin-top:0">Look carefully at the word. Say it out loud, breaking it into sounds or letters if that helps. When you're confident, cover it and write it from memory.</p>
-      <button class="btn btn-primary" onclick="goToWriteStage()">🙈 Cover it — I'm ready to write</button>
+      <button class="btn btn-primary" style="width:100%; margin-bottom:14px" onclick="goToWriteStage()">🙈 Cover it — I'm ready to write</button>
     </div>
 
     <div id="writeStage" class="hidden">
@@ -358,7 +358,7 @@
       <div class="feedback-title" id="feedbackTitle"></div>
       <div id="feedbackBody"></div>
     </div>
-    <button class="btn btn-ghost btn-small" style="width:100%; margin-bottom:10px" onclick="openFrustrationHelp()">🤗 Struggling or frustrated? Let's do something different for a moment</button>
+    <button class="btn btn-ghost btn-small" style="width:100%; margin-bottom:0" onclick="openFrustrationHelp()">🤗 Struggling or frustrated? Let's do something different for a moment</button>
     <div class="modal-actions" id="modalActions">
       <button class="btn btn-ghost btn-small" onclick="closeModal()">Stop here</button>
       <button class="btn btn-secondary" id="nextBtn" style="display:none" onclick="nextQuestion()">Next word →</button>
@@ -1052,25 +1052,44 @@ function awardStar(){
   if(el) el.textContent = sessionStars;
 }
 
-const QUICK_FACTS = [
-  "A bolt of lightning is hotter than the surface of the Sun.",
-  "Octopuses have three hearts and blue blood.",
-  "Honey never goes off — archaeologists have found edible honey in ancient Egyptian tombs.",
-  "A group of flamingos is called a flamboyance.",
-  "Wombat poo comes out cube-shaped.",
-  "Some turtles can breathe through their bottoms.",
-  "An ostrich's eye is bigger than its brain.",
-  "There are more ways to shuffle a deck of cards than there are atoms on Earth.",
-  "Butterflies taste with their feet.",
-  "A day on Venus is longer than a year on Venus.",
-  "Sea otters hold hands while they sleep so they do not drift apart.",
-  "Mount Everest grows about 4mm taller every year.",
-  "A blue whale's heart is roughly the size of a small car.",
-  "Koalas have fingerprints so similar to humans that they have occasionally confused crime scene investigators.",
-  "The tallest mountain in the solar system, Olympus Mons, is on Mars.",
+const FUN_FACTS = [
+  { text:"A single bolt of lightning can heat the air around it to roughly five times the temperature of the Sun's surface.", source:"US National Weather Service", url:"https://www.weather.gov/safety/lightning-temperature" },
+  { text:"Octopuses have three hearts and blue blood.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/octopuses-keep-surprising-us-here-are-eight-examples-how.html" },
+  { text:"Honey never spoils — archaeologists have found 3,000-year-old pots of honey in Egyptian tombs that are still edible.", source:"Smithsonian Magazine", url:"https://www.smithsonianmag.com/science-nature/the-science-behind-honeys-eternal-shelf-life-1218690/" },
+  { text:"A group of flamingos is called a 'flamboyance'.", source:"Dictionary.com", url:"https://www.dictionary.com/e/s/flamboyance-flamingos-brilliant-bird-groups/" },
+  { text:"Wombat poo comes out cube-shaped, thanks to their unusual intestines.", source:"Smithsonian Magazine", url:"https://www.smithsonianmag.com/smart-news/scientists-have-solved-mystery-how-wombats-poop-cubes-180976898/" },
+  { text:"A few species of freshwater turtle can breathe through their bottoms while hibernating underwater.", source:"PBS News", url:"https://www.pbs.org/newshour/science/the-secret-to-turtle-hibernation-butt-breathing" },
+  { text:"An ostrich's eye is bigger than its brain.", source:"Smithsonian's National Zoo", url:"https://nationalzoo.si.edu/animals/ostrich" },
+  { text:"There are more possible ways to shuffle a deck of cards than there are atoms on Earth.", source:"McGill Office for Science and Society", url:"https://www.mcgill.ca/oss/article/did-you-know-infographics/there-are-more-ways-arrange-deck-cards-there-are-atoms-earth" },
+  { text:"Butterflies taste things using sensors on their feet.", source:"National Geographic", url:"https://www.nationalgeographic.com/animals/article/insects-butterflies-anatomy-senses-animals" },
+  { text:"The Eiffel Tower grows a few millimetres taller in summer, as the heat makes its metal expand.", source:"Official Eiffel Tower site", url:"https://www.toureiffel.paris/en/news/history-and-culture/why-does-eiffel-tower-change-size" },
+  { text:"One species of jellyfish can reverse its own ageing process, making it biologically immortal.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/immortal-jellyfish-secret-to-cheating-death.html" },
+  { text:"Olympus Mons on Mars is around two and a half times taller than Mount Everest — one of the tallest mountains in the whole solar system.", source:"Britannica", url:"https://www.britannica.com/place/Olympus-Mons" },
+  { text:"You can't actually see the Great Wall of China from space with the naked eye — that's a myth.", source:"NASA", url:"https://www.nasa.gov/image-article/great-wall/" },
+  { text:"Bananas are naturally very slightly radioactive, because of the potassium inside them — completely harmless to eat.", source:"US Department of Energy", url:"https://www.energy.gov/ne/articles/5-radioactive-products-we-use-every-day" },
+  { text:"A day on Venus (one full spin) actually lasts longer than a year on Venus (one full orbit of the Sun).", source:"NASA", url:"https://science.nasa.gov/venus/venus-facts/" },
+  { text:"Venus is the hottest planet in the solar system, even though Mercury is closer to the Sun.", source:"NASA", url:"https://science.nasa.gov/venus/venus-facts/" },
+  { text:"Giant sequoia trees can live for more than 3,000 years.", source:"US National Park Service", url:"https://www.nps.gov/seki/learn/nature/bigtrees.htm" },
+  { text:"One of the shortest wars in recorded history, between Britain and Zanzibar in 1896, lasted only about 38 minutes.", source:"History Hit", url:"https://www.historyhit.com/the-anglo-zanzibar-war-the-shortest-war-in-history-which-lasted-38-minutes/" },
+  { text:"Starfish have no brain and no blood — they use seawater instead.", source:"Smithsonian Ocean", url:"https://ocean.si.edu/ocean-life/invertebrates/sea-stars-urchins-and-relatives" },
+  { text:"Weight for weight, spider silk is around five times stronger than steel.", source:"BBC Discover Wildlife", url:"https://www.discoverwildlife.com/animal-facts/insects-invertebrates/how-strong-is-spider-silk" },
+  { text:"Antarctica's ice sheet holds a huge share of all the fresh water on Earth — commonly estimated at around 70%.", source:"British Antarctic Survey", url:"https://www.bas.ac.uk/about/antarctica/geography/ice/" },
+  { text:"Koalas have fingerprints that look remarkably similar to human fingerprints.", source:"PBS NOVA", url:"https://www.pbs.org/wgbh/nova/article/koala-fingerprints/" },
+  { text:"Scientists have recreated 'diamond rain' in the lab — the conditions thought to exist deep inside Neptune and Uranus.", source:"Lawrence Livermore National Laboratory", url:"https://www.llnl.gov/article/43621/scientists-create-diamond-rain-forms-interior-icy-giant-planets-neptune" },
+  { text:"The human nose can detect over a trillion different odours.", source:"Scientific American", url:"https://www.scientificamerican.com/article/human-nose-can-detect-1-trillion-odors/" },
+  { text:"Sea otter mothers hold paws with their pups while sleeping, so they don't drift apart.", source:"Seattle Aquarium", url:"https://www.seattleaquarium.org/animal/sea-otter/" },
+  { text:"The world's oldest known living tree, a bristlecone pine called Methuselah, is about 4,800 years old.", source:"US Department of Agriculture", url:"https://www.usda.gov/about-usda/news/blog/methuselah-bristlecone-pine-thought-be-oldest-living-organism-earth" },
+  { text:"Mount Everest grows about 4mm taller every year.", source:"Smithsonian Magazine", url:"https://www.smithsonianmag.com/smart-news/geologists-reveal-a-surprising-reason-why-mount-everest-grows-taller-each-year-180985175/" },
+  { text:"A blue whale's heart weighs about as much as a small studio piano — roughly 180kg.", source:"NOAA Fisheries", url:"https://www.fisheries.noaa.gov/feature-story/big-hearted-blue-whale" },
+  { text:"Some parts of the Sahara Desert can go years without a single drop of rain.", source:"National Geographic Education", url:"https://education.nationalgeographic.org/resource/desert/" },
+  { text:"Cows form close friendships with particular other cows, and get stressed when separated from them.", source:"The Humane League", url:"https://thehumaneleague.org/article/do-cows-have-best-friends" },
+  { text:"A group of crows is called a 'murder'.", source:"Ornitheology", url:"https://www.ornitheology.com/post/murder-of-crows-collective-bird-names" },
+  { text:"An average fluffy cumulus cloud weighs around 500,000 kilograms.", source:"US Geological Survey", url:"https://www.usgs.gov/water-science-school/science/how-much-does-a-cloud-weigh" },
+  { text:"Sharks have been around for roughly 400 million years — tens of millions of years before the first trees appeared.", source:"Natural History Museum", url:"https://www.nhm.ac.uk/discover/shark-evolution-a-450-million-year-timeline.html" },
 ];
 function openFrustrationHelp(){
-  document.getElementById('frustrationFact').textContent = choice(QUICK_FACTS);
+  const fact = choice(FUN_FACTS);
+  document.getElementById('frustrationFact').innerHTML = `${fact.text}<br><a href="${fact.url}" target="_blank" rel="noopener" style="display:inline-block; margin-top:8px; font-size:.8rem; font-weight:700; color:var(--blue)">Read more — ${fact.source} ↗</a>`;
   document.getElementById('frustrationOverlay').classList.add('show');
 }
 function closeFrustrationHelp(){
