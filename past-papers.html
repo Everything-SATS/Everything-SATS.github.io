@@ -80,7 +80,6 @@
   <h1>📄 Past Papers</h1>
   <p>Real SATs papers, 2026–2000, free — organised in one place so nobody has to hunt for them or pay for them.</p>
   <button class="home-btn" onclick="location.href='index.html'" aria-label="Back to Everything SATS home">🏠</button>
-  <div style="margin-top:8px"><a class="back-link" href="#" onclick="openColourPicker();return false;">🎨 Change reading background colour</a></div>
   <div class="section-nav">
     <a href="arithmetic.html">🔢 Arithmetic</a>
     <a href="reasoning.html">🧩 Reasoning</a>
@@ -822,43 +821,14 @@
     </div>
 </main>
 
-<div class="overlay" id="colourOverlay">
-  <div class="modal">
-    <button class="close-x" onclick="closeColourPicker()">✕</button>
-    <h2 style="margin-top:0">🎨 Reading Background Colour</h2>
-    <p style="color:var(--ink-soft); font-size:.88rem; line-height:1.5">Some people find a different background colour more comfortable to read on than white — the same idea as coloured overlays or tinted exercise books some schools use. Try one and see what feels best for you. There's no wrong answer, and you can change back any time.</p>
-    <div class="colour-swatches">
-      <div class="colour-swatch" style="background:#FFFFFF" onclick="setReadingBg('white')" data-bg="white">White</div>
-      <div class="colour-swatch" style="background:#FDF6E3" onclick="setReadingBg('cream')" data-bg="cream">Cream</div>
-      <div class="colour-swatch" style="background:#E8F2FB" onclick="setReadingBg('blue')" data-bg="blue">Blue</div>
-      <div class="colour-swatch" style="background:#EAF7EC" onclick="setReadingBg('green')" data-bg="green">Green</div>
-      <div class="colour-swatch" style="background:#FCEAEF" onclick="setReadingBg('rose')" data-bg="rose">Rose</div>
-      <div class="colour-swatch" style="background:#EDEEF0" onclick="setReadingBg('grey')" data-bg="grey">Grey</div>
-    </div>
-    <p class="colour-note">Honest note: research on coloured backgrounds and reading is actually mixed — they're not a proven fix for dyslexia specifically, but they're completely harmless and some people genuinely find them more comfortable. Worth trying if white feels too bright or "busy" to read.</p>
-  </div>
-</div>
-
 <script>
-/* ---------- Reading background colour (site-wide, shared preference) ---------- */
+/* ---------- Reading background colour (site-wide, shared preference — set on other pages) ---------- */
 function loadReadingBg(){ return localStorage.getItem('sats_reading_bg') || 'white'; }
 function applyReadingBg(){
   const bg = loadReadingBg();
   if(bg === 'white'){ document.documentElement.removeAttribute('data-reading-bg'); }
   else { document.documentElement.setAttribute('data-reading-bg', bg); }
-  document.querySelectorAll('.colour-swatch').forEach(el => {
-    el.classList.toggle('active', el.dataset.bg === bg);
-  });
 }
-function setReadingBg(bg){
-  localStorage.setItem('sats_reading_bg', bg);
-  applyReadingBg();
-}
-function openColourPicker(){ document.getElementById('colourOverlay').classList.add('show'); }
-function closeColourPicker(){ document.getElementById('colourOverlay').classList.remove('show'); }
-document.addEventListener('click', (e) => {
-  if(e.target.id === 'colourOverlay') closeColourPicker();
-});
 applyReadingBg();
 </script>
 </body>
