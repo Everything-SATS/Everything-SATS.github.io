@@ -392,97 +392,98 @@ const CLASS_DEF = {
   pronoun: "a word used in place of a noun (like 'she', 'they', 'it').",
 };
 
-/* Hand-written, sensible sentences only -- no randomly-assembled word
-   salad. Each entry tags every word of each askable class actually
-   present, so any correct word is accepted (not just one "official" pick). */
-const WORDCLASS_BANK = {
-  0: [
-    { s:"The brave firefighter rescued the frightened kitten.", classes:{ determiner:["The","the"], adjective:["brave","frightened"], noun:["firefighter","kitten"], verb:["rescued"] } },
-    { s:"A gentle breeze cooled the tired hikers.", classes:{ determiner:["A","the"], adjective:["gentle","tired"], noun:["breeze","hikers"], verb:["cooled"] } },
-    { s:"The hungry fox searched the empty barn.", classes:{ determiner:["The","the"], adjective:["hungry","empty"], noun:["fox","barn"], verb:["searched"] } },
-    { s:"The excited children boarded the yellow bus.", classes:{ determiner:["The","the"], adjective:["excited","yellow"], noun:["children","bus"], verb:["boarded"] } },
-    { s:"A tall giraffe chewed the green leaves.", classes:{ determiner:["A","the"], adjective:["tall","green"], noun:["giraffe","leaves"], verb:["chewed"] } },
-    { s:"The clever squirrel buried the shiny acorn.", classes:{ determiner:["The","the"], adjective:["clever","shiny"], noun:["squirrel","acorn"], verb:["buried"] } },
-    { s:"A small puppy chased the red ball.", classes:{ determiner:["A","the"], adjective:["small","red"], noun:["puppy","ball"], verb:["chased"] } },
-    { s:"The proud farmer harvested the golden wheat.", classes:{ determiner:["The","the"], adjective:["proud","golden"], noun:["farmer","wheat"], verb:["harvested"] } },
-    { s:"A patient nurse comforted the frightened patient.", classes:{ determiner:["A","the"], adjective:["patient","frightened"], noun:["nurse","patient"], verb:["comforted"] } },
-    { s:"The angry wasp stung the startled camper.", classes:{ determiner:["The","the"], adjective:["angry","startled"], noun:["wasp","camper"], verb:["stung"] } },
-    { s:"A wise owl watched the silent forest.", classes:{ determiner:["A","the"], adjective:["wise","silent"], noun:["owl","forest"], verb:["watched"] } },
-    { s:"The busy bees pollinated the colourful flowers.", classes:{ determiner:["The","the"], adjective:["busy","colourful"], noun:["bees","flowers"], verb:["pollinated"] } },
-    { s:"The kind stranger helped the lost tourist.", classes:{ determiner:["The","the"], adjective:["kind","lost"], noun:["stranger","tourist"], verb:["helped"] } },
-    { s:"A fierce storm damaged the wooden fence.", classes:{ determiner:["A","the"], adjective:["fierce","wooden"], noun:["storm","fence"], verb:["damaged"] } },
-    { s:"The elderly man fed the hungry pigeons.", classes:{ determiner:["The","the"], adjective:["elderly","hungry"], noun:["man","pigeons"], verb:["fed"] } },
-  ],
-  1: [
-    { s:"The nervous puppy hid quietly under the old blanket.", classes:{ determiner:["The","the"], adjective:["nervous","old"], noun:["puppy","blanket"], verb:["hid"], adverb:["quietly"] } },
-    { s:"A curious cat watched the birds silently from the window.", classes:{ determiner:["A","the"], adjective:["curious"], noun:["cat","birds","window"], verb:["watched"], adverb:["silently"] } },
-    { s:"The tired athlete finished the race slowly but proudly.", classes:{ determiner:["The","the"], adjective:["tired"], noun:["athlete","race"], verb:["finished"], adverb:["slowly","proudly"] } },
-    { s:"The clever detective solved the mystery quickly.", classes:{ determiner:["The","the"], adjective:["clever"], noun:["detective","mystery"], verb:["solved"], adverb:["quickly"] } },
-    { s:"A shy student answered the question nervously.", classes:{ determiner:["A","the"], adjective:["shy"], noun:["student","question"], verb:["answered"], adverb:["nervously"] } },
-    { s:"The worried mother searched anxiously for her son.", classes:{ determiner:["The"], adjective:["worried"], noun:["mother","son"], verb:["searched"], adverb:["anxiously"] } },
-    { s:"A determined swimmer crossed the lake steadily.", classes:{ determiner:["A","the"], adjective:["determined"], noun:["swimmer","lake"], verb:["crossed"], adverb:["steadily"] } },
-    { s:"The frightened cat climbed swiftly up the tree.", classes:{ determiner:["The","the"], adjective:["frightened"], noun:["cat","tree"], verb:["climbed"], adverb:["swiftly"] } },
-    { s:"The confident speaker addressed the crowd calmly.", classes:{ determiner:["The","the"], adjective:["confident"], noun:["speaker","crowd"], verb:["addressed"], adverb:["calmly"] } },
-    { s:"A curious toddler explored the garden eagerly.", classes:{ determiner:["A","the"], adjective:["curious"], noun:["toddler","garden"], verb:["explored"], adverb:["eagerly"] } },
-    { s:"The exhausted runner crossed the finish line gratefully.", classes:{ determiner:["The","the"], adjective:["exhausted"], noun:["runner","line"], verb:["crossed"], adverb:["gratefully"] } },
-    { s:"The anxious passenger waited nervously for the delayed train.", classes:{ determiner:["The","the"], adjective:["anxious","delayed"], noun:["passenger","train"], verb:["waited"], adverb:["nervously"] } },
-    { s:"A gentle giant lifted the heavy crate effortlessly.", classes:{ determiner:["A","the"], adjective:["gentle","heavy"], noun:["giant","crate"], verb:["lifted"], adverb:["effortlessly"] } },
-    { s:"The stubborn goat blocked the narrow path defiantly.", classes:{ determiner:["The","the"], adjective:["stubborn","narrow"], noun:["goat","path"], verb:["blocked"], adverb:["defiantly"] } },
-    { s:"The talented dancer performed the routine flawlessly.", classes:{ determiner:["The","the"], adjective:["talented"], noun:["dancer","routine"], verb:["performed"], adverb:["flawlessly"] } },
-  ],
-  2: [
-    { s:"The curious fox crept through the quiet garden.", classes:{ determiner:["The","the"], adjective:["curious","quiet"], noun:["fox","garden"], verb:["crept"], preposition:["through"] } },
-    { s:"The exhausted climbers rested beside the frozen lake.", classes:{ determiner:["The","the"], adjective:["exhausted","frozen"], noun:["climbers","lake"], verb:["rested"], preposition:["beside"] } },
-    { s:"A small mouse scurried across the wooden floor.", classes:{ determiner:["A","the"], adjective:["small","wooden"], noun:["mouse","floor"], verb:["scurried"], preposition:["across"] } },
-    { s:"The excited fans waited outside the stadium gates.", classes:{ determiner:["The","the"], adjective:["excited"], noun:["fans","stadium","gates"], verb:["waited"], preposition:["outside"] } },
-    { s:"The old lighthouse stood between two rocky cliffs.", classes:{ determiner:["The"], adjective:["old","rocky"], noun:["lighthouse","cliffs"], verb:["stood"], preposition:["between"] } },
-    { s:"The playful otters slid down the muddy bank.", classes:{ determiner:["The","the"], adjective:["playful","muddy"], noun:["otters","bank"], verb:["slid"], preposition:["down"] } },
-    { s:"The nervous actor stood behind the heavy curtain.", classes:{ determiner:["The","the"], adjective:["nervous","heavy"], noun:["actor","curtain"], verb:["stood"], preposition:["behind"] } },
-    { s:"The tired hikers rested beneath the tall pine.", classes:{ determiner:["The","the"], adjective:["tired","tall"], noun:["hikers","pine"], verb:["rested"], preposition:["beneath"] } },
-    { s:"The eager puppy ran towards the closed gate.", classes:{ determiner:["The","the"], adjective:["eager","closed"], noun:["puppy","gate"], verb:["ran"], preposition:["towards"] } },
-    { s:"The curious children peered inside the dusty attic.", classes:{ determiner:["The","the"], adjective:["curious","dusty"], noun:["children","attic"], verb:["peered"], preposition:["inside"] } },
-    { s:"The frightened deer bolted through the dense woods.", classes:{ determiner:["The","the"], adjective:["frightened","dense"], noun:["deer","woods"], verb:["bolted"], preposition:["through"] } },
-    { s:"The determined climbers pushed beyond the steep ridge.", classes:{ determiner:["The","the"], adjective:["determined","steep"], noun:["climbers","ridge"], verb:["pushed"], preposition:["beyond"] } },
-    { s:"The sleepy cat curled up on the warm windowsill.", classes:{ determiner:["The","the"], adjective:["sleepy","warm"], noun:["cat","windowsill"], verb:["curled"], preposition:["on"] } },
-    { s:"The proud captain sailed beyond the rocky headland.", classes:{ determiner:["The","the"], adjective:["proud","rocky"], noun:["captain","headland"], verb:["sailed"], preposition:["beyond"] } },
-    { s:"The anxious swimmer floated near the wooden pier.", classes:{ determiner:["The","the"], adjective:["anxious","wooden"], noun:["swimmer","pier"], verb:["floated"], preposition:["near"] } },
-  ],
-  3: [
-    { s:"She waited patiently because the bus was late.", classes:{ pronoun:["She"], adjective:["late"], noun:["bus"], verb:["waited"], adverb:["patiently"], conjunction:["because"] } },
-    { s:"He finished his homework quickly so he could relax.", classes:{ pronoun:["He","he"], noun:["homework"], verb:["finished"], adverb:["quickly"], conjunction:["so"] } },
-    { s:"They explored the cave although it was dark.", classes:{ pronoun:["They","it"], adjective:["dark"], noun:["cave"], verb:["explored"], conjunction:["although"] } },
-    { s:"We stayed inside while the storm raged.", classes:{ pronoun:["We"], noun:["storm"], verb:["stayed","raged"], conjunction:["while"] } },
-    { s:"She smiled when she opened her present.", classes:{ pronoun:["She","she"], noun:["present"], verb:["smiled","opened"], conjunction:["when"] } },
-    { s:"He apologised quickly because he had made a mistake.", classes:{ pronoun:["He","he"], noun:["mistake"], verb:["apologised","made"], adverb:["quickly"], conjunction:["because"] } },
-    { s:"She packed an umbrella since rain was forecast.", classes:{ pronoun:["She"], noun:["umbrella","rain"], verb:["packed","was"], conjunction:["since"] } },
-    { s:"They cheered loudly when their team scored.", classes:{ pronoun:["They"], noun:["team"], verb:["cheered","scored"], adverb:["loudly"], conjunction:["when"] } },
-    { s:"We left early so we would avoid the traffic.", classes:{ pronoun:["We","we"], noun:["traffic"], verb:["left","avoid"], adverb:["early"], conjunction:["so"] } },
-    { s:"He trained every day until he mastered the routine.", classes:{ pronoun:["He","he"], noun:["day","routine"], verb:["trained","mastered"], conjunction:["until"] } },
-    { s:"She whispered quietly because the baby was sleeping.", classes:{ pronoun:["She"], noun:["baby"], verb:["whispered","was"], adverb:["quietly"], conjunction:["because"] } },
-    { s:"They stayed calm although the alarm was ringing.", classes:{ pronoun:["They"], noun:["alarm"], verb:["stayed","was"], conjunction:["although"] } },
-    { s:"He finished first even though he started last.", classes:{ pronoun:["He","he"], verb:["finished","started"], conjunction:["though"] } },
-    { s:"We waited patiently while the mechanic fixed the car.", classes:{ pronoun:["We"], noun:["mechanic","car"], verb:["waited","fixed"], adverb:["patiently"], conjunction:["while"] } },
-    { s:"She smiled proudly because she won the prize.", classes:{ pronoun:["She","she"], noun:["prize"], verb:["smiled","won"], adverb:["proudly"], conjunction:["because"] } },
-  ],
-};
+/* Combinatorial generator: fixed grammatical templates with curated word
+   banks per slot. Every bank member is chosen so it's compatible with
+   every other bank at that template position, so every combination
+   produces a grammatically correct sentence -- this is not word-salad,
+   it's the same principle as varying the numbers in a maths question.
+   Because each word is inserted from a known slot, the class tags are
+   always exactly right with no manual per-sentence tagging needed. */
+const WC_ANIMATE_NOUNS = ["firefighter","kitten","hiker","farmer","teacher","puppy","mouse","athlete","doctor","dancer","chef","artist","pilot","gardener","builder","scientist","explorer","swimmer","runner","singer","painter","baker","librarian","postman","vet","coach","nurse","driver","sailor","climber","fox","owl","squirrel","wasp","bee","rabbit","otter","wolf","eagle","deer"];
+const WC_ADJ = ["brave","tired","curious","gentle","clever","proud","nervous","excited","patient","kind","calm","happy","wise","bold","shy","cheerful","careful","honest","quiet","busy","frightened","confident","determined","exhausted","anxious","stubborn","playful","sleepy","eager","gloomy"];
+const WC_VERB_T0 = ["helped","watched","followed","greeted","found","joined","thanked","noticed","approached","visited","spotted","called","hugged","warned","taught","trusted","admired","comforted","congratulated","welcomed"];
+const WC_ADVERB = ["quietly","quickly","slowly","carefully","cautiously","nervously","happily","calmly","bravely","gently","eagerly","patiently","silently","cheerfully","anxiously","confidently","reluctantly","gracefully","hastily","steadily","proudly","kindly","gratefully","warily"];
+const WC_VERB_T1 = ["greeted","thanked","warned","helped","comforted","congratulated","welcomed","questioned","reassured","surprised"];
+const WC_PREP = ["down","behind","beneath","towards","inside","through","beyond","near","across","around","above","below","alongside","past","over"];
+const WC_VERB_T2 = ["slid","stood","rested","ran","peered","bolted","pushed","curled","sailed","floated","crept","hurried","wandered","climbed","dashed","strolled","ventured","hovered","darted","waited"];
+const WC_PRONOUNS = ["He","She","They","We"];
+const WC_VERB1_T3 = ["smiled","laughed","cheered","apologised","waited","trained","whispered","arrived","relaxed","celebrated","worried","hesitated","paused","sighed","nodded"];
+const WC_CONJ = ["because","since","although","while","until","so","when"];
+const WC_VERB2_T3 = ["won","made","fixed","found","lost","finished","started","missed","caught","opened","solved","chose","saved","forgot","remembered"];
+const WC_OBJ_NOUNS = ["prize","mistake","match","race","game","puzzle","trophy","ticket","present","competition","challenge","test","secret","plan","key"];
 
-function genWordClass(diff){
-  const item = bagChoice('wordclass-' + diff, WORDCLASS_BANK[diff]);
-  const classNames = Object.keys(item.classes);
+/* "a"/"an" depends on the sound of the word immediately after it, not just
+   the determiner's own random pick -- honest/hour/honour have a silent h
+   and need "an" even though they start with a consonant letter. */
+function articleFor(word){
+  const w = word.toLowerCase();
+  if(w === 'honest' || w === 'hour' || w === 'honour') return 'an';
+  return /^[aeiou]/.test(w) ? 'an' : 'a';
+}
+function detWord(type, nextWord, capitalize){
+  const word = type === 'the' ? 'the' : articleFor(nextWord);
+  return capitalize ? word.charAt(0).toUpperCase() + word.slice(1) : word;
+}
+
+function pickWordClassQuestion(s, classes){
+  const classNames = Object.keys(classes);
   const targetClass = choice(classNames);
-  const options = item.classes[targetClass];
+  const options = classes[targetClass];
   const primary = options[0];
   const article = (targetClass === 'adjective' || targetClass === 'adverb') ? 'an' : 'a';
   const wordList = options.length > 1 ? `"${options.join('" or "')}"` : `"${primary}"`;
   return {
-    text: `Which word in this sentence is ${article} ${targetClass}? — "${item.s}"`,
+    text: `Which word in this sentence is ${article} ${targetClass}? — "${s}"`,
     answer: primary.toLowerCase(),
     answerAliases: options.map(o => o.toLowerCase()),
     steps: [
       `${article.charAt(0).toUpperCase()}${article.slice(1)} ${targetClass} is ${CLASS_DEF[targetClass]}`,
-      `In "${item.s}", ${wordList} ${options.length > 1 ? 'are' : 'is'} the ${targetClass}${options.length > 1 ? 's' : ''}.`,
+      `In "${s}", ${wordList} ${options.length > 1 ? 'are' : 'is'} the ${targetClass}${options.length > 1 ? 's' : ''}.`,
     ],
   };
+}
+
+function genWordClass(diff){
+  if(diff === 0){
+    const det1type = bagChoice('wc0-det1', ['the','a']), det2type = bagChoice('wc0-det2', ['the','a']);
+    const adj1 = bagChoice('wc0-adj1', WC_ADJ), adj2 = bagChoice('wc0-adj2', WC_ADJ);
+    const noun1 = bagChoice('wc0-noun1', WC_ANIMATE_NOUNS), noun2 = bagChoice('wc0-noun2', WC_ANIMATE_NOUNS);
+    const verb = bagChoice('wc0-verb', WC_VERB_T0);
+    const det1 = detWord(det1type, adj1, true), det2 = detWord(det2type, adj2, false);
+    const s = `${det1} ${adj1} ${noun1} ${verb} ${det2} ${adj2} ${noun2}.`;
+    return pickWordClassQuestion(s, { determiner:[det1,det2], adjective:[adj1,adj2], noun:[noun1,noun2], verb:[verb] });
+  }
+  if(diff === 1){
+    const det1type = bagChoice('wc1-det1', ['the','a']), det2type = bagChoice('wc1-det2', ['the','a']);
+    const adj = bagChoice('wc1-adj', WC_ADJ);
+    const noun1 = bagChoice('wc1-noun1', WC_ANIMATE_NOUNS), noun2 = bagChoice('wc1-noun2', WC_ANIMATE_NOUNS);
+    const verb = bagChoice('wc1-verb', WC_VERB_T1);
+    const adverb = bagChoice('wc1-adverb', WC_ADVERB);
+    const det1 = detWord(det1type, adj, true), det2 = detWord(det2type, noun2, false);
+    const s = `${det1} ${adj} ${noun1} ${verb} ${det2} ${noun2} ${adverb}.`;
+    return pickWordClassQuestion(s, { determiner:[det1,det2], adjective:[adj], noun:[noun1,noun2], verb:[verb], adverb:[adverb] });
+  }
+  if(diff === 2){
+    const det1type = bagChoice('wc2-det1', ['the','a']), det2type = bagChoice('wc2-det2', ['the','a']);
+    const adj1 = bagChoice('wc2-adj1', WC_ADJ), adj2 = bagChoice('wc2-adj2', WC_ADJ);
+    const noun1 = bagChoice('wc2-noun1', WC_ANIMATE_NOUNS), noun2 = bagChoice('wc2-noun2', WC_ANIMATE_NOUNS);
+    const verb = bagChoice('wc2-verb', WC_VERB_T2);
+    const prep = bagChoice('wc2-prep', WC_PREP);
+    const det1 = detWord(det1type, adj1, true), det2 = detWord(det2type, adj2, false);
+    const s = `${det1} ${adj1} ${noun1} ${verb} ${prep} ${det2} ${adj2} ${noun2}.`;
+    return pickWordClassQuestion(s, { determiner:[det1,det2], adjective:[adj1,adj2], noun:[noun1,noun2], verb:[verb], preposition:[prep] });
+  }
+  const pronoun1 = bagChoice('wc3-pronoun', WC_PRONOUNS);
+  const pronoun2 = pronoun1.toLowerCase();
+  const verb1 = bagChoice('wc3-verb1', WC_VERB1_T3);
+  const adverb = bagChoice('wc3-adverb', WC_ADVERB);
+  const conj = bagChoice('wc3-conj', WC_CONJ);
+  const verb2 = bagChoice('wc3-verb2', WC_VERB2_T3);
+  const noun = bagChoice('wc3-noun', WC_OBJ_NOUNS);
+  const dettype = bagChoice('wc3-det', ['the','a']);
+  const det = detWord(dettype, noun, false);
+  const s = `${pronoun1} ${verb1} ${adverb} ${conj} ${pronoun2} ${verb2} ${det} ${noun}.`;
+  return pickWordClassQuestion(s, { pronoun:[pronoun1,pronoun2], verb:[verb1,verb2], adverb:[adverb], conjunction:[conj], noun:[noun] });
 }
 
 /* ---------- Sentence Types (statement / question / exclamation / command) ---------- */
@@ -509,11 +510,29 @@ function genSentenceType(diff){
   };
 }
 
-/* ---------- Apostrophes (contractions and possession) ---------- */
-const CONTRACTIONS = [["do not","don't"],["cannot","can't"],["I am","I'm"],["they are","they're"],["it is","it's"],["did not","didn't"],["we will","we'll"],["should not","shouldn't"],["you are","you're"],["I will","I'll"],["is not","isn't"],["are not","aren't"],["was not","wasn't"],["were not","weren't"],["has not","hasn't"],["have not","haven't"],["had not","hadn't"],["would not","wouldn't"],["could not","couldn't"],["will not","won't"],["let us","let's"],["that is","that's"],["who is","who's"],["does not","doesn't"]];
-const SING_POSSESSION = [["dog","Sam"],["bike","Ellie"],["coat","the teacher"],["homework","Ravi"],["kite","the boy"],["pencil case","Aisha"],["scarf","Grandad"],["football","Leo"],["backpack","Mrs Patel"],["umbrella","the girl"],["notebook","Oliver"],["hat","Grandma"],["guitar","Jamal"],["phone","the doctor"],["lunchbox","Sophie"]];
-const PLURAL_S_POSSESSION = [["toys","the girls"],["boots","the players"],["books","the students"],["lunches","the workers"],["bikes","the twins"],["coats","the nurses"],["desks","the teachers"],["shoes","the dancers"],["kits","the athletes"],["bags","the tourists"],["tickets","the passengers"],["badges","the scouts"]];
-const IRREGULAR_PLURAL_POSSESSION = [["coats","the children"],["shoes","the men"],["scarves","the women"],["tails","the mice"],["feathers","the geese"],["backpacks","the people"],["horns","the oxen"],["collars","the sheep"],["gills","the fish"],["antlers","the deer"]];
+/* ---------- Apostrophes (contractions and possession) ----------
+   Possession questions are combinatorial: a real everyday-item bank crossed
+   with a real owner bank, picked independently. Any item can genuinely
+   belong to any owner, so every combination is a valid, sensible question --
+   this is not word-salad, it's the same principle as varying the numbers
+   in a maths question. Contractions and irregular plurals are capped at
+   the real number that exist in English -- padding those with invented
+   words would be worse than a smaller honest pool. */
+const CONTRACTIONS = [
+  ["do not","don't"],["does not","doesn't"],["did not","didn't"],["cannot","can't"],["could not","couldn't"],
+  ["will not","won't"],["would not","wouldn't"],["should not","shouldn't"],["must not","mustn't"],
+  ["is not","isn't"],["are not","aren't"],["was not","wasn't"],["were not","weren't"],
+  ["has not","hasn't"],["have not","haven't"],["had not","hadn't"],
+  ["I am","I'm"],["you are","you're"],["he is","he's"],["she is","she's"],["it is","it's"],["we are","we're"],["they are","they're"],
+  ["I will","I'll"],["you will","you'll"],["he will","he'll"],["she will","she'll"],["we will","we'll"],["they will","they'll"],
+  ["I have","I've"],["you have","you've"],["we have","we've"],["they have","they've"],
+  ["I would","I'd"],["you would","you'd"],["he would","he'd"],["she would","she'd"],["we would","we'd"],["they would","they'd"],
+  ["let us","let's"],["that is","that's"],["who is","who's"],["what is","what's"],["there is","there's"],["here is","here's"],
+];
+const POSSESSION_ITEMS = ["dog","bike","coat","homework","kite","pencil case","scarf","football","backpack","umbrella","notebook","hat","guitar","phone","lunchbox","book","jacket","watch","camera","wallet","helmet","tablet","ruler","jumper","glove","ticket","badge","torch","water bottle","trophy"];
+const SING_OWNERS = ["Sam","Ellie","the teacher","Ravi","the boy","Aisha","Grandad","Leo","Mrs Patel","the girl","Oliver","Grandma","Jamal","the doctor","Sophie","Mr Chen","the vet","Priya","the coach","Aunt Rosa","Uncle Tom","the pilot","the chef","the nurse","the farmer","the postman","the librarian","the scientist","the author","Noah"];
+const PLURAL_S_OWNERS = ["the girls","the players","the students","the teachers","the dancers","the nurses","the workers","the tourists","the passengers","the scouts","the athletes","the twins","the neighbours","the volunteers","the artists","the farmers","the doctors","the customers","the drivers","the swimmers","the singers","the actors","the painters","the runners","the cyclists"];
+const IRREGULAR_OWNERS = ["the children","the men","the women","the mice","the geese","the people","the oxen","the sheep","the fish","the deer"];
 
 function genApostrophes(diff){
   if(diff === 0){
@@ -529,7 +548,8 @@ function genApostrophes(diff){
       const [full, contracted] = bagChoice('apo-contractions', CONTRACTIONS);
       return { text: `Write "${full}" as a contraction.`, answer: contracted, steps: [`"${full}" becomes "${contracted}".`] };
     }
-    const [item, owner] = bagChoice('apo-sing', SING_POSSESSION);
+    const item = bagChoice('apo-items-1', POSSESSION_ITEMS);
+    const owner = bagChoice('apo-sing-owners', SING_OWNERS);
     return {
       text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe.`,
       answer: `${owner}'s ${item}`,
@@ -537,14 +557,16 @@ function genApostrophes(diff){
     };
   }
   if(diff === 2){
-    const [item, owner] = bagChoice('apo-plurals', PLURAL_S_POSSESSION);
+    const item = bagChoice('apo-items-2', POSSESSION_ITEMS);
+    const owner = bagChoice('apo-plural-owners', PLURAL_S_OWNERS);
     return {
       text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe. (${owner} already ends in 's'.)`,
       answer: `${owner}' ${item}`,
       steps: [ `${owner} is already plural and ends in 's', so just add an apostrophe after the s — no extra s needed.`, `So it becomes "${owner}' ${item}".` ],
     };
   }
-  const [item, owner] = bagChoice('apo-irregular', IRREGULAR_PLURAL_POSSESSION);
+  const item = bagChoice('apo-items-3', POSSESSION_ITEMS);
+  const owner = bagChoice('apo-irregular-owners', IRREGULAR_OWNERS);
   return {
     text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe. (${owner} is an irregular plural — it doesn't end in 's'.)`,
     answer: `${owner}'s ${item}`,
