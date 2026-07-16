@@ -832,8 +832,19 @@ function normalizeAnswer(s){
 
 function checkAnswer(userInput, q){
   const given = normalizeAnswer(userInput);
-  const candidates = [normalizeAnswer(q.answer)].concat((q.answerAliases||[]).map(normalizeAnswer));
+  const answerNorm = normalizeAnswer(q.answer);
+  const candidates = [answerNorm].concat((q.answerAliases||[]).map(normalizeAnswer));
   if(candidates.includes(given)) return true;
+  // Time-of-day answers (e.g. "10:15"): accept a "." or space instead of the
+  // colon, and a missing leading zero -- these are formatting slips, not
+  // wrong answers. Handled separately from the numeric fallback below,
+  // because parseFloat("10:15") silently truncates to 10 at the colon --
+  // without this, any guess with the right hour but wrong minutes would
+  // have been marked correct.
+  if(/^\d{1,2}:\d{2}$/.test(answerNorm)){
+    const timeKey = s => s.replace(/[.\s]/g, ':').replace(/^(\d)(?::)/, '0$1:');
+    return timeKey(given) === timeKey(answerNorm);
+  }
   // tolerant numeric compare (handles "0.30" vs "0.3", trailing zeros, etc.)
   const numGiven = parseFloat(given);
   const numAns = parseFloat(q.answer);
