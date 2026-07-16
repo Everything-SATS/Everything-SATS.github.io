@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everything SATS</title>
+<style>
+  :root{
+    --bg:#F3F6FB; --bg-alt:#FFFFFF; --ink:#1E2A3A; --ink-soft:#5C6B7E;
+    --line:#DCE4EE; --shadow:0 4px 14px rgba(30,42,58,0.08);
+    --blue:#3D7BD9; --blue-light:#E3ECFB; --purple:#8B5FBF; --radius:16px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12161F; --bg-alt:#1A202C; --ink:#EAF0F9; --ink-soft:#96A3B8; --line:#2A3242; --blue-light:#1D3153; }
+  }
+  :root[data-theme="dark"]{ --bg:#12161F; --bg-alt:#1A202C; --ink:#EAF0F9; --ink-soft:#96A3B8; --line:#2A3242; --blue-light:#1D3153; }
+  :root[data-theme="light"]{ --bg:#F3F6FB; --bg-alt:#FFFFFF; --ink:#1E2A3A; --ink-soft:#5C6B7E; --line:#DCE4EE; --blue-light:#E3ECFB; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{ font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:40px; }
+  header.top{
+    background:linear-gradient(120deg,var(--blue) 0%,var(--purple) 100%);
+    color:#fff; padding:36px 18px 40px; text-align:center;
+    border-radius:0 0 28px 28px; box-shadow:var(--shadow);
+  }
+  header.top h1{margin:0 0 8px; font-size:2rem}
+  header.top p{margin:0 auto; opacity:.92; font-size:.95rem; max-width:480px; line-height:1.5}
+  .free-badge{
+    display:inline-block; margin-top:14px; background:rgba(255,255,255,0.18);
+    border-radius:999px; padding:6px 16px; font-size:.8rem; font-weight:700;
+  }
+  main{max-width:960px; margin:0 auto; padding:28px 16px}
+  section{margin-bottom:30px}
+  .section-title{font-size:1rem; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin:0 0 14px}
+  .tiles-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;
+  }
+  .tile{
+    background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:22px; text-decoration:none; color:var(--ink); display:flex; flex-direction:column;
+    gap:8px; transition:transform .15s ease; border:2px solid transparent;
+  }
+  .tile.live:hover{transform:translateY(-3px); border-color:var(--blue-light)}
+  .tile-icon{font-size:2rem}
+  .tile-name{font-weight:800; font-size:1.1rem}
+  .tile-sub{font-size:.82rem; color:var(--ink-soft); line-height:1.4}
+  .tile-status{
+    margin-top:auto; font-size:.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.04em; padding:4px 10px; border-radius:999px; display:inline-block; width:fit-content;
+  }
+  .tile.live .tile-status{background:#E1F6EB; color:#2FA86B}
+  .tile.soon{opacity:.55; cursor:default}
+  .tile.soon .tile-status{background:var(--line); color:var(--ink-soft)}
+  footer{max-width:960px; margin:20px auto 0; padding:0 16px; text-align:center; color:var(--ink-soft); font-size:.8rem; line-height:1.6}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🎓 Everything SATS</h1>
+  <p>Free Key Stage 2 SATs revision — every exam paper, properly tiered from foundation to greater depth, built to actually be usable by every kind of learner.</p>
+  <div class="free-badge">💛 100% free, always — no accounts, no paywalls</div>
+</header>
+
+<main>
+  <section>
+    <div class="section-title">Maths</div>
+    <div class="tiles-grid">
+      <a class="tile live" href="arithmetic.html">
+        <span class="tile-icon">🔢</span>
+        <span class="tile-name">Arithmetic</span>
+        <span class="tile-sub">Paper 1 — every calculation type, drilled until it's automatic.</span>
+        <span class="tile-status">Ready</span>
+      </a>
+      <div class="tile soon">
+        <span class="tile-icon">🧩</span>
+        <span class="tile-name">Reasoning</span>
+        <span class="tile-sub">Papers 2 & 3 — word problems, geometry, statistics, algebra.</span>
+        <span class="tile-status">Coming soon</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">English</div>
+    <div class="tiles-grid">
+      <div class="tile soon">
+        <span class="tile-icon">📖</span>
+        <span class="tile-name">Reading</span>
+        <span class="tile-sub">Comprehension technique across fiction, non-fiction and poetry.</span>
+        <span class="tile-status">Coming soon</span>
+      </div>
+      <div class="tile soon">
+        <span class="tile-icon">✏️</span>
+        <span class="tile-name">SPaG</span>
+        <span class="tile-sub">Grammar & punctuation — word classes, clauses, punctuation rules.</span>
+        <span class="tile-status">Coming soon</span>
+      </div>
+      <div class="tile soon">
+        <span class="tile-icon">🔤</span>
+        <span class="tile-name">Spelling</span>
+        <span class="tile-sub">The statutory Year 5/6 word list and common spelling patterns.</span>
+        <span class="tile-status">Coming soon</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Resources</div>
+    <div class="tiles-grid">
+      <a class="tile live" href="past-papers.html">
+        <span class="tile-icon">📄</span>
+        <span class="tile-name">Past Papers</span>
+        <span class="tile-sub">Real SATs papers back to 2011, organised by year, free.</span>
+        <span class="tile-status">Ready</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Built to make sure a paywall never stands between a kid and doing well in these exams.
+</footer>
+
+</body>
+</html>

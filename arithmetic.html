@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everything SATS — Arithmetic</title>
+<style>
+  :root{
+    --bg:#F3F6FB; --bg-alt:#FFFFFF; --ink:#1E2A3A; --ink-soft:#5C6B7E;
+    --line:#DCE4EE; --shadow:0 4px 14px rgba(30,42,58,0.08);
+    --blue:#3D7BD9; --blue-light:#E3ECFB;
+    --green:#2FA86B; --green-light:#E1F6EB;
+    --red:#E0554F; --red-light:#FBE6E5;
+    --gold:#E8A93A; --gold-light:#FCF1DD;
+    --purple:#8B5FBF; --purple-light:#F0E7FA;
+    --radius:16px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12161F; --bg-alt:#1A202C; --ink:#EAF0F9; --ink-soft:#96A3B8;
+      --line:#2A3242; --shadow:0 4px 14px rgba(0,0,0,0.4);
+      --blue-light:#1D3153; --green-light:#173829; --red-light:#3A2020;
+      --gold-light:#3A2E14; --purple-light:#2C2140;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161F; --bg-alt:#1A202C; --ink:#EAF0F9; --ink-soft:#96A3B8;
+    --line:#2A3242; --shadow:0 4px 14px rgba(0,0,0,0.4);
+    --blue-light:#1D3153; --green-light:#173829; --red-light:#3A2020;
+    --gold-light:#3A2E14; --purple-light:#2C2140;
+  }
+  :root[data-theme="light"]{
+    --bg:#F3F6FB; --bg-alt:#FFFFFF; --ink:#1E2A3A; --ink-soft:#5C6B7E;
+    --line:#DCE4EE; --shadow:0 4px 14px rgba(30,42,58,0.08);
+    --blue-light:#E3ECFB; --green-light:#E1F6EB; --red-light:#FBE6E5;
+    --gold-light:#FCF1DD; --purple-light:#F0E7FA;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:40px;
+  }
+  header.top{
+    position:relative;
+    background:linear-gradient(120deg,var(--blue) 0%,var(--purple) 100%);
+    color:#fff; padding:22px 18px 26px; text-align:center;
+    border-radius:0 0 24px 24px; box-shadow:var(--shadow);
+  }
+  :root[data-calm="true"] header.top{ background:var(--blue); }
+  .settings-btn{
+    position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.18);
+    border:none; border-radius:10px; width:38px; height:38px; font-size:1.1rem;
+    cursor:pointer; color:#fff;
+  }
+  .difficulty-row{ margin-top:16px; display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap }
+  .difficulty-label{ font-size:.82rem; opacity:.9 }
+  .difficulty-tabs{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center }
+  .difficulty-tabs button{
+    background:rgba(255,255,255,0.15); color:#fff; border:2px solid transparent;
+    border-radius:999px; padding:6px 14px; font-size:.82rem; font-weight:700; cursor:pointer; font-family:inherit;
+  }
+  .difficulty-tabs button.active{ background:#fff; color:var(--blue); border-color:#fff }
+  .setting-row{
+    display:flex; justify-content:space-between; align-items:center; gap:14px;
+    padding:14px 0; border-bottom:1px solid var(--line);
+  }
+  .setting-title{ font-weight:700; font-size:.92rem }
+  .setting-sub{ font-size:.78rem; color:var(--ink-soft); margin-top:2px }
+  .setting-note{ font-size:.8rem; color:var(--ink-soft); margin-top:16px; text-align:center }
+  select{
+    font-family:inherit; font-size:.9rem; padding:6px 10px; border-radius:8px;
+    border:2px solid var(--line); background:var(--bg-alt); color:var(--ink);
+  }
+  .switch{ position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0 }
+  .switch input{ opacity:0; width:0; height:0 }
+  .slider{
+    position:absolute; cursor:pointer; inset:0; background:var(--line);
+    border-radius:999px; transition:background .15s ease;
+  }
+  .slider::before{
+    content:""; position:absolute; height:18px; width:18px; left:3px; bottom:3px;
+    background:#fff; border-radius:50%; transition:transform .15s ease;
+  }
+  .switch input:checked + .slider{ background:var(--blue) }
+  .switch input:checked + .slider::before{ transform:translateX(20px) }
+  :root[data-large-text="true"] .question-text{ font-size:1.7rem }
+  :root[data-large-text="true"] .answer-row input{ font-size:1.5rem }
+  .brand-tag{font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; opacity:.85; margin-bottom:2px}
+  .back-link{ display:inline-block; margin-top:10px; color:#fff; opacity:.9; font-size:.8rem; text-decoration:underline; }
+  header.top h1{margin:0 0 4px; font-size:1.5rem; text-wrap:balance}
+  header.top p{margin:0; opacity:.9; font-size:.88rem}
+  .streak-row{
+    display:flex; justify-content:center; gap:18px; margin-top:14px; flex-wrap:wrap;
+  }
+  .streak-chip{
+    background:rgba(255,255,255,0.18); border-radius:999px; padding:6px 14px;
+    font-size:.85rem; font-weight:600; display:flex; align-items:center; gap:6px;
+  }
+  main{max-width:920px; margin:0 auto; padding:20px 16px}
+  .daily-card{
+    background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:20px; margin-bottom:22px; display:flex; justify-content:space-between;
+    align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .daily-card h2{margin:0 0 4px; font-size:1.1rem}
+  .daily-card p{margin:0; color:var(--ink-soft); font-size:.86rem}
+  .btn{
+    border:none; border-radius:12px; padding:12px 20px; font-size:.95rem; font-weight:700;
+    cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; font-family:inherit;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn-primary{background:var(--blue); color:#fff; box-shadow:0 4px 12px rgba(61,123,217,0.35)}
+  .btn-ghost{background:var(--blue-light); color:var(--blue)}
+  .btn-secondary{background:var(--green); color:#fff}
+  .btn-small{padding:8px 14px; font-size:.82rem; border-radius:9px}
+  .topics-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;
+  }
+  .topic-card{
+    background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:18px; cursor:pointer; transition:transform .15s ease;
+    border:2px solid transparent;
+  }
+  .topic-card:hover{transform:translateY(-2px)}
+  .topic-head{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+  .topic-icon{font-size:1.6rem}
+  .topic-name{font-weight:700; font-size:1.02rem}
+  .topic-sub{color:var(--ink-soft); font-size:.78rem; margin-bottom:12px}
+  .progress-track{
+    height:9px; background:var(--line); border-radius:999px; overflow:hidden; margin-bottom:6px;
+  }
+  .progress-fill{height:100%; border-radius:999px; transition:width .4s ease}
+  .progress-label{font-size:.72rem; color:var(--ink-soft); display:flex; justify-content:space-between}
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,20,30,0.55); display:none;
+    align-items:center; justify-content:center; padding:16px; z-index:50;
+  }
+  .overlay.show{display:flex}
+  .modal{
+    background:var(--bg-alt); border-radius:20px; max-width:560px; width:100%;
+    max-height:90vh; overflow-y:auto; padding:26px; box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  }
+  .modal-topic-tag{
+    display:inline-block; font-size:.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.04em; padding:4px 10px; border-radius:999px; margin-bottom:14px;
+  }
+  .question-text{
+    font-size:1.35rem; font-weight:700; line-height:1.5; margin-bottom:18px;
+    font-variant-numeric:tabular-nums;
+  }
+  .answer-row{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap}
+  .answer-row input{
+    flex:1; min-width:140px; font-size:1.2rem; padding:12px 14px; border-radius:12px;
+    border:2px solid var(--line); background:var(--bg); color:var(--ink); font-family:inherit;
+    font-variant-numeric:tabular-nums;
+  }
+  .answer-row input:focus{outline:none; border-color:var(--blue)}
+  .feedback-box{
+    border-radius:14px; padding:16px; margin-top:12px; display:none;
+  }
+  .feedback-box.show{display:block}
+  .feedback-box.correct{background:var(--green-light); border:2px solid var(--green)}
+  .feedback-box.incorrect{background:var(--red-light); border:2px solid var(--red)}
+  .feedback-title{font-weight:800; font-size:1.05rem; margin-bottom:8px; display:flex; align-items:center; gap:8px}
+  .feedback-box.correct .feedback-title{color:var(--green)}
+  .feedback-box.incorrect .feedback-title{color:var(--red)}
+  .working-steps{margin:10px 0 0; padding-left:20px; font-size:.9rem; line-height:1.7}
+  .working-steps li{margin-bottom:4px}
+  .final-answer{
+    margin-top:10px; font-weight:700; font-size:.95rem; background:var(--bg-alt);
+    border-radius:10px; padding:8px 12px; display:inline-block;
+  }
+  .modal-actions{display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:10px}
+  .close-x{
+    position:absolute; top:14px; right:18px; background:none; border:none; font-size:1.3rem;
+    cursor:pointer; color:var(--ink-soft);
+  }
+  .modal{position:relative}
+  .session-progress{font-size:.78rem; color:var(--ink-soft); margin-bottom:10px}
+  .empty-note{color:var(--ink-soft); text-align:center; padding:30px}
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button class="settings-btn" onclick="openSettings()" aria-label="Settings">⚙️</button>
+  <div class="brand-tag">Everything SATS</div>
+  <h1>🎯 Arithmetic</h1>
+  <p>Paper 1 — every calculation type that comes up, practised until it's automatic. No timer, ever — go at your own pace.</p>
+  <a class="back-link" href="index.html">← Back to Everything SATS home</a>
+  <div class="streak-row">
+    <div class="streak-chip">🔥 <span id="streakCount">0</span> day streak</div>
+    <div class="streak-chip">⭐ <span id="totalAnswered">0</span> questions answered</div>
+    <div class="streak-chip">✅ <span id="overallAccuracy">0</span>% correct</div>
+  </div>
+  <div class="difficulty-row">
+    <span class="difficulty-label">Level:</span>
+    <div class="difficulty-tabs" id="difficultyTabs">
+      <button data-level="1" onclick="setDifficulty(1)">Foundation</button>
+      <button data-level="2" onclick="setDifficulty(2)">Expected Standard</button>
+      <button data-level="3" onclick="setDifficulty(3)">Greater Depth</button>
+    </div>
+  </div>
+</header>
+
+<div class="overlay" id="settingsOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeSettings()">✕</button>
+    <h2 style="margin-top:0">⚙️ Settings</h2>
+    <div class="setting-row">
+      <div>
+        <div class="setting-title">Questions per Daily Practice session</div>
+        <div class="setting-sub">Shorter sessions can help if long stretches of focus are hard.</div>
+      </div>
+      <select id="sessionLengthSelect" onchange="saveSettings()">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-title">Reduce animation</div>
+        <div class="setting-sub">Turns off all movement/transition effects, even if your device allows them.</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="reduceMotionToggle" onchange="saveSettings()"><span class="slider"></span></label>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-title">Calm colours</div>
+        <div class="setting-sub">Softer, lower-contrast colours and no background gradient.</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="calmModeToggle" onchange="saveSettings()"><span class="slider"></span></label>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-title">Larger text</div>
+        <div class="setting-sub">Increases question and answer text size.</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="largeTextToggle" onchange="saveSettings()"><span class="slider"></span></label>
+    </div>
+    <p class="setting-note">There is no timer anywhere in this app, on any setting — take as long as you need.</p>
+  </div>
+</div>
+
+<main>
+  <div class="daily-card">
+    <div>
+      <h2>📅 Daily Practice</h2>
+      <p>A mixed set picked just for you — due topics and a few new ones, 10 questions.</p>
+    </div>
+    <button class="btn btn-primary" onclick="startSession('daily')">Start Daily Practice</button>
+  </div>
+
+  <div class="topics-grid" id="topicsGrid"></div>
+
+  <div class="daily-card" style="margin-top:22px">
+    <div>
+      <h2>📄 Past Papers</h2>
+      <p>Real SATs papers back to 2011, organised by year — free, no sign-up, no cost.</p>
+    </div>
+    <a class="btn btn-ghost" href="past-papers.html">Browse Past Papers →</a>
+  </div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <span class="modal-topic-tag" id="modalTopicTag"></span>
+    <div class="session-progress" id="sessionProgress"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="answer-row">
+      <input type="text" id="answerInput" inputmode="decimal" placeholder="Type your answer" autocomplete="off">
+      <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()">Check</button>
+    </div>
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div id="feedbackBody"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-small" onclick="closeModal()">Stop here</button>
+      <button class="btn btn-secondary" id="nextBtn" style="display:none" onclick="nextQuestion()">Next question →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Topic definitions ---------- */
+const TOPICS = [
+  { id:"addsub", name:"Addition & Subtraction", icon:"➕", sub:"Column methods, multi-digit numbers", color:"blue" },
+  { id:"mult", name:"Multiplication", icon:"✖️", sub:"Short & long multiplication", color:"purple" },
+  { id:"div", name:"Division", icon:"➗", sub:"Short & long division, with remainders", color:"green" },
+  { id:"bodmas", name:"Order of Operations", icon:"🔢", sub:"Brackets, ×÷ before +−", color:"gold" },
+  { id:"fractions", name:"Fractions", icon:"🍰", sub:"Add, subtract, multiply, divide", color:"red" },
+  { id:"decimals", name:"Decimals", icon:"🔟", sub:"Add, subtract, multiply, divide, ×÷10/100/1000", color:"blue" },
+  { id:"percent", name:"Percentages", icon:"💯", sub:"Percentage of an amount", color:"purple" },
+  { id:"negatives", name:"Negative Numbers", icon:"❄️", sub:"Calculating across zero", color:"green" },
+];
+
+/* ---------- Utility ---------- */
+function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+function choice(arr){ return arr[randInt(0, arr.length - 1)]; }
+function gcd(a, b){ return b === 0 ? a : gcd(b, a % b); }
+function fmtFrac(n, d){ return `${n}/${d}`; }
+function commas(n){ return n.toLocaleString('en-GB'); }
+
+/* ---------- Question generators ----------
+   Each returns { text, answer, steps (array of strings), answerNote }
+   answer may be a number or string; checked with tolerant matching. */
+
+function genAddSub(diff){
+  const op = choice(["+","-"]);
+  const ranges = { 1:[100,999,50,899], 2:[1234,98765,234,87654], 3:[123456,987654,50000,900000] };
+  const [aMin,aMax,bMin,bMax] = ranges[diff];
+  if(op === "+"){
+    let a = randInt(aMin, aMax), b = randInt(bMin, bMax);
+    if(diff === 3 && Math.random() < 0.5){
+      // Greater Depth: three-number sum, a genuine step up in complexity
+      const c = randInt(bMin, bMax);
+      const sum = a + b + c;
+      return {
+        text: `${commas(a)} + ${commas(b)} + ${commas(c)} = ?`,
+        answer: sum,
+        steps: [
+          `Add the first two numbers: ${commas(a)} + ${commas(b)} = ${commas(a+b)}.`,
+          `Then add the third: ${commas(a+b)} + ${commas(c)} = ${commas(sum)}.`,
+        ],
+      };
+    }
+    const sum = a + b;
+    return {
+      text: `${commas(a)} + ${commas(b)} = ?`,
+      answer: sum,
+      steps: [
+        `Line the numbers up by place value (units under units, tens under tens, and so on).`,
+        `Add each column from right to left, carrying into the next column when a total is 10 or more.`,
+        `${commas(a)} + ${commas(b)} = ${commas(sum)}`,
+      ],
+    };
+  } else {
+    let a = randInt(Math.max(aMin, bMin+100), aMax), b = randInt(bMin, a - Math.max(50, Math.floor(bMin/4)));
+    const dif = a - b;
+    return {
+      text: `${commas(a)} − ${commas(b)} = ?`,
+      answer: dif,
+      steps: [
+        `Line the numbers up by place value, larger number on top.`,
+        `Subtract each column from right to left, borrowing (exchanging) from the next column when needed.`,
+        `${commas(a)} − ${commas(b)} = ${commas(dif)}`,
+      ],
+    };
+  }
+}
+
+function genMult(diff){
+  const long = diff === 1 ? Math.random() < 0.15 : Math.random() < 0.5;
+  if(long){
+    const ranges = { 1:[12,99,2,9], 2:[123,987,23,89], 3:[1234,9876,23,97] };
+    const [aMin,aMax,bMin,bMax] = ranges[diff];
+    const a = randInt(aMin, aMax), b = randInt(bMin, bMax);
+    const product = a * b;
+    return {
+      text: `${commas(a)} × ${commas(b)} = ?`,
+      answer: product,
+      steps: [
+        `Split ${b} into tens and ones (e.g. ${Math.floor(b/10)*10} + ${b % 10}).`,
+        `Multiply ${a} by each part separately, then add the results (long multiplication).`,
+        `${a} × ${Math.floor(b/10)*10} = ${a * Math.floor(b/10) * 10}`,
+        `${a} × ${b % 10} = ${a * (b % 10)}`,
+        `${a * Math.floor(b/10) * 10} + ${a * (b % 10)} = ${commas(product)}`,
+      ],
+    };
+  } else {
+    const ranges = { 1:[23,987,2,9], 2:[1234,9876,2,9], 3:[1234,9876,6,9] };
+    const [aMin,aMax,bMin,bMax] = ranges[diff];
+    const a = randInt(aMin, aMax), b = randInt(bMin, bMax);
+    const product = a * b;
+    return {
+      text: `${commas(a)} × ${b} = ?`,
+      answer: product,
+      steps: [
+        `Multiply each digit of ${a} by ${b}, starting from the ones column, carrying as needed.`,
+        `${commas(a)} × ${b} = ${commas(product)}`,
+      ],
+    };
+  }
+}
+
+function genDiv(diff){
+  const long = diff === 1 ? Math.random() < 0.1 : Math.random() < 0.5;
+  if(long){
+    const ranges = { 1:[11,20], 2:[12,45], 3:[23,89] };
+    const [dMin,dMax] = ranges[diff];
+    const divisor = randInt(dMin, dMax);
+    const quotient = randInt(diff===1?12:23, diff===3?900:400);
+    const remainder = diff === 1 ? 0 : randInt(0, divisor - 1);
+    const dividend = divisor * quotient + remainder;
+    const ansStr = remainder === 0 ? `${quotient}` : `${quotient} remainder ${remainder}`;
+    return {
+      text: `${commas(dividend)} ÷ ${divisor} = ?`,
+      answer: ansStr,
+      answerAliases: remainder === 0 ? [String(quotient)] : [`${quotient} r ${remainder}`, `${quotient}r${remainder}`],
+      steps: [
+        `Use long division: how many times does ${divisor} go into the leading digits of ${commas(dividend)}?`,
+        `Work through each digit, bringing the next one down after each step.`,
+        `${commas(dividend)} ÷ ${divisor} = ${quotient}${remainder ? ` remainder ${remainder}` : ""}`,
+      ],
+    };
+  } else {
+    const ranges = { 1:[2,5,23,499], 2:[2,9,234,4999], 3:[6,9,2340,9899] };
+    const [dMin,dMax,qMin,qMax] = ranges[diff];
+    const divisor = randInt(dMin, dMax);
+    const quotient = randInt(qMin, qMax);
+    const remainder = diff === 1 ? 0 : randInt(0, divisor - 1);
+    const dividend = divisor * quotient + remainder;
+    const ansStr = remainder === 0 ? `${quotient}` : `${quotient} remainder ${remainder}`;
+    return {
+      text: `${commas(dividend)} ÷ ${divisor} = ?`,
+      answer: ansStr,
+      answerAliases: remainder === 0 ? [String(quotient)] : [`${quotient} r ${remainder}`, `${quotient}r${remainder}`],
+      steps: [
+        `Use short division: divide each digit of ${commas(dividend)} by ${divisor} from left to right, carrying remainders to the next digit.`,
+        `${commas(dividend)} ÷ ${divisor} = ${quotient}${remainder ? ` remainder ${remainder}` : ""}`,
+      ],
+    };
+  }
+}
+
+function genBodmas(diff){
+  const small = diff === 1;
+  const a = randInt(2, small?6:12), b = randInt(2, small?6:12), c = randInt(2, small?10:20), d = randInt(2, small?5:9);
+  const forms2op = [
+    () => {
+      const result = c + a * b;
+      return { text:`${c} + ${a} × ${b} = ?`, answer: result,
+        steps:[`Multiplication before addition: work out ${a} × ${b} = ${a*b} first.`, `Then add: ${c} + ${a*b} = ${result}.`] };
+    },
+    () => {
+      const result = (c + a) * b;
+      return { text:`(${c} + ${a}) × ${b} = ?`, answer: result,
+        steps:[`Brackets first: ${c} + ${a} = ${c+a}.`, `Then multiply: ${c+a} × ${b} = ${result}.`] };
+    },
+    () => {
+      const result = c - a * d;
+      const cc = c + a*d;
+      return { text:`${cc} − ${a} × ${d} = ?`, answer: cc - a*d,
+        steps:[`Multiplication before subtraction: ${a} × ${d} = ${a*d} first.`, `Then subtract: ${cc} − ${a*d} = ${cc - a*d}.`] };
+    },
+    () => {
+      const divisor = choice([2,3,4,5]);
+      const q = randInt(2,10);
+      const inner = divisor * q;
+      const result = inner / divisor + b;
+      return { text:`${inner} ÷ ${divisor} + ${b} = ?`, answer: result,
+        steps:[`Division before addition: ${inner} ÷ ${divisor} = ${inner/divisor} first.`, `Then add: ${inner/divisor} + ${b} = ${result}.`] };
+    },
+  ];
+  if(diff !== 3) return choice(forms2op)();
+
+  // Greater Depth: three operations / nested brackets, a genuine step up
+  const forms3op = [
+    () => {
+      const result = (a + b) * c - d;
+      return { text:`(${a} + ${b}) × ${c} − ${d} = ?`, answer: result,
+        steps:[`Brackets first: ${a} + ${b} = ${a+b}.`, `Then multiply: ${a+b} × ${c} = ${(a+b)*c}.`, `Then subtract: ${(a+b)*c} − ${d} = ${result}.`] };
+    },
+    () => {
+      const result = a * b + c * d;
+      return { text:`${a} × ${b} + ${c} × ${d} = ?`, answer: result,
+        steps:[`Do both multiplications first: ${a} × ${b} = ${a*b}, and ${c} × ${d} = ${c*d}.`, `Then add them: ${a*b} + ${c*d} = ${result}.`] };
+    },
+    () => {
+      const inner = a + b;
+      const result = inner * c - inner;
+      return { text:`(${a} + ${b}) × ${c} − (${a} + ${b}) = ?`, answer: result,
+        steps:[`Work out the bracket first: ${a} + ${b} = ${inner} (both brackets are the same).`, `Multiply: ${inner} × ${c} = ${inner*c}.`, `Subtract: ${inner*c} − ${inner} = ${result}.`] };
+    },
+  ];
+  return choice(forms3op)();
+}
+
+function genFractions(diff){
+  const kinds = diff === 1 ? ["addsame","addsame","adddiff"]
+              : diff === 3 ? ["adddiff","mult","divwhole","mixed"]
+              : ["addsame","adddiff","mult","divwhole"];
+  const kind = choice(kinds);
+  if(kind === "mixed"){
+    // Greater Depth: mixed number addition, needs converting to improper fractions first
+    const w1 = randInt(1,4), d1 = randInt(3,8), n1 = randInt(1,d1-1);
+    const w2 = randInt(1,4);
+    const n2 = randInt(1,d1-1);
+    const totalN = (w1*d1+n1) + (w2*d1+n2);
+    const wholeResult = Math.floor(totalN/d1), remN = totalN % d1;
+    const g = gcd(remN||1, d1);
+    return {
+      text: `${w1} ${fmtFrac(n1,d1)} + ${w2} ${fmtFrac(n2,d1)} = ?`,
+      answer: remN === 0 ? `${wholeResult}` : `${wholeResult} ${fmtFrac(remN/g, d1/g)}`,
+      answerAliases: remN === 0 ? [] : [`${wholeResult} ${fmtFrac(remN, d1)}`],
+      steps: [
+        `Convert each mixed number to an improper fraction: ${w1} ${fmtFrac(n1,d1)} = ${fmtFrac(w1*d1+n1, d1)}, and ${w2} ${fmtFrac(n2,d1)} = ${fmtFrac(w2*d1+n2, d1)}.`,
+        `Add the numerators: ${w1*d1+n1} + ${w2*d1+n2} = ${totalN}, giving ${fmtFrac(totalN, d1)}.`,
+        `Convert back to a mixed number: ${remN === 0 ? wholeResult : `${wholeResult} ${fmtFrac(remN,d1)}`}${g>1 ? ` = ${wholeResult} ${fmtFrac(remN/g,d1/g)}` : ""}`,
+      ],
+    };
+  }
+  if(kind === "addsame"){
+    const d = diff === 1 ? randInt(3,8) : randInt(4, 12);
+    let n1 = randInt(1, d-1), n2 = randInt(1, d-1);
+    const sumN = n1 + n2;
+    const g = gcd(sumN, d);
+    const simp = g > 1 ? ` = ${fmtFrac(sumN/g, d/g)}` : "";
+    return {
+      text: `${fmtFrac(n1,d)} + ${fmtFrac(n2,d)} = ?  (simplify if you can)`,
+      answer: fmtFrac(sumN, d),
+      answerAliases: g > 1 ? [fmtFrac(sumN/g, d/g)] : [],
+      steps: [
+        `The denominators already match (${d}), so just add the numerators: ${n1} + ${n2} = ${sumN}.`,
+        `Answer: ${fmtFrac(sumN, d)}${simp}`,
+      ],
+    };
+  } else if(kind === "adddiff"){
+    const d1 = choice([2,3,4,5]), d2 = choice([3,4,5,6].filter(x=>x!==d1));
+    const lcm = (d1*d2)/gcd(d1,d2);
+    const n1 = randInt(1, d1-1), n2 = randInt(1, d2-1);
+    const totalN = n1*(lcm/d1) + n2*(lcm/d2);
+    const g = gcd(totalN, lcm);
+    return {
+      text: `${fmtFrac(n1,d1)} + ${fmtFrac(n2,d2)} = ?`,
+      answer: fmtFrac(totalN/g, lcm/g),
+      answerAliases: [fmtFrac(totalN, lcm)],
+      steps: [
+        `Find a common denominator for ${d1} and ${d2}: the lowest common multiple is ${lcm}.`,
+        `Convert: ${fmtFrac(n1,d1)} = ${fmtFrac(n1*(lcm/d1), lcm)}, and ${fmtFrac(n2,d2)} = ${fmtFrac(n2*(lcm/d2), lcm)}.`,
+        `Add the numerators: ${n1*(lcm/d1)} + ${n2*(lcm/d2)} = ${totalN}, giving ${fmtFrac(totalN, lcm)}.`,
+        g > 1 ? `Simplify by dividing top and bottom by ${g}: ${fmtFrac(totalN/g, lcm/g)}.` : `This is already in its simplest form.`,
+      ],
+    };
+  } else if(kind === "mult"){
+    const n1 = randInt(1,6), d1 = randInt(n1+1, 9), n2 = randInt(1,6), d2 = randInt(n2+1,9);
+    const numN = n1*n2, numD = d1*d2;
+    const g = gcd(numN, numD);
+    return {
+      text: `${fmtFrac(n1,d1)} × ${fmtFrac(n2,d2)} = ?`,
+      answer: fmtFrac(numN/g, numD/g),
+      answerAliases: [fmtFrac(numN, numD)],
+      steps: [
+        `Multiply the numerators together: ${n1} × ${n2} = ${numN}.`,
+        `Multiply the denominators together: ${d1} × ${d2} = ${numD}.`,
+        `That gives ${fmtFrac(numN, numD)}.`,
+        g > 1 ? `Simplify by dividing top and bottom by ${g}: ${fmtFrac(numN/g, numD/g)}.` : `This is already in its simplest form.`,
+      ],
+    };
+  } else {
+    const whole = randInt(2, 8);
+    const n1 = 1, d1 = randInt(2, 6);
+    const numD = d1 * whole;
+    return {
+      text: `${fmtFrac(n1,d1)} ÷ ${whole} = ?`,
+      answer: fmtFrac(n1, numD),
+      steps: [
+        `Dividing by a whole number means multiplying the denominator by it: ${d1} × ${whole} = ${numD}.`,
+        `Answer: ${fmtFrac(n1, numD)}`,
+      ],
+    };
+  }
+}
+
+function genDecimals(diff){
+  const kinds = diff === 1 ? ["addsub","addsub","scale"] : diff === 3 ? ["addsub","mult","div","scale"] : ["addsub","mult","div","scale"];
+  const kind = choice(kinds);
+  if(kind === "addsub"){
+    const op = choice(["+","-"]);
+    const a = diff === 1 ? (randInt(20,999)/10).toFixed(1) : (randInt(1000, diff===3?999999:99999)/100).toFixed(2);
+    const b = diff === 1 ? (randInt(10,499)/10).toFixed(1) : (randInt(500, diff===3?99999:9999)/100).toFixed(2);
+    const result = op === "+" ? (parseFloat(a)+parseFloat(b)) : (parseFloat(a)-parseFloat(b));
+    return {
+      text: `${a} ${op} ${b} = ?`,
+      answer: result.toFixed(2),
+      steps: [
+        `Line up the decimal points, then ${op === "+" ? "add" : "subtract"} as normal, keeping the decimal point in the same place.`,
+        `${a} ${op} ${b} = ${result.toFixed(2)}`,
+      ],
+    };
+  } else if(kind === "mult"){
+    const a = (randInt(20, 999)/10).toFixed(1);
+    const b = randInt(2, 9);
+    const result = parseFloat(a) * b;
+    return {
+      text: `${a} × ${b} = ?`,
+      answer: Number(result.toFixed(3)),
+      steps: [
+        `Ignore the decimal point and multiply as whole numbers: ${Math.round(parseFloat(a)*10)} × ${b} = ${Math.round(parseFloat(a)*10)*b}.`,
+        `Put the decimal point back in — ${a} has 1 decimal place, so the answer does too: ${result.toFixed(1)}`,
+      ],
+    };
+  } else if(kind === "div"){
+    const divisor = randInt(2, 9);
+    const whole = randInt(10, 400);
+    const dividend = (whole * divisor / 10).toFixed(1);
+    return {
+      text: `${dividend} ÷ ${divisor} = ?`,
+      answer: Number((whole/10).toFixed(2)),
+      steps: [
+        `Divide as if there were no decimal point, then place it back in the same relative position.`,
+        `${dividend} ÷ ${divisor} = ${(whole/10).toFixed(1)}`,
+      ],
+    };
+  } else {
+    const a = (randInt(120, 9876)/100).toFixed(2);
+    const factor = choice([10, 100, 1000]);
+    const mult = Math.random() < 0.5;
+    const result = mult ? parseFloat(a) * factor : parseFloat(a) / factor;
+    return {
+      text: `${a} ${mult ? "×" : "÷"} ${factor} = ?`,
+      answer: Number(result.toFixed(4)),
+      steps: [
+        `${mult ? "Multiplying" : "Dividing"} by ${factor} moves every digit ${Math.log10(factor)} place value column${Math.log10(factor)>1?"s":""} to the ${mult ? "left" : "right"}.`,
+        `${a} ${mult ? "×" : "÷"} ${factor} = ${result}`,
+      ],
+    };
+  }
+}
+
+function genPercent(diff){
+  if(diff === 3 && Math.random() < 0.5){
+    // Greater Depth: less-friendly percentages, larger amounts
+    const pct = choice([17,23,35,42,65,85,12,8]);
+    const amount = randInt(20, 800) * choice([1,2,5]);
+    const result = (pct/100) * amount;
+    return {
+      text: `Calculate ${pct}% of ${commas(amount)}.`,
+      answer: Number(result.toFixed(2)),
+      steps: [
+        `Find 1% first by dividing by 100: 1% of ${amount} = ${(amount/100).toFixed(2)}.`,
+        `Multiply by ${pct} to reach ${pct}%: ${(amount/100).toFixed(2)} × ${pct} = ${result}.`,
+      ],
+    };
+  }
+  const pctPool = diff === 1 ? [10,25,50,75,20] : [10,20,25,50,75,5,15,30,40,60,70,80,90];
+  const pct = choice(pctPool);
+  const amount = randInt(4, diff===1?100:200) * (choice([1,2,4,5]));
+  const result = (pct/100) * amount;
+  return {
+    text: `Calculate ${pct}% of ${commas(amount)}.`,
+    answer: Number(result.toFixed(2)),
+    steps: [
+      `Find 10% first by dividing by 10: 10% of ${amount} = ${(amount/10).toFixed(2)}.`,
+      `Scale that up (or use 50%/25% shortcuts) to reach ${pct}%.`,
+      `${pct}% of ${commas(amount)} = ${result}`,
+    ],
+  };
+}
+
+function genNegatives(diff){
+  const kind = diff === 1 ? "addsub" : choice(["addsub","interval"]);
+  const ranges = { 1:[-10,5,1,10], 2:[-20,15,1,25], 3:[-50,30,10,60] };
+  const [aMin,aMax,bMin,bMax] = ranges[diff];
+  if(kind === "addsub"){
+    const a = randInt(aMin, aMax), b = randInt(bMin, bMax);
+    const op = choice(["+","-"]);
+    const result = op === "+" ? a + b : a - b;
+    return {
+      text: `${a} ${op} ${b} = ?`,
+      answer: result,
+      steps: [
+        `Picture a number line: start at ${a}.`,
+        `${op === "+" ? `Move ${b} to the right (add).` : `Move ${b} to the left (subtract).`}`,
+        `${a} ${op} ${b} = ${result}`,
+      ],
+    };
+  } else {
+    const a = randInt(Math.min(aMin,-1), -1), b = randInt(1, bMax);
+    const result = b - a;
+    return {
+      text: `What is the difference between ${a} and ${b}?`,
+      answer: result,
+      steps: [
+        `The distance from ${a} up to 0 is ${Math.abs(a)}.`,
+        `The distance from 0 up to ${b} is ${b}.`,
+        `Total distance (the difference): ${Math.abs(a)} + ${b} = ${result}`,
+      ],
+    };
+  }
+}
+
+const GENERATORS = {
+  addsub: genAddSub, mult: genMult, div: genDiv, bodmas: genBodmas,
+  fractions: genFractions, decimals: genDecimals, percent: genPercent, negatives: genNegatives,
+};
+
+/* ---------- Spaced repetition (simple Leitner system) ----------
+   Each topic has a "box" 1-5. Box determines how many questions of
+   that topic show up in a Daily Practice session relative to others --
+   lower box (recently wrong / new) = more frequent, higher box (mastered) = rarer.
+   Correct answer -> box + 1 (max 5). Wrong answer -> box back to 1. */
+function loadProgress(){
+  const raw = localStorage.getItem('sats_arith_progress');
+  if(raw){ try { return JSON.parse(raw); } catch(e){} }
+  const fresh = {};
+  TOPICS.forEach(t => fresh[t.id] = { box:1, correct:0, attempted:0 });
+  return fresh;
+}
+function saveProgress(){ localStorage.setItem('sats_arith_progress', JSON.stringify(progress)); }
+
+let progress = loadProgress();
+
+function loadStats(){
+  const raw = localStorage.getItem('sats_arith_stats');
+  if(raw){ try { return JSON.parse(raw); } catch(e){} }
+  return { totalAnswered:0, totalCorrect:0, streak:0, lastActiveDate:null };
+}
+function saveStats(){ localStorage.setItem('sats_arith_stats', JSON.stringify(stats)); }
+let stats = loadStats();
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function updateStreakOnLoad(){
+  const today = todayStr();
+  if(stats.lastActiveDate === today) return; // already counted today
+  const yest = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if(stats.lastActiveDate === yest){ /* keep streak, will bump when they answer something today */ }
+  else if(stats.lastActiveDate !== null){ stats.streak = 0; } // gap -> streak broken until they answer today
+}
+updateStreakOnLoad();
+
+function bumpStreakIfNewDay(){
+  const today = todayStr();
+  if(stats.lastActiveDate !== today){
+    stats.streak += 1;
+    stats.lastActiveDate = today;
+    saveStats();
+  }
+}
+
+/* ---------- Rendering ---------- */
+const topicColors = { blue:"var(--blue)", green:"var(--green)", red:"var(--red)", gold:"var(--gold)", purple:"var(--purple)" };
+const topicColorsLight = { blue:"var(--blue-light)", green:"var(--green-light)", red:"var(--red-light)", gold:"var(--gold-light)", purple:"var(--purple-light)" };
+
+function renderTopics(){
+  const grid = document.getElementById('topicsGrid');
+  grid.innerHTML = TOPICS.map(t => {
+    const p = progress[t.id];
+    const pct = Math.round(((p.box - 1) / 4) * 100);
+    return `
+      <div class="topic-card" style="border-color:${topicColorsLight[t.color]}" onclick="startSession('${t.id}')">
+        <div class="topic-head">
+          <span class="topic-icon">${t.icon}</span>
+          <span class="topic-name">${t.name}</span>
+        </div>
+        <div class="topic-sub">${t.sub}</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%; background:${topicColors[t.color]}"></div></div>
+        <div class="progress-label"><span>Mastery: ${pct}%</span><span>${p.correct}/${p.attempted} correct</span></div>
+      </div>`;
+  }).join('');
+}
+
+function renderHeaderStats(){
+  document.getElementById('streakCount').textContent = stats.streak;
+  document.getElementById('totalAnswered').textContent = stats.totalAnswered;
+  document.getElementById('overallAccuracy').textContent = stats.totalAnswered ? Math.round((stats.totalCorrect/stats.totalAnswered)*100) : 0;
+}
+
+const CORRECT_MESSAGES = [
+  '✅ Correct — great work!',
+  '✅ Spot on!',
+  '✅ Yes! That\'s exactly right.',
+  '✅ Nailed it — well done.',
+  '✅ Correct — you\'ve got this.',
+];
+const INCORRECT_MESSAGES = [
+  '💪 Not this time — but here\'s exactly how to get it',
+  '💪 Close, keep going — here\'s the method',
+  '💪 That\'s okay, this one\'s tricky — here\'s how it works',
+  '💪 Good try — let\'s look at the steps together',
+];
+
+/* ---------- Session logic ---------- */
+let session = { topicIds:[], questions:[], index:0, currentQ:null };
+
+function buildDailyQueue(){
+  // Weight topics by inverse box (lower box = more due) -- simple weighted pick
+  const weights = TOPICS.map(t => ({ id:t.id, w: 6 - progress[t.id].box }));
+  const totalW = weights.reduce((s,x)=>s+x.w, 0);
+  const queue = [];
+  for(let i=0; i<appSettings.sessionLength; i++){
+    let r = Math.random() * totalW, acc = 0, pick = weights[0].id;
+    for(const w of weights){ acc += w.w; if(r <= acc){ pick = w.id; break; } }
+    queue.push(pick);
+  }
+  return queue;
+}
+
+function startSession(kind){
+  if(kind === 'daily'){
+    session.topicIds = buildDailyQueue();
+  } else {
+    session.topicIds = new Array(8).fill(kind);
+  }
+  session.index = 0;
+  openModal();
+  loadQuestionAt(0);
+}
+
+function loadQuestionAt(i){
+  if(i >= session.topicIds.length){ closeModal(); return; }
+  const topicId = session.topicIds[i];
+  const topic = TOPICS.find(t => t.id === topicId);
+  session.currentQ = GENERATORS[topicId](getDifficulty());
+  session.currentQ.topicId = topicId;
+
+  document.getElementById('modalTopicTag').textContent = `${topic.icon} ${topic.name}`;
+  document.getElementById('modalTopicTag').style.background = topicColorsLight[topic.color];
+  document.getElementById('modalTopicTag').style.color = topicColors[topic.color];
+  document.getElementById('sessionProgress').textContent = `Question ${i+1} of ${session.topicIds.length}`;
+  document.getElementById('questionText').textContent = session.currentQ.text;
+  document.getElementById('answerInput').value = '';
+  document.getElementById('answerInput').disabled = false;
+  document.getElementById('submitBtn').style.display = 'inline-block';
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('answerInput').focus();
+}
+
+function normalizeAnswer(s){
+  return String(s).trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function checkAnswer(userInput, q){
+  const given = normalizeAnswer(userInput);
+  const candidates = [normalizeAnswer(q.answer)].concat((q.answerAliases||[]).map(normalizeAnswer));
+  if(candidates.includes(given)) return true;
+  // tolerant numeric compare (handles "0.30" vs "0.3", trailing zeros, etc.)
+  const numGiven = parseFloat(given);
+  const numAns = parseFloat(q.answer);
+  if(!isNaN(numGiven) && !isNaN(numAns) && Math.abs(numGiven - numAns) < 0.005) return true;
+  return false;
+}
+
+function submitAnswer(){
+  const input = document.getElementById('answerInput');
+  const q = session.currentQ;
+  if(!input.value.trim()) return;
+  const correct = checkAnswer(input.value, q);
+
+  // update progress
+  const p = progress[q.topicId];
+  p.attempted += 1;
+  if(correct){ p.correct += 1; p.box = Math.min(5, p.box + 1); }
+  else { p.box = 1; }
+  saveProgress();
+
+  stats.totalAnswered += 1;
+  if(correct) stats.totalCorrect += 1;
+  bumpStreakIfNewDay();
+  saveStats();
+  renderHeaderStats();
+  renderTopics();
+
+  const box = document.getElementById('feedbackBox');
+  box.className = 'feedback-box show ' + (correct ? 'correct' : 'incorrect');
+  document.getElementById('feedbackTitle').innerHTML = correct
+    ? choice(CORRECT_MESSAGES)
+    : choice(INCORRECT_MESSAGES);
+  const stepsHtml = q.steps.map(s => `<li>${s}</li>`).join('');
+  document.getElementById('feedbackBody').innerHTML = `
+    ${correct ? '' : `<p style="margin:0 0 10px">Here’s the working for full marks — have a read through, then try one like it again in a bit:</p>`}
+    <ol class="working-steps">${stepsHtml}</ol>
+    <div class="final-answer">Full-marks answer: ${q.answer}</div>
+  `;
+
+  input.disabled = true;
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'inline-block';
+  document.getElementById('nextBtn').focus();
+}
+
+function nextQuestion(){
+  session.index += 1;
+  loadQuestionAt(session.index);
+}
+
+function openModal(){ document.getElementById('overlay').classList.add('show'); }
+function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+
+document.getElementById('answerInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){
+    if(document.getElementById('submitBtn').style.display !== 'none') submitAnswer();
+    else nextQuestion();
+  }
+});
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if(e.target.id === 'overlay') closeModal();
+});
+
+/* ---------- Difficulty ---------- */
+function getDifficulty(){
+  return Number(localStorage.getItem('sats_arith_difficulty') || '2');
+}
+function setDifficulty(level){
+  localStorage.setItem('sats_arith_difficulty', String(level));
+  renderDifficultyTabs();
+}
+function renderDifficultyTabs(){
+  const level = getDifficulty();
+  document.querySelectorAll('#difficultyTabs button').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.level) === level);
+  });
+}
+
+/* ---------- Accessibility settings ---------- */
+function loadSettings(){
+  const raw = localStorage.getItem('sats_arith_settings');
+  if(raw){ try { return JSON.parse(raw); } catch(e){} }
+  return { sessionLength:10, reduceMotion:false, calmMode:false, largeText:false };
+}
+let appSettings = loadSettings();
+
+function applySettings(){
+  document.documentElement.setAttribute('data-large-text', appSettings.largeText ? 'true' : 'false');
+  document.documentElement.setAttribute('data-calm', appSettings.calmMode ? 'true' : 'false');
+  if(appSettings.reduceMotion){
+    document.documentElement.style.setProperty('--force-no-motion', '1');
+    const styleTag = document.getElementById('forceMotionStyle') || document.createElement('style');
+    styleTag.id = 'forceMotionStyle';
+    styleTag.textContent = '*{ transition:none !important; animation:none !important; }';
+    document.head.appendChild(styleTag);
+  } else {
+    const styleTag = document.getElementById('forceMotionStyle');
+    if(styleTag) styleTag.remove();
+  }
+  document.getElementById('sessionLengthSelect').value = String(appSettings.sessionLength);
+  document.getElementById('reduceMotionToggle').checked = appSettings.reduceMotion;
+  document.getElementById('calmModeToggle').checked = appSettings.calmMode;
+  document.getElementById('largeTextToggle').checked = appSettings.largeText;
+}
+
+function saveSettings(){
+  appSettings = {
+    sessionLength: Number(document.getElementById('sessionLengthSelect').value),
+    reduceMotion: document.getElementById('reduceMotionToggle').checked,
+    calmMode: document.getElementById('calmModeToggle').checked,
+    largeText: document.getElementById('largeTextToggle').checked,
+  };
+  localStorage.setItem('sats_arith_settings', JSON.stringify(appSettings));
+  applySettings();
+}
+
+function openSettings(){ document.getElementById('settingsOverlay').classList.add('show'); }
+function closeSettings(){ document.getElementById('settingsOverlay').classList.remove('show'); }
+document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'settingsOverlay') closeSettings();
+});
+
+renderTopics();
+renderHeaderStats();
+renderDifficultyTabs();
+applySettings();
+</script>
+</body>
+</html>
