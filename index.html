@@ -13,6 +13,9 @@
     --bg:#E9F6F4; --bg-alt:#FFFFFF; --ink:#1E2A3A; --ink-soft:#5C6B7E;
     --line:#DCE4EE; --shadow:0 8px 24px rgba(30,42,58,0.22);
     --blue:#3D7BD9; --blue-light:#E3ECFB; --purple:#8B5FBF; --teal:#178077; --teal-dark:#0F5F58; --radius:16px;
+    /* AllTime's "golf" (ballsports) activity palette, reused here so every
+       tile always starts with the same gradient rather than a plain fill */
+    --golf-blue-light:#D8F1FA; --golf-green-light:#D9F2E3; --golf-gold-light:#FDF2CE; --golf-orange-light:#FBE8CE;
   }
   @media (prefers-color-scheme: dark){
     :root{ --bg:#12161F; --bg-alt:#1A202C; --ink:#EAF0F9; --ink-soft:#96A3B8; --line:#2A3242; --blue-light:#1D3153; }
@@ -68,11 +71,17 @@
     display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;
   }
   .tile{
-    background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow);
+    background:linear-gradient(120deg,var(--golf-blue-light) 0%,var(--golf-green-light) 35%,var(--golf-gold-light) 65%,var(--golf-orange-light) 100%);
+    background-size:300% 300%; animation:tileGradientDrift 18s ease infinite;
+    border-radius:var(--radius); box-shadow:var(--shadow);
     padding:22px; text-decoration:none; color:var(--ink); display:flex; flex-direction:column;
     gap:8px; transition:transform .15s ease; border:2px solid transparent;
     position:relative; overflow:hidden;
   }
+  @keyframes tileGradientDrift{
+    0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+  }
+  @media (prefers-reduced-motion: reduce){ .tile{ animation:none } }
   .tile.live:hover{transform:translateY(-3px); border-color:var(--blue-light)}
   .tile-header{display:flex; flex-direction:column; align-items:center; gap:6px; padding:2px 0; text-align:center}
   .tile-icon{
