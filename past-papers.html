@@ -12,7 +12,7 @@
   :root{
     --bg:#F3F6FB; --bg-alt:#FFFFFF; --ink:#1E2A3A; --ink-soft:#5C6B7E;
     --line:#DCE4EE; --shadow:0 4px 14px rgba(30,42,58,0.08);
-    --blue:#3D7BD9; --blue-light:#E3ECFB; --purple:#8B5FBF; --radius:16px;
+    --blue:#3D7BD9; --blue-light:#E3ECFB; --purple:#8B5FBF; --teal:#1E9C97; --teal-dark:#137873; --radius:16px;
   }
   @media (prefers-color-scheme: dark){
     :root{ --bg:#12161F; --bg-alt:#1A202C; --ink:#EAF0F9; --ink-soft:#96A3B8; --line:#2A3242; --blue-light:#1D3153; }
@@ -22,11 +22,16 @@
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{ font-family:'Quicksand',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:40px; }
-  header.top{ background:linear-gradient(120deg,var(--blue) 0%,var(--purple) 100%); color:#fff; padding:22px 18px 26px; text-align:center; border-radius:0 0 24px 24px; box-shadow:var(--shadow); }
+  header.top{ position:relative; background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%); color:#fff; padding:22px 18px 26px; text-align:center; border-radius:0 0 24px 24px; box-shadow:var(--shadow); }
   .brand-tag{font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; opacity:.85; margin-bottom:2px}
   header.top h1{margin:0 0 4px; font-size:1.5rem}
   header.top p{margin:0; opacity:.9; font-size:.88rem; max-width:520px; margin:0 auto}
   .back-link{ display:inline-block; margin-top:14px; color:#fff; opacity:.9; font-size:.85rem; text-decoration:underline; }
+  .home-btn{
+    position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.18);
+    border:none; border-radius:10px; width:38px; height:38px; font-size:1.1rem;
+    cursor:pointer; color:#fff;
+  }
   main{max-width:920px; margin:0 auto; padding:20px 16px}
   .note-card{ background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px 20px; margin-bottom:20px; font-size:.86rem; color:var(--ink-soft); }
   .note-card b{color:var(--ink)}
@@ -70,7 +75,7 @@
   <div class="brand-tag">Everything SATS</div>
   <h1>📄 Past Papers</h1>
   <p>Real SATs papers, 2026–2011, free — organised in one place so nobody has to hunt for them or pay for them.</p>
-  <a class="back-link" href="index.html">← Back to Everything SATS home</a>
+  <button class="home-btn" onclick="location.href='index.html'" aria-label="Back to Everything SATS home">🏠</button>
   <div style="margin-top:8px"><a class="back-link" href="#" onclick="openColourPicker();return false;">🎨 Change reading background colour</a></div>
 </header>
 <main>

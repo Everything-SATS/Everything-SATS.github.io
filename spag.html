@@ -16,7 +16,7 @@
     --green:#2FA86B; --green-light:#E1F6EB;
     --red:#E0554F; --red-light:#FBE6E5;
     --gold:#E8A93A; --gold-light:#FCF1DD;
-    --purple:#8B5FBF; --purple-light:#F0E7FA;
+    --purple:#8B5FBF; --teal:#1E9C97; --teal-dark:#137873; --purple-light:#F0E7FA;
     --radius:16px;
   }
   @media (prefers-color-scheme: dark){
@@ -47,13 +47,18 @@
   }
   header.top{
     position:relative;
-    background:linear-gradient(120deg,var(--blue) 0%,var(--purple) 100%);
+    background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%);
     color:#fff; padding:22px 18px 26px; text-align:center;
     border-radius:0 0 24px 24px; box-shadow:var(--shadow);
   }
-  :root[data-calm="true"] header.top{ background:var(--blue); }
+  :root[data-calm="true"] header.top{ background:var(--teal); }
   .settings-btn{
     position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.18);
+    border:none; border-radius:10px; width:38px; height:38px; font-size:1.1rem;
+    cursor:pointer; color:#fff;
+  }
+  .home-btn{
+    position:absolute; top:14px; left:16px; background:rgba(255,255,255,0.18);
     border:none; border-radius:10px; width:38px; height:38px; font-size:1.1rem;
     cursor:pointer; color:#fff;
   }
@@ -223,11 +228,10 @@
   <div class="brand-tag">Everything SATS</div>
   <h1>✍️ SPaG</h1>
   <p>Grammar, punctuation and word classes for the SPaG paper — official DfE terminology, practised until it clicks. No timer, ever.</p>
-  <a class="back-link" href="index.html">← Back to Everything SATS home</a>
+  <button class="home-btn" onclick="location.href='index.html'" aria-label="Back to Everything SATS home">🏠</button>
   <div class="streak-row">
     <div class="streak-chip">🔥 <span id="streakCount">0</span> day streak</div>
     <div class="streak-chip">⭐ <span id="totalAnswered">0</span> questions answered</div>
-    <div class="streak-chip">✅ <span id="overallAccuracy">0</span>% correct</div>
   </div>
   <div class="difficulty-row">
     <span class="difficulty-label">Level:</span>
@@ -321,15 +325,6 @@ function choice(arr){ return arr[randInt(0, arr.length - 1)]; }
 /* ---------- Word Classes ----------
    Curriculum source: DfE English Appendix 2 (grammar terminology by year).
    Sentences are built procedurally from word banks so they're always new. */
-const WORD_BANK = {
-  noun: ["dragon","teacher","mountain","kitchen","forest","engine","island","stadium","bicycle","harbour","volcano","orchestra","museum","glacier","festival","captain","garden","bridge"],
-  verb: ["ran","jumped","whispered","built","discovered","climbed","painted","launched","gathered","escaped","measured","argued","collected","repaired","celebrated","waited","explored","laughed"],
-  adjective: ["ancient","brilliant","enormous","fragile","mysterious","cheerful","exhausted","spotless","curious","stormy","golden","narrow","silent","vibrant","clumsy","fearless","gloomy","polished"],
-  adverb: ["quickly","carefully","silently","bravely","eagerly","suddenly","gently","loudly","nervously","gracefully","cheerfully","calmly"],
-  preposition: ["under","beside","through","across","between","behind","above","towards","during","without","beneath","alongside"],
-  conjunction: ["because","although","while","since","unless","whenever","if","so"],
-  pronoun: ["she","they","it","we","he","you"],
-};
 const CLASS_DEF = {
   noun: "a naming word — a person, place, animal or thing.",
   verb: "a doing or being word — it shows an action or a state.",
@@ -341,39 +336,55 @@ const CLASS_DEF = {
   pronoun: "a word used in place of a noun (like 'she', 'they', 'it').",
 };
 
-function genWordClass(diff){
-  const adj = choice(WORD_BANK.adjective);
-  const noun = choice(WORD_BANK.noun);
-  const verb = choice(WORD_BANK.verb);
-  const adverb = choice(WORD_BANK.adverb);
-  const prep = choice(WORD_BANK.preposition);
-  const noun2 = choice(WORD_BANK.noun);
-  const pronoun = choice(WORD_BANK.pronoun);
-  const conj = choice(WORD_BANK.conjunction);
-  const verb2 = choice(WORD_BANK.verb);
-  const adverb2 = choice(WORD_BANK.adverb);
+/* Hand-written, sensible sentences only -- no randomly-assembled word
+   salad. Each entry tags every word of each askable class actually
+   present, so any correct word is accepted (not just one "official" pick). */
+const WORDCLASS_BANK = {
+  0: [
+    { s:"The brave firefighter rescued the frightened kitten.", classes:{ determiner:["The","the"], adjective:["brave","frightened"], noun:["firefighter","kitten"], verb:["rescued"] } },
+    { s:"A gentle breeze cooled the tired hikers.", classes:{ determiner:["A","the"], adjective:["gentle","tired"], noun:["breeze","hikers"], verb:["cooled"] } },
+    { s:"The hungry fox searched the empty barn.", classes:{ determiner:["The","the"], adjective:["hungry","empty"], noun:["fox","barn"], verb:["searched"] } },
+    { s:"The excited children boarded the yellow bus.", classes:{ determiner:["The","the"], adjective:["excited","yellow"], noun:["children","bus"], verb:["boarded"] } },
+    { s:"A tall giraffe chewed the green leaves.", classes:{ determiner:["A","the"], adjective:["tall","green"], noun:["giraffe","leaves"], verb:["chewed"] } },
+  ],
+  1: [
+    { s:"The nervous puppy hid quietly under the old blanket.", classes:{ determiner:["The","the"], adjective:["nervous","old"], noun:["puppy","blanket"], verb:["hid"], adverb:["quietly"] } },
+    { s:"A curious cat watched the birds silently from the window.", classes:{ determiner:["A","the"], adjective:["curious"], noun:["cat","birds","window"], verb:["watched"], adverb:["silently"] } },
+    { s:"The tired athlete finished the race slowly but proudly.", classes:{ determiner:["The","the"], adjective:["tired"], noun:["athlete","race"], verb:["finished"], adverb:["slowly","proudly"] } },
+    { s:"The clever detective solved the mystery quickly.", classes:{ determiner:["The","the"], adjective:["clever"], noun:["detective","mystery"], verb:["solved"], adverb:["quickly"] } },
+    { s:"A shy student answered the question nervously.", classes:{ determiner:["A","the"], adjective:["shy"], noun:["student","question"], verb:["answered"], adverb:["nervously"] } },
+  ],
+  2: [
+    { s:"The curious fox crept through the quiet garden.", classes:{ determiner:["The","the"], adjective:["curious","quiet"], noun:["fox","garden"], verb:["crept"], preposition:["through"] } },
+    { s:"The exhausted climbers rested beside the frozen lake.", classes:{ determiner:["The","the"], adjective:["exhausted","frozen"], noun:["climbers","lake"], verb:["rested"], preposition:["beside"] } },
+    { s:"A small mouse scurried across the wooden floor.", classes:{ determiner:["A","the"], adjective:["small","wooden"], noun:["mouse","floor"], verb:["scurried"], preposition:["across"] } },
+    { s:"The excited fans waited outside the stadium gates.", classes:{ determiner:["The","the"], adjective:["excited"], noun:["fans","stadium","gates"], verb:["waited"], preposition:["outside"] } },
+    { s:"The old lighthouse stood between two rocky cliffs.", classes:{ determiner:["The"], adjective:["old","rocky"], noun:["lighthouse","cliffs"], verb:["stood"], preposition:["between"] } },
+  ],
+  3: [
+    { s:"She waited patiently because the bus was late.", classes:{ pronoun:["She"], adjective:["late"], noun:["bus"], verb:["waited"], adverb:["patiently"], conjunction:["because"] } },
+    { s:"He finished his homework quickly so he could relax.", classes:{ pronoun:["He","he"], noun:["homework"], verb:["finished"], adverb:["quickly"], conjunction:["so"] } },
+    { s:"They explored the cave although it was dark.", classes:{ pronoun:["They","it"], adjective:["dark"], noun:["cave"], verb:["explored"], conjunction:["although"] } },
+    { s:"We stayed inside while the storm raged.", classes:{ pronoun:["We"], noun:["storm"], verb:["stayed","raged"], conjunction:["while"] } },
+    { s:"She smiled when she opened her present.", classes:{ pronoun:["She","she"], noun:["present"], verb:["smiled","opened"], conjunction:["when"] } },
+  ],
+};
 
-  let tokens;
-  if(diff === 0){
-    tokens = [ {w:"The",c:"determiner"}, {w:adj,c:"adjective"}, {w:noun,c:"noun"}, {w:verb,c:"verb"} ];
-  } else if(diff === 1){
-    tokens = [ {w:"The",c:"determiner"}, {w:adj,c:"adjective"}, {w:noun,c:"noun"}, {w:verb,c:"verb"}, {w:adverb,c:"adverb"} ];
-  } else if(diff === 2){
-    tokens = [ {w:"The",c:"determiner"}, {w:adj,c:"adjective"}, {w:noun,c:"noun"}, {w:verb,c:"verb"}, {w:prep,c:"preposition"}, {w:"the",c:"determiner"}, {w:noun2,c:"noun"} ];
-  } else {
-    const Pronoun = pronoun.charAt(0).toUpperCase() + pronoun.slice(1);
-    tokens = [ {w:Pronoun,c:"pronoun"}, {w:verb,c:"verb"}, {w:conj,c:"conjunction"}, {w:"the",c:"determiner"}, {w:noun,c:"noun"}, {w:verb2,c:"verb"}, {w:adverb2,c:"adverb"} ];
-  }
-  const text = tokens.map(t => t.w).join(' ') + '.';
-  const target = choice(tokens);
-  const classLabel = target.c;
-  const article = (classLabel === 'adjective' || classLabel === 'adverb') ? 'an' : 'a';
+function genWordClass(diff){
+  const item = choice(WORDCLASS_BANK[diff]);
+  const classNames = Object.keys(item.classes);
+  const targetClass = choice(classNames);
+  const options = item.classes[targetClass];
+  const primary = options[0];
+  const article = (targetClass === 'adjective' || targetClass === 'adverb') ? 'an' : 'a';
+  const wordList = options.length > 1 ? `"${options.join('" or "')}"` : `"${primary}"`;
   return {
-    text: `Which word in this sentence is ${article} ${classLabel}? — "${text}"`,
-    answer: target.w.toLowerCase(),
+    text: `Which word in this sentence is ${article} ${targetClass}? — "${item.s}"`,
+    answer: primary.toLowerCase(),
+    answerAliases: options.map(o => o.toLowerCase()),
     steps: [
-      `A ${classLabel} is ${CLASS_DEF[classLabel]}`,
-      `In "${text}", the word "${target.w}" is the ${classLabel}.`,
+      `${article.charAt(0).toUpperCase()}${article.slice(1)} ${targetClass} is ${CLASS_DEF[targetClass]}`,
+      `In "${item.s}", ${wordList} ${options.length > 1 ? 'are' : 'is'} the ${targetClass}${options.length > 1 ? 's' : ''}.`,
     ],
   };
 }
@@ -660,7 +671,6 @@ function renderTopics(){
 function renderHeaderStats(){
   document.getElementById('streakCount').textContent = stats.streak;
   document.getElementById('totalAnswered').textContent = stats.totalAnswered;
-  document.getElementById('overallAccuracy').textContent = stats.totalAnswered ? Math.round((stats.totalCorrect/stats.totalAnswered)*100) : 0;
 }
 
 const CORRECT_MESSAGES = [

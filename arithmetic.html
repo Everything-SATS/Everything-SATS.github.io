@@ -16,7 +16,7 @@
     --green:#2FA86B; --green-light:#E1F6EB;
     --red:#E0554F; --red-light:#FBE6E5;
     --gold:#E8A93A; --gold-light:#FCF1DD;
-    --purple:#8B5FBF; --purple-light:#F0E7FA;
+    --purple:#8B5FBF; --teal:#1E9C97; --teal-dark:#137873; --purple-light:#F0E7FA;
     --radius:16px;
   }
   @media (prefers-color-scheme: dark){
@@ -47,13 +47,18 @@
   }
   header.top{
     position:relative;
-    background:linear-gradient(120deg,var(--blue) 0%,var(--purple) 100%);
+    background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%);
     color:#fff; padding:22px 18px 26px; text-align:center;
     border-radius:0 0 24px 24px; box-shadow:var(--shadow);
   }
-  :root[data-calm="true"] header.top{ background:var(--blue); }
+  :root[data-calm="true"] header.top{ background:var(--teal); }
   .settings-btn{
     position:absolute; top:14px; right:16px; background:rgba(255,255,255,0.18);
+    border:none; border-radius:10px; width:38px; height:38px; font-size:1.1rem;
+    cursor:pointer; color:#fff;
+  }
+  .home-btn{
+    position:absolute; top:14px; left:16px; background:rgba(255,255,255,0.18);
     border:none; border-radius:10px; width:38px; height:38px; font-size:1.1rem;
     cursor:pointer; color:#fff;
   }
@@ -223,11 +228,10 @@
   <div class="brand-tag">Everything SATS</div>
   <h1>🎯 Arithmetic</h1>
   <p>Paper 1 — every calculation type that comes up, practised until it's automatic. No timer, ever — go at your own pace.</p>
-  <a class="back-link" href="index.html">← Back to Everything SATS home</a>
+  <button class="home-btn" onclick="location.href='index.html'" aria-label="Back to Everything SATS home">🏠</button>
   <div class="streak-row">
     <div class="streak-chip">🔥 <span id="streakCount">0</span> day streak</div>
     <div class="streak-chip">⭐ <span id="totalAnswered">0</span> questions answered</div>
-    <div class="streak-chip">✅ <span id="overallAccuracy">0</span>% correct</div>
   </div>
   <div class="difficulty-row">
     <span class="difficulty-label">Level:</span>
@@ -321,6 +325,7 @@ function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) +
 function choice(arr){ return arr[randInt(0, arr.length - 1)]; }
 function gcd(a, b){ return b === 0 ? a : gcd(b, a % b); }
 function fmtFrac(n, d){ return `${n}/${d}`; }
+function fmtMixed(whole, n, d){ return whole > 0 ? `${whole} and ${fmtFrac(n,d)}` : fmtFrac(n,d); }
 function commas(n){ return n.toLocaleString('en-GB'); }
 
 /* ---------- Question generators ----------
@@ -558,13 +563,13 @@ function genFractions(diff){
     const wholeResult = Math.floor(totalN/d1), remN = totalN % d1;
     const g = gcd(remN||1, d1);
     return {
-      text: `${w1} ${fmtFrac(n1,d1)} + ${w2} ${fmtFrac(n2,d1)} = ?`,
-      answer: remN === 0 ? `${wholeResult}` : `${wholeResult} ${fmtFrac(remN/g, d1/g)}`,
-      answerAliases: remN === 0 ? [] : [`${wholeResult} ${fmtFrac(remN, d1)}`],
+      text: `${fmtMixed(w1,n1,d1)} + ${fmtMixed(w2,n2,d1)} = ?`,
+      answer: remN === 0 ? `${wholeResult}` : fmtMixed(wholeResult, remN/g, d1/g),
+      answerAliases: remN === 0 ? [] : [fmtMixed(wholeResult, remN, d1)],
       steps: [
-        `Convert each mixed number to an improper fraction: ${w1} ${fmtFrac(n1,d1)} = ${fmtFrac(w1*d1+n1, d1)}, and ${w2} ${fmtFrac(n2,d1)} = ${fmtFrac(w2*d1+n2, d1)}.`,
+        `Convert each mixed number to an improper fraction: ${fmtMixed(w1,n1,d1)} = ${fmtFrac(w1*d1+n1, d1)}, and ${fmtMixed(w2,n2,d1)} = ${fmtFrac(w2*d1+n2, d1)}.`,
         `Add the numerators: ${w1*d1+n1} + ${w2*d1+n2} = ${totalN}, giving ${fmtFrac(totalN, d1)}.`,
-        `Convert back to a mixed number: ${remN === 0 ? wholeResult : `${wholeResult} ${fmtFrac(remN,d1)}`}${g>1 ? ` = ${wholeResult} ${fmtFrac(remN/g,d1/g)}` : ""}`,
+        `Convert back to a mixed number: ${remN === 0 ? wholeResult : fmtMixed(wholeResult,remN,d1)}${g>1 ? ` = ${fmtMixed(wholeResult,remN/g,d1/g)}` : ""}`,
       ],
     };
   }
@@ -848,7 +853,6 @@ function renderTopics(){
 function renderHeaderStats(){
   document.getElementById('streakCount').textContent = stats.streak;
   document.getElementById('totalAnswered').textContent = stats.totalAnswered;
-  document.getElementById('overallAccuracy').textContent = stats.totalAnswered ? Math.round((stats.totalCorrect/stats.totalAnswered)*100) : 0;
 }
 
 const CORRECT_MESSAGES = [
