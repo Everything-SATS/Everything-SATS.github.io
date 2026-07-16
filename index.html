@@ -45,12 +45,9 @@
     position:relative; overflow:hidden;
   }
   .header-tile.clickable:hover{background:rgba(255,255,255,0.26); transform:translateY(-2px)}
-  .header-tile .ht-icon{
-    position:absolute; right:10px; bottom:10px; font-size:2.4rem; line-height:1;
-    opacity:.22; pointer-events:none;
-  }
-  .header-tile .ht-title{font-weight:800; font-size:1.05rem; margin-bottom:3px; position:relative}
-  .header-tile .ht-sub{font-size:.68rem; opacity:.9; line-height:1.3; text-align:justify; position:relative}
+  .header-tile .ht-icon{display:block; text-align:center; font-size:1.4rem; line-height:1; margin-bottom:4px}
+  .header-tile .ht-title{font-weight:800; font-size:1.05rem; margin-bottom:3px}
+  .header-tile .ht-sub{font-size:.68rem; opacity:.9; line-height:1.3; text-align:justify}
   .overlay{
     position:fixed; inset:0; background:rgba(15,20,30,0.55); display:none;
     align-items:center; justify-content:center; padding:16px; z-index:50;
@@ -84,12 +81,9 @@
   @media (prefers-reduced-motion: reduce){ .tile{ animation:none } }
   .tile.live:hover{transform:translateY(-3px); border-color:var(--blue-light)}
   .tile-header{display:flex; flex-direction:column; align-items:center; gap:6px; padding:2px 0; text-align:center}
-  .tile-icon{
-    position:absolute; right:14px; bottom:14px; font-size:3.4rem; line-height:1;
-    opacity:.14; pointer-events:none;
-  }
-  .tile-name{font-weight:800; font-size:1.4rem; line-height:1.25; position:relative}
-  .tile-sub{font-size:.82rem; color:var(--ink-soft); line-height:1.4; text-align:justify; position:relative}
+  .tile-icon{display:block; font-size:2.2rem; line-height:1}
+  .tile-name{font-weight:800; font-size:1.4rem; line-height:1.25}
+  .tile-sub{font-size:.82rem; color:var(--ink-soft); line-height:1.4; text-align:justify}
   .tile-status{
     margin-top:auto; font-size:.72rem; font-weight:700; text-transform:uppercase;
     letter-spacing:.04em; padding:4px 10px; border-radius:999px; display:inline-block; width:fit-content;
