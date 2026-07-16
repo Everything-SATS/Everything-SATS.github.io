@@ -202,6 +202,10 @@
   .break-modal .big-icon{font-size:2.6rem; margin-bottom:8px}
   .break-modal h2{margin:0 0 10px; font-size:1.3rem}
   .break-modal p{margin:0 0 18px; color:var(--ink-soft); font-size:.92rem; line-height:1.5}
+  .calm-sound-label{font-size:.75rem; font-weight:700; color:var(--ink-soft); margin-bottom:6px}
+  .calm-sound-row{display:flex; gap:6px; flex-wrap:wrap; justify-content:center}
+  .calm-sound-btn{background:var(--blue-light); color:var(--blue); border:none; border-radius:9px; padding:7px 11px; font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit}
+  .calm-sound-btn.active{background:var(--blue); color:#fff}
   .break-timer-badge{
     position:fixed; bottom:18px; right:18px; background:var(--green); color:#fff;
     border-radius:999px; padding:10px 18px; font-weight:800; font-size:.9rem;
@@ -1149,6 +1153,7 @@ function showBreakReminder(){
   document.getElementById('breakTitle').textContent = tip.title;
   document.getElementById('breakText').textContent = tip.text;
   document.getElementById('breakOverlay').classList.add('show');
+  renderCalmButtons();
 }
 
 function dismissBreak(){
@@ -1239,38 +1244,92 @@ function closeFrustrationHelp(){
   document.getElementById('frustrationOverlay').classList.remove('show');
 }
 
-/* ---------- Calming sound: synthesised brown noise, entirely client-side ---------- */
-let calmAudioCtx = null, calmNoiseSource = null;
-function toggleCalmSound(){
-  if(calmNoiseSource){ stopCalmSound(); return; }
-  calmAudioCtx = calmAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
-  const bufferSize = 2 * calmAudioCtx.sampleRate;
-  const buffer = calmAudioCtx.createBuffer(1, bufferSize, calmAudioCtx.sampleRate);
+/* ---------- Calming sounds: 5 synthesised ambient sounds, entirely client-side, no downloads ---------- */
+const CALM_SOUNDS = [
+  { id:'waves', label:'🌊 Ocean Waves' },
+  { id:'rain', label:'🌧️ Rain' },
+  { id:'brown', label:'🟤 Brown Noise' },
+  { id:'pink', label:'🩷 Pink Noise' },
+  { id:'white', label:'⚪ White Noise' },
+];
+let calmAudioCtx = null, calmNodes = null, calmActiveType = null;
+
+function buildNoiseBuffer(ctx, color){
+  const bufferSize = 2 * ctx.sampleRate;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const output = buffer.getChannelData(0);
-  let lastOut = 0;
-  for(let i = 0; i < bufferSize; i++){
-    const white = Math.random() * 2 - 1;
-    output[i] = (lastOut + (0.02 * white)) / 1.02;
-    lastOut = output[i];
-    output[i] *= 3.5;
+  if(color === 'brown'){
+    let lastOut = 0;
+    for(let i = 0; i < bufferSize; i++){
+      const white = Math.random() * 2 - 1;
+      output[i] = (lastOut + (0.02 * white)) / 1.02;
+      lastOut = output[i];
+      output[i] *= 3.5;
+    }
+  } else if(color === 'pink'){
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i = 0; i < bufferSize; i++){
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886*b0 + white*0.0555179; b1 = 0.99332*b1 + white*0.0750759;
+      b2 = 0.96900*b2 + white*0.1538520; b3 = 0.86650*b3 + white*0.3104856;
+      b4 = 0.55000*b4 + white*0.5329522; b5 = -0.7616*b5 - white*0.0168980;
+      output[i] = (b0+b1+b2+b3+b4+b5+b6+white*0.5362) * 0.11;
+      b6 = white*0.115926;
+    }
+  } else {
+    for(let i = 0; i < bufferSize; i++){ output[i] = Math.random() * 2 - 1; }
   }
-  calmNoiseSource = calmAudioCtx.createBufferSource();
-  calmNoiseSource.buffer = buffer;
-  calmNoiseSource.loop = true;
-  const filter = calmAudioCtx.createBiquadFilter();
+  return buffer;
+}
+
+function playCalmSound(type){
+  if(calmActiveType === type){ stopCalmSound(); return; }
+  stopCalmSound();
+  calmAudioCtx = calmAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  const ctx = calmAudioCtx;
+  const color = type === 'waves' ? 'brown' : (type === 'rain' ? 'white' : type);
+  const source = ctx.createBufferSource();
+  source.buffer = buildNoiseBuffer(ctx, color);
+  source.loop = true;
+
+  const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 700;
-  const gain = calmAudioCtx.createGain();
+  filter.frequency.value = { brown:500, waves:600, pink:2200, rain:4000, white:9000 }[type];
+
+  const gain = ctx.createGain();
   gain.gain.value = 0.18;
-  calmNoiseSource.connect(filter).connect(gain).connect(calmAudioCtx.destination);
-  calmNoiseSource.start();
-  const btn = document.getElementById('calmSoundBtn');
-  if(btn) btn.textContent = '🔇 Stop calming sound';
+
+  let lfo = null;
+  if(type === 'waves' || type === 'rain'){
+    lfo = ctx.createOscillator();
+    lfo.frequency.value = type === 'waves' ? 0.12 : 5.5;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = type === 'waves' ? 0.09 : 0.035;
+    lfo.connect(lfoGain).connect(gain.gain);
+    gain.gain.value = type === 'waves' ? 0.13 : 0.16;
+    lfo.start();
+  }
+
+  source.connect(filter).connect(gain).connect(ctx.destination);
+  source.start();
+
+  calmNodes = { source, lfo };
+  calmActiveType = type;
+  renderCalmButtons();
 }
 function stopCalmSound(){
-  if(calmNoiseSource){ calmNoiseSource.stop(); calmNoiseSource.disconnect(); calmNoiseSource = null; }
-  const btn = document.getElementById('calmSoundBtn');
-  if(btn) btn.textContent = '🎵 Play a calming sound';
+  if(calmNodes){
+    calmNodes.source.stop(); calmNodes.source.disconnect();
+    if(calmNodes.lfo){ calmNodes.lfo.stop(); calmNodes.lfo.disconnect(); }
+    calmNodes = null;
+  }
+  calmActiveType = null;
+  renderCalmButtons();
+}
+function renderCalmButtons(){
+  const el = document.getElementById('calmSoundButtons');
+  if(!el) return;
+  el.innerHTML = CALM_SOUNDS.map(s => `<button class="calm-sound-btn${calmActiveType===s.id?' active':''}" onclick="playCalmSound('${s.id}')">${s.label}</button>`).join('');
 }
 
 startWellbeingTimer();
@@ -1316,7 +1375,10 @@ applyReadingBg();
     <h2 id="breakTitle">Time for a quick break!</h2>
     <p id="breakText">You've been working for 15 minutes — brilliant focus. Get a drink of water, then have a short walk around before you come back.</p>
     <button class="btn btn-primary" onclick="startBreakCountdown()">Start a 5-minute break</button>
-    <div style="margin-top:10px"><button class="btn btn-ghost btn-small" id="calmSoundBtn" onclick="toggleCalmSound()">🎵 Play a calming sound</button></div>
+    <div style="margin-top:14px">
+      <div class="calm-sound-label">🎵 Calming sounds — tap to play, tap again to stop</div>
+      <div id="calmSoundButtons" class="calm-sound-row"></div>
+    </div>
     <div style="margin-top:10px"><button class="btn btn-ghost btn-small" onclick="dismissBreak()">I'll take a break in a moment</button></div>
   </div>
 </div>
