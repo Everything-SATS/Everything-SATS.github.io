@@ -104,12 +104,9 @@
     border-radius:var(--radius); box-shadow:var(--shadow); display:flex; align-items:center;
     gap:16px; flex-wrap:wrap;
   }
-  .cb-label-stack{display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left}
-  .cb-icon{font-size:1.4rem; line-height:1}
-  .cb-text{font-weight:800; font-size:.78rem; white-space:nowrap; color:var(--ink); text-transform:uppercase; letter-spacing:.03em}
-  .cb-content{flex:1; min-width:200px; display:flex; flex-direction:column; gap:4px}
-  .curiosity-fact{font-family:Georgia,'Times New Roman',serif; font-size:1.05rem; font-weight:700; color:var(--purple); line-height:1.4}
-  .cb-source{font-size:.72rem; color:var(--ink-soft); text-decoration:underline}
+  .cb-label{font-weight:800; font-size:.85rem; white-space:nowrap; color:var(--ink)}
+  .curiosity-fact{font-size:.9rem; font-weight:600; flex:1; min-width:200px}
+  .cb-source{font-size:.72rem; color:var(--ink-soft); white-space:nowrap; text-decoration:underline}
   .cb-source:empty{display:none}
   .stat-banner{
     background:linear-gradient(120deg,var(--teal) 0%,var(--teal-dark) 100%);
@@ -204,14 +201,9 @@
 </header>
 
 <div class="curiosity-banner">
-  <div class="cb-label-stack">
-    <span class="cb-icon">🎲</span>
-    <span class="cb-text">Curiosity Corner</span>
-  </div>
-  <div class="cb-content">
-    <span class="curiosity-fact" id="curiosityFact">Tap for a random fact!</span>
-    <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
-  </div>
+  <span class="cb-label">🎲 Curiosity Corner</span>
+  <span class="curiosity-fact" id="curiosityFact">Tap for a random fact!</span>
+  <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
   <button class="btn btn-primary btn-small" onclick="showRandomFact()">Give me a fact</button>
 </div>
 

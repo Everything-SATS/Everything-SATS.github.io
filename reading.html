@@ -236,11 +236,17 @@
   .passage-teaser{font-size:.82rem; color:var(--ink-soft); margin-bottom:12px}
   .passage-progress{font-size:.72rem; color:var(--ink-soft)}
   .technique-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px}
-  .technique-card{background:var(--bg-alt); border-radius:16px; box-shadow:var(--shadow); padding:16px}
+  .technique-card{background:var(--bg-alt); border-radius:16px; box-shadow:var(--shadow); padding:16px; cursor:pointer; transition:transform .12s ease}
+  .technique-card:hover{transform:translateY(-2px)}
   .technique-code{font-size:.68rem; font-weight:800; color:var(--purple); text-transform:uppercase; letter-spacing:.05em}
   .technique-name{font-weight:800; font-size:.95rem; margin:4px 0 6px}
   .technique-desc{font-size:.82rem; color:var(--ink-soft); margin-bottom:8px}
   .technique-tip{font-size:.8rem; background:var(--purple-light); border-radius:8px; padding:8px 10px; color:var(--ink)}
+  .technique-example-label{font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--purple); margin-bottom:8px}
+  .technique-excerpt{background:var(--bg); border-radius:12px; padding:14px; font-size:.92rem; line-height:1.6; color:var(--ink); margin-bottom:14px; font-style:italic}
+  .technique-excerpt mark{background:var(--purple-light); color:var(--ink); padding:1px 3px; border-radius:4px; font-weight:700; font-style:normal}
+  .technique-example-q{font-size:.9rem; margin-bottom:8px}
+  .technique-example-a{font-size:.9rem; font-weight:700; background:var(--green-light); border-radius:10px; padding:10px 12px}
   .reading-view{max-width:820px; margin:0 auto}
   .hidden{display:none !important}
   .passage-teaser-card{background:var(--bg-alt); border-radius:16px; box-shadow:var(--shadow); padding:24px; margin-bottom:20px}
@@ -317,6 +323,13 @@
   </div>
   <div class="technique-grid" id="techniqueGrid"></div>
 
+  <div class="overlay" id="techniqueDetailOverlay">
+    <div class="modal">
+      <button class="close-x" onclick="closeTechniqueDetail()">✕</button>
+      <div id="techniqueDetailBody"></div>
+    </div>
+  </div>
+
   <div class="daily-card" style="margin-top:26px">
     <div>
       <h2>📚 Practice Passages</h2>
@@ -362,14 +375,22 @@
 /* ---------- Technique guide: the 8 official KS2 reading content-domain
    question types (2a-2h), each with plain-language meaning + strategy. ---------- */
 const TECHNIQUES = [
-  { code:"2a", name:"Word Meaning", desc:"Explain what a word means, using how it's used in the passage.", tip:"Don't just guess from the word alone — read the whole sentence around it for clues." },
-  { code:"2b", name:"Retrieval", desc:"Find a fact or detail that's stated directly in the text.", tip:"Scan for keywords from the question. The answer is written down somewhere — find it, don't work it out." },
-  { code:"2c", name:"Summary", desc:"Sum up the main idea, in your own words.", tip:"Pick out 2-3 key points. Don't just copy whole sentences — that's not summarising." },
-  { code:"2d", name:"Inference", desc:"Work out something the text implies but doesn't say outright.", tip:"Find your evidence first, then explain what it suggests. Always back it up with the text." },
-  { code:"2e", name:"Prediction", desc:"Say what might happen next, based on evidence so far.", tip:"Use clues already given in the passage — don't just guess randomly." },
-  { code:"2f", name:"Whole-Text Meaning", desc:"Explain how one part connects to the story or text as a whole.", tip:"Think about why the writer included that detail — what job is it doing?" },
-  { code:"2g", name:"Language Choices", desc:"Explain the effect of a word or phrase the writer chose.", tip:"Think about the feeling, picture, or sound the word creates — not just its dictionary meaning." },
-  { code:"2h", name:"Comparison", desc:"Compare two parts of a text (or two texts).", tip:"Find one similarity and one difference, and back up both with evidence." },
+  { code:"2a", name:"Word Meaning", desc:"Explain what a word means, using how it's used in the passage.", tip:"Don't just guess from the word alone — read the whole sentence around it for clues.",
+    example:{ source:"The Attic Key", excerpt:"Priya turned the box over, searching for a way in, but the lock held firm.", highlight:"firm", q:"Find a word that suggests the box's lock was difficult to open.", a:"firm — \"the lock held firm\" means it was solid and wouldn't budge." } },
+  { code:"2b", name:"Retrieval", desc:"Find a fact or detail that's stated directly in the text.", tip:"Scan for keywords from the question. The answer is written down somewhere — find it, don't work it out.",
+    example:{ source:"The Attic Key", excerpt:"But her grandmother's house was being sold, and someone had to sort through fifty years of boxes before the new owners arrived.", highlight:"her grandmother's house was being sold", q:"Why was the family in the attic that day?", a:"Because her grandmother's house was being sold." } },
+  { code:"2c", name:"Summary", desc:"Sum up the main idea, in your own words.", tip:"Pick out 2-3 key points. Don't just copy whole sentences — that's not summarising.",
+    example:{ source:"Life in the Deep Ocean", excerpt:"Around 90% of deep-sea animals can produce their own glow, a process called bioluminescence. Many deep-sea creatures have adapted to this scarcity by moving as little as possible, saving energy for the rare occasions when a meal actually arrives.", highlight:"moving as little as possible, saving energy", q:"Summarise, in your own words, how deep-sea creatures cope with the darkness and lack of food.", a:"They make their own light, and they don't move much so they can save energy for when food does appear." } },
+  { code:"2d", name:"Inference", desc:"Work out something the text implies but doesn't say outright.", tip:"Find your evidence first, then explain what it suggests. Always back it up with the text.",
+    example:{ source:"The Treehouse Blueprint", excerpt:"William stared at the sketch, then grinned. It was, annoyingly, a much better idea than his.", highlight:"annoyingly, a much better idea than his", q:"What does the passage suggest about how William really feels about Harry's idea, even though he doesn't say so directly?", a:"He's impressed by Harry's idea, even if a little annoyed it's better than his own." } },
+  { code:"2e", name:"Prediction", desc:"Say what might happen next, based on evidence so far.", tip:"Use clues already given in the passage — don't just guess randomly.",
+    example:{ source:"The Attic Key", excerpt:"Part of her wanted to run downstairs and open it in front of everyone. But another part of her — the part that remembered her grandmother's stories about keeping secrets safe until the right moment — decided this was something she needed to do alone, first. She slid the key into the lock.", highlight:"she needed to do alone, first", q:"What do you think Priya will do next?", a:"She will open the box by herself." } },
+  { code:"2f", name:"Whole-Text Meaning", desc:"Explain how one part connects to the story or text as a whole.", tip:"Think about why the writer included that detail — what job is it doing?",
+    example:{ source:"Life in the Deep Ocean", excerpt:"Scientists believe we have explored less than a quarter of the deep ocean in detail. Each expedition still turns up creatures unknown to science — a reminder that some of the strangest life on our planet is also some of the least understood.", highlight:"a reminder that some of the strangest life on our planet is also some of the least understood", q:"How does the final paragraph relate to the rest of the passage?", a:"It adds a broader point about how little we still know about the deep ocean, following on from the specific examples described earlier." } },
+  { code:"2g", name:"Language Choices", desc:"Explain the effect of a word or phrase the writer chose.", tip:"Think about the feeling, picture, or sound the word creates — not just its dictionary meaning.",
+    example:{ source:"The Attic Key", excerpt:"Priya sat very still for a moment, the key warm in her palm.", highlight:"warm", q:"Why might the writer have chosen the word \"warm\" to describe the key?", a:"It makes the key feel special and personal — almost connected to her grandmother." } },
+  { code:"2h", name:"Comparison", desc:"Compare two parts of a text (or two texts).", tip:"Find one similarity and one difference, and back up both with evidence.",
+    example:{ source:"The Treehouse Blueprint", excerpt:"\"Trapdoors are heavy,\" William said. \"We'd need proper hinges, and Dad only has the small ones.\" Edie folded her arms. \"Then find bigger ones.\"", highlight:"Then find bigger ones", q:"How is Edie's approach to building the treehouse different from William's?", a:"William thinks it through carefully, but Edie just wants what she wants." } },
 ];
 
 /* ---------- Passages ----------
@@ -549,12 +570,32 @@ function renderHeaderStats(){
 
 function renderTechniques(){
   document.getElementById('techniqueGrid').innerHTML = TECHNIQUES.map(t => `
-    <div class="technique-card">
+    <div class="technique-card" onclick="openTechniqueDetail('${t.code}')">
       <div class="technique-code">${t.code}</div>
       <div class="technique-name">${t.name}</div>
       <div class="technique-desc">${t.desc}</div>
       <div class="technique-tip">💡 ${t.tip}</div>
     </div>`).join('');
+}
+
+function openTechniqueDetail(code){
+  const t = TECHNIQUES.find(x => x.code === code);
+  const ex = t.example;
+  const highlighted = ex.excerpt.replace(ex.highlight, `<mark>${ex.highlight}</mark>`);
+  document.getElementById('techniqueDetailBody').innerHTML = `
+    <span class="technique-code">${t.code}</span>
+    <h2 style="margin:8px 0 4px">${t.name}</h2>
+    <p style="color:var(--ink-soft); margin:0 0 4px">${t.desc}</p>
+    <div class="technique-tip" style="margin:10px 0 18px">💡 ${t.tip}</div>
+    <div class="technique-example-label">Worked example — from "${ex.source}"</div>
+    <div class="technique-excerpt">${highlighted}</div>
+    <div class="technique-example-q"><b>Q:</b> ${ex.q}</div>
+    <div class="technique-example-a">✅ ${ex.a}</div>
+  `;
+  document.getElementById('techniqueDetailOverlay').classList.add('show');
+}
+function closeTechniqueDetail(){
+  document.getElementById('techniqueDetailOverlay').classList.remove('show');
 }
 
 function renderPassages(){
@@ -669,6 +710,9 @@ function openSettings(){ document.getElementById('settingsOverlay').classList.ad
 function closeSettings(){ document.getElementById('settingsOverlay').classList.remove('show'); }
 document.getElementById('settingsOverlay').addEventListener('click', (e) => {
   if(e.target.id === 'settingsOverlay') closeSettings();
+});
+document.getElementById('techniqueDetailOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'techniqueDetailOverlay') closeTechniqueDetail();
 });
 
 renderTechniques();
