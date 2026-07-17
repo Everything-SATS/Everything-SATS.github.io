@@ -105,13 +105,13 @@
   .tile.external .external-badge{background:var(--gold-light,#FCF1DD); color:#B8860B}
   .section-note{font-size:.84rem; color:var(--ink-soft); margin:-8px 0 14px}
   .curiosity-banner{
-    width:calc(100% - 32px); max-width:928px; margin:14px auto 0; padding:14px 20px; background:var(--bg-alt);
-    border-radius:var(--radius); box-shadow:var(--shadow); display:flex; align-items:center;
-    gap:16px; flex-wrap:wrap;
+    width:calc(100% - 32px); max-width:928px; margin:14px auto 0; padding:18px 22px; background:var(--bg-alt);
+    border-radius:var(--radius); box-shadow:var(--shadow); display:flex; flex-direction:column; gap:10px;
   }
+  .cb-top-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
   .cb-label{font-weight:800; font-size:.85rem; white-space:nowrap; color:var(--ink)}
-  .curiosity-fact{font-size:.9rem; font-weight:600; flex:1; min-width:200px}
-  .cb-source{font-size:.72rem; color:var(--ink-soft); white-space:nowrap; text-decoration:underline}
+  .curiosity-fact{font-size:1.3rem; font-weight:700; line-height:1.42; margin:0; text-wrap:balance}
+  .cb-source{font-size:.78rem; color:var(--ink-soft); text-decoration:underline; align-self:flex-start}
   .calm-sound-row{display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:14px}
   .calm-sound-btn{background:var(--blue-light); color:var(--blue); border:none; border-radius:9px; padding:7px 11px; font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit}
   .calm-sound-btn.active{background:var(--blue); color:#fff}
@@ -214,10 +214,12 @@
 </header>
 
 <div class="curiosity-banner">
-  <span class="cb-label">🎲 Curiosity Corner</span>
-  <span class="curiosity-fact" id="curiosityFact">Tap for a random fact!</span>
+  <div class="cb-top-row">
+    <span class="cb-label">🎲 Curiosity Corner</span>
+    <button class="btn btn-primary btn-small" onclick="showRandomFact()">Give me a fact</button>
+  </div>
+  <p class="curiosity-fact" id="curiosityFact">Tap for a random fact!</p>
   <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
-  <button class="btn btn-primary btn-small" onclick="showRandomFact()">Give me a fact</button>
 </div>
 
 <main>
