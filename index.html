@@ -565,10 +565,12 @@ function closeColourPicker(){ document.getElementById('colourOverlay').classList
 /* ---------- Calming sounds: 5 synthesised ambient sounds, entirely client-side, no downloads ---------- */
 const CALM_SOUNDS = [
   { id:'waves', label:'🌊 Ocean Waves' },
-  { id:'rain', label:'🌧️ Rain' },
+  { id:'rain', label:'🌧️ Rainfall' },
   { id:'brown', label:'🟤 Brown Noise' },
   { id:'pink', label:'🩷 Pink Noise' },
   { id:'white', label:'⚪ White Noise' },
+  { id:'binaural', label:'🎧 Binaural Beats (headphones)' },
+  { id:'ambient', label:'🎹 Ambient Tone' },
 ];
 let calmAudioCtx = null, calmNodes = null, calmActiveType = null;
 
@@ -605,40 +607,84 @@ function playCalmSound(type){
   stopCalmSound();
   calmAudioCtx = calmAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
   const ctx = calmAudioCtx;
-  const color = type === 'waves' ? 'brown' : (type === 'rain' ? 'white' : type);
-  const source = ctx.createBufferSource();
-  source.buffer = buildNoiseBuffer(ctx, color);
-  source.loop = true;
+  const stoppable = [];
 
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = { brown:500, waves:600, pink:2200, rain:4000, white:9000 }[type];
-
-  const gain = ctx.createGain();
-  gain.gain.value = 0.18;
-
-  let lfo = null;
-  if(type === 'waves' || type === 'rain'){
-    lfo = ctx.createOscillator();
-    lfo.frequency.value = type === 'waves' ? 0.12 : 5.5;
+  if(type === 'binaural'){
+    /* Two pure tones, one per ear, 6Hz apart -- the brain perceives the
+       difference as a slow "beat", a real and simple audio effect (not
+       "content" in the copyright sense, so nothing to license). Needs
+       headphones/stereo speakers to work, said honestly in the label. */
+    const oscL = ctx.createOscillator(), oscR = ctx.createOscillator();
+    oscL.type = 'sine'; oscR.type = 'sine';
+    oscL.frequency.value = 200; oscR.frequency.value = 206;
+    const panL = ctx.createStereoPanner(), panR = ctx.createStereoPanner();
+    panL.pan.value = -1; panR.pan.value = 1;
+    const gainL = ctx.createGain(), gainR = ctx.createGain();
+    gainL.gain.value = 0.05; gainR.gain.value = 0.05;
+    oscL.connect(gainL).connect(panL).connect(ctx.destination);
+    oscR.connect(gainR).connect(panR).connect(ctx.destination);
+    oscL.start(); oscR.start();
+    stoppable.push(oscL, oscR);
+  } else if(type === 'ambient'){
+    /* A soft sustained chord (C major triad), not a copy of any real
+       track -- honestly labelled "Ambient Tone", not "lofi" or a named
+       piece, since we can't legally embed real recorded music here. */
+    const gain = ctx.createGain();
+    gain.gain.value = 0.05;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.08;
     const lfoGain = ctx.createGain();
-    lfoGain.gain.value = type === 'waves' ? 0.09 : 0.035;
+    lfoGain.gain.value = 0.025;
     lfo.connect(lfoGain).connect(gain.gain);
-    gain.gain.value = type === 'waves' ? 0.13 : 0.16;
     lfo.start();
+    stoppable.push(lfo);
+    [130.81, 164.81, 196.00].forEach(f => {
+      const o = ctx.createOscillator();
+      o.type = 'sine'; o.frequency.value = f;
+      o.connect(gain); o.start();
+      stoppable.push(o);
+    });
+    gain.connect(ctx.destination);
+  } else {
+    const color = type === 'waves' ? 'brown' : (type === 'rain' ? 'white' : type);
+    const source = ctx.createBufferSource();
+    source.buffer = buildNoiseBuffer(ctx, color);
+    source.loop = true;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = type === 'rain' ? 'bandpass' : 'lowpass';
+    filter.frequency.value = { brown:500, waves:600, pink:2200, rain:3500, white:9000 }[type];
+    if(type === 'rain') filter.Q.value = 0.6;
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0.18;
+
+    if(type === 'waves' || type === 'rain'){
+      /* Rain uses a slow, gust-like gain swell rather than a fast, overly
+         regular flutter, plus a bandpass filter for a real patter/hiss
+         texture instead of a flat hush. */
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = type === 'waves' ? 0.12 : 0.5;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = type === 'waves' ? 0.09 : 0.06;
+      lfo.connect(lfoGain).connect(gain.gain);
+      gain.gain.value = type === 'waves' ? 0.13 : 0.16;
+      lfo.start();
+      stoppable.push(lfo);
+    }
+
+    source.connect(filter).connect(gain).connect(ctx.destination);
+    source.start();
+    stoppable.push(source);
   }
 
-  source.connect(filter).connect(gain).connect(ctx.destination);
-  source.start();
-
-  calmNodes = { source, lfo };
+  calmNodes = stoppable;
   calmActiveType = type;
   renderCalmButtons();
 }
 function stopCalmSound(){
   if(calmNodes){
-    calmNodes.source.stop(); calmNodes.source.disconnect();
-    if(calmNodes.lfo){ calmNodes.lfo.stop(); calmNodes.lfo.disconnect(); }
+    calmNodes.forEach(n => { try{ n.stop(); }catch(e){} try{ n.disconnect(); }catch(e){} });
     calmNodes = null;
   }
   calmActiveType = null;
