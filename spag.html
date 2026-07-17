@@ -240,6 +240,9 @@
     display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; color:#333; text-align:center;
   }
   .colour-swatch.active{border-color:var(--blue); border-width:3px}
+  .mini-colour-row{ display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.18); border-radius:999px; padding:6px 10px; }
+  .colour-swatch.mini{ width:16px; height:16px; border-radius:50%; border-width:2px; font-size:0; padding:0; }
+  .colour-swatch.mini.active{ border-width:2.5px; }
   .colour-note{font-size:.8rem; color:var(--ink-soft); line-height:1.5; margin-top:6px}
   footer{max-width:640px; margin:0 auto; padding:24px 20px 12px; text-align:center; color:var(--ink-soft); font-size:.78rem; line-height:1.7}
   footer a{color:var(--ink-soft)}
@@ -258,6 +261,14 @@
     <div class="streak-chip" onclick="openStatDetail('streak')">🔥 <span id="streakCount">0</span> day streak</div>
     <div class="streak-chip" onclick="openStatDetail('stars')">🌟 <span id="sessionStars">0</span> stars this session</div>
     <div class="streak-chip" onclick="openStatDetail('answered')">⭐ <span id="totalAnswered">0</span> questions answered</div>
+    <div class="mini-colour-row" title="Background colour">
+      <div class="colour-swatch mini" style="background:#FFFFFF" onclick="setReadingBg('white')" data-bg="white"></div>
+      <div class="colour-swatch mini" style="background:#FDF6E3" onclick="setReadingBg('cream')" data-bg="cream"></div>
+      <div class="colour-swatch mini" style="background:#E8F2FB" onclick="setReadingBg('blue')" data-bg="blue"></div>
+      <div class="colour-swatch mini" style="background:#EAF7EC" onclick="setReadingBg('green')" data-bg="green"></div>
+      <div class="colour-swatch mini" style="background:#FCEAEF" onclick="setReadingBg('rose')" data-bg="rose"></div>
+      <div class="colour-swatch mini" style="background:#EDEEF0" onclick="setReadingBg('grey')" data-bg="grey"></div>
+    </div>
   </div>
   <div class="difficulty-row">
     <span class="difficulty-label">Level:</span>

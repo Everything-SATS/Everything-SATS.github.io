@@ -75,6 +75,9 @@
     border-radius:999px; padding:6px 14px; font-size:.82rem; font-weight:700; cursor:pointer; font-family:inherit;
   }
   .difficulty-tabs button.active{ background:#fff; color:var(--blue); border-color:#fff }
+  .difficulty-tabs.on-light{ justify-content:flex-start }
+  .difficulty-tabs.on-light button{ background:var(--bg); color:var(--ink); border-color:var(--line) }
+  .difficulty-tabs.on-light button.active{ background:var(--blue-light); color:var(--blue); border-color:var(--blue) }
   .setting-tile-label{ font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin:18px 0 10px }
   .setting-tile-label:first-of-type{ margin-top:6px }
   .settings-tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px }
@@ -240,6 +243,9 @@
     display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; color:#333; text-align:center;
   }
   .colour-swatch.active{border-color:var(--blue); border-width:3px}
+  .mini-colour-row{ display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.18); border-radius:999px; padding:6px 10px; }
+  .colour-swatch.mini{ width:16px; height:16px; border-radius:50%; border-width:2px; font-size:0; padding:0; }
+  .colour-swatch.mini.active{ border-width:2.5px; }
   .colour-note{font-size:.8rem; color:var(--ink-soft); line-height:1.5; margin-top:6px}
   footer{max-width:640px; margin:0 auto; padding:24px 20px 12px; text-align:center; color:var(--ink-soft); font-size:.78rem; line-height:1.7}
   footer a{color:var(--ink-soft)}
@@ -283,6 +289,14 @@
     <div class="streak-chip" onclick="openStatDetail('streak')">🔥 <span id="streakCount">0</span> day streak</div>
     <div class="streak-chip" onclick="openStatDetail('stars')">🌟 <span id="sessionStars">0</span> stars this session</div>
     <div class="streak-chip" onclick="openStatDetail('answered')">⭐ <span id="totalAnswered">0</span> words practised</div>
+    <div class="mini-colour-row" title="Background colour">
+      <div class="colour-swatch mini" style="background:#FFFFFF" onclick="setReadingBg('white')" data-bg="white"></div>
+      <div class="colour-swatch mini" style="background:#FDF6E3" onclick="setReadingBg('cream')" data-bg="cream"></div>
+      <div class="colour-swatch mini" style="background:#E8F2FB" onclick="setReadingBg('blue')" data-bg="blue"></div>
+      <div class="colour-swatch mini" style="background:#EAF7EC" onclick="setReadingBg('green')" data-bg="green"></div>
+      <div class="colour-swatch mini" style="background:#FCEAEF" onclick="setReadingBg('rose')" data-bg="rose"></div>
+      <div class="colour-swatch mini" style="background:#EDEEF0" onclick="setReadingBg('grey')" data-bg="grey"></div>
+    </div>
   </div>
   <div class="difficulty-row">
     <span class="difficulty-label">Word list:</span>
@@ -331,6 +345,11 @@
     <div>
       <h2>📅 Daily Practice</h2>
       <p>A mixed set from your chosen word list — words you're less sure of come up more often.</p>
+      <div class="difficulty-tabs on-light" id="difficultyTabsDaily" style="margin-top:10px">
+        <button data-level="y34" onclick="setDifficulty('y34')">Years 3–4</button>
+        <button data-level="y56" onclick="setDifficulty('y56')">Years 5–6</button>
+        <button data-level="mixed" onclick="setDifficulty('mixed')">Mixed</button>
+      </div>
     </div>
     <button class="btn btn-primary" onclick="startSession('daily')">Start Daily Practice</button>
   </div>
@@ -980,7 +999,7 @@ function setDifficulty(band){
 }
 function renderDifficultyTabs(){
   const band = getDifficulty();
-  document.querySelectorAll('#difficultyTabs button').forEach(b => {
+  document.querySelectorAll('.difficulty-tabs button').forEach(b => {
     b.classList.toggle('active', b.dataset.level === band);
   });
 }
