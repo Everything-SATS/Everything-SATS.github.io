@@ -553,6 +553,9 @@ function setReadingBg(bg){
 }
 applyReadingBg();
 
+showRandomFact();
+setInterval(showRandomFact, 25000);
+
 document.getElementById('starsTotal').textContent = localStorage.getItem('sats_stars_total') || '0';
 
 function openWhy(){ document.getElementById('whyOverlay').classList.add('show'); }
