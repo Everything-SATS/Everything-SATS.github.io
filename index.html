@@ -105,13 +105,15 @@
   .tile.external .external-badge{background:var(--gold-light,#FCF1DD); color:#B8860B}
   .section-note{font-size:.84rem; color:var(--ink-soft); margin:-8px 0 14px}
   .curiosity-banner{
-    width:calc(100% - 32px); max-width:928px; margin:14px auto 0; padding:14px 20px; background:var(--bg-alt);
-    border-radius:var(--radius); box-shadow:var(--shadow); display:flex; align-items:center;
-    gap:16px; flex-wrap:wrap;
+    width:calc(100% - 32px); max-width:928px; margin:14px auto 0; padding:22px 24px;
+    background:linear-gradient(120deg,var(--teal) 0%,var(--blue) 100%); color:#fff;
+    border-radius:18px; box-shadow:0 8px 22px rgba(23,128,119,0.35);
   }
-  .cb-label{font-weight:800; font-size:.85rem; white-space:nowrap; color:var(--ink)}
-  .curiosity-fact{font-size:1.05rem; font-weight:700; flex:1; min-width:200px; margin:0}
-  .cb-source{font-size:.75rem; color:var(--ink-soft); white-space:nowrap; text-decoration:underline}
+  .cb-label{font-weight:800; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; opacity:.85; display:block; margin-bottom:8px}
+  .curiosity-fact{font-size:1.3rem; font-weight:700; line-height:1.4; margin:0 0 14px; color:#fff; text-wrap:balance}
+  .cb-row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  .cb-source{font-size:.78rem; color:#fff; opacity:.85; text-decoration:underline}
+  .cb-btn{background:#fff; color:var(--teal-dark); font-size:.82rem; font-weight:800; padding:8px 16px; border-radius:999px; white-space:nowrap; border:none; cursor:pointer; font-family:inherit}
   .calm-sound-row{display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:14px}
   .calm-sound-btn{background:var(--blue-light); color:var(--blue); border:none; border-radius:9px; padding:7px 11px; font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit}
   .calm-sound-btn.active{background:var(--blue); color:#fff}
@@ -216,8 +218,10 @@
 <div class="curiosity-banner">
   <span class="cb-label">🎲 Curiosity Corner</span>
   <p class="curiosity-fact" id="curiosityFact">Tap for a random fact!</p>
-  <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
-  <button class="btn btn-primary btn-small" onclick="showRandomFact()">Give me a fact</button>
+  <div class="cb-row">
+    <a class="cb-source" id="curiositySource" href="#" target="_blank" rel="noopener"></a>
+    <button class="cb-btn" onclick="showRandomFact()">Give me a fact</button>
+  </div>
 </div>
 
 <main>
