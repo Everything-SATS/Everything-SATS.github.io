@@ -985,6 +985,14 @@ document.getElementById('answerInput').addEventListener('focus', () => {
     document.getElementById('writeStage').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 350);
 });
+document.addEventListener('keydown', (e) => {
+  if((e.key === ' ' || e.key === 'Enter') &&
+     document.getElementById('overlay').classList.contains('show') &&
+     !document.getElementById('lookStage').classList.contains('hidden')){
+    e.preventDefault();
+    goToWriteStage();
+  }
+});
 document.getElementById('overlay').addEventListener('click', (e) => {
   if(e.target.id === 'overlay') closeModal();
 });
