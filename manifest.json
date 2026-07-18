@@ -1,8 +1,10 @@
 {
+  "id": "/",
   "name": "Everything SATS",
   "short_name": "Everything SATS",
   "description": "Free UK Year 6 SATs revision — every paper, every level, built for every kind of learner.",
-  "start_url": "index.html",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#E9F6F4",
   "theme_color": "#178077",
