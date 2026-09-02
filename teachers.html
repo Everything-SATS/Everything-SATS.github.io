@@ -99,8 +99,8 @@
   .section-nav{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.25); }
   .section-nav a{ display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.32); color:#fff; text-decoration:none; font-size:.72rem; font-weight:700; padding:5px 11px; border-radius:999px; transition:background .15s ease; }
   .section-nav a:hover{ background:rgba(255,255,255,0.3); }
-  header.top h1{margin:0 0 4px; font-size:1.5rem; text-wrap:balance}
-  header.top p{margin:0; opacity:.9; font-size:.88rem}
+  header.top h1{margin:0 0 6px; font-size:clamp(2rem,6.5vw,2.9rem); line-height:1.08; text-wrap:balance; letter-spacing:-.01em}
+  header.top p{margin:0; opacity:.94; font-size:clamp(1rem,2.6vw,1.14rem); line-height:1.4}
   .streak-row{
     display:flex; justify-content:center; gap:18px; margin-top:14px; flex-wrap:wrap;
   }
@@ -114,8 +114,8 @@
     padding:20px; margin-bottom:22px; display:flex; justify-content:space-between;
     align-items:center; gap:16px; flex-wrap:wrap;
   }
-  .daily-card h2{margin:0 0 4px; font-size:1.1rem}
-  .daily-card p{margin:0; color:var(--ink-soft); font-size:.86rem}
+  .daily-card h2{margin:0 0 6px; font-size:clamp(1.35rem,3.6vw,1.7rem); font-weight:800}
+  .daily-card p{margin:0; color:var(--ink-soft); font-size:1rem; line-height:1.45}
   .btn{
     border:none; border-radius:12px; padding:12px 20px; font-size:.95rem; font-weight:700;
     cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; font-family:inherit;
@@ -130,20 +130,25 @@
     display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;
   }
   .topic-card{
-    background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow);
-    padding:18px; cursor:pointer; transition:transform .15s ease;
-    border:2px solid transparent;
+    background:linear-gradient(165deg, var(--accent-soft, var(--bg-alt)) 0%, var(--bg-alt) 62%);
+    border-radius:20px; box-shadow:0 6px 20px rgba(30,42,58,0.15);
+    padding:20px; cursor:pointer; transition:transform .16s ease, box-shadow .16s ease;
+    border:2px solid var(--line); border-top:8px solid var(--accent, var(--blue));
   }
-  .topic-card:hover{transform:translateY(-2px)}
-  .topic-head{display:flex; align-items:center; gap:10px; margin-bottom:8px}
-  .topic-icon{font-size:1.6rem}
-  .topic-name{font-weight:700; font-size:1.02rem}
-  .topic-sub{color:var(--ink-soft); font-size:.78rem; margin-bottom:12px}
+  .topic-card:hover{transform:translateY(-4px); box-shadow:0 14px 30px rgba(30,42,58,0.24)}
+  .topic-head{display:flex; align-items:center; gap:13px; margin-bottom:10px}
+  .topic-icon{
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+    width:54px; height:54px; border-radius:15px; font-size:1.8rem; line-height:1;
+    background:var(--accent, var(--blue)); box-shadow:0 4px 12px rgba(30,42,58,0.22);
+  }
+  .topic-name{font-weight:800; font-size:clamp(1.25rem,3.4vw,1.5rem); line-height:1.15}
+  .topic-sub{color:var(--ink-soft); font-size:.98rem; line-height:1.45; margin-bottom:14px}
   .progress-track{
     height:9px; background:var(--line); border-radius:999px; overflow:hidden; margin-bottom:6px;
   }
   .progress-fill{height:100%; border-radius:999px; transition:width .4s ease}
-  .progress-label{font-size:.72rem; color:var(--ink-soft); display:flex; justify-content:space-between}
+  .progress-label{font-size:.86rem; color:var(--ink-soft); display:flex; justify-content:space-between}
 
   /* Modal */
   .overlay{
