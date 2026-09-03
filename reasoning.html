@@ -419,295 +419,1035 @@ function commas(n){ return n.toLocaleString('en-GB'); }
    Each returns { text, answer, steps (array of strings), answerNote }
    answer may be a number or string; checked with tolerant matching. */
 
+/* ---------- Question generators ----------
+   Each returns { text, answer, steps (array of strings), code, answerAliases? }
+   `code` is the KS2 content domain reference from the DfE mathematics test
+   framework, so coverage can be checked against the real curriculum rather
+   than guessed at. answer may be a number or string; checked with tolerant
+   matching. Every generator picks its question KIND through bagChoice, which
+   deals kinds out without replacement -- so a session works through the
+   spread of a topic instead of landing on the same wording repeatedly. */
+
+/* ---- shared helpers for the generators below ---- */
+const NAMES = ["Amelia","Noah","Priya","Jack","Aisha","Tom","Leah","Omar","Grace","Finn","Zara","Isaac","Maya","Ellis","Nina","Rory"];
+const PLURALS = ["stickers","marbles","conkers","raffle tickets","beads","cards","pencils","sweets","badges","shells"];
+const COLOURS = ["red","blue","green","yellow","purple","orange","silver"];
+const CONTAINERS = ["box","jar","tin","crate","tray","bag"];
+const SHOPS = ["the school shop","the garden centre","the market stall","the bakery","the sports shop","the corner shop"];
+
+/* Flat, everyday objects to hang a perimeter/area question on, so the same
+   maths arrives dressed differently each time rather than always "a rectangle". */
+const FLATS = ["rug","poster","garden","photograph","noticeboard","flower bed","tablecloth","patio","banner","vegetable patch","carpet tile","picture frame"];
+const BOXES = ["storage box","fish tank","packing crate","toy box","planter","suitcase"];
+function twoNames(){ const a = choice(NAMES); let b = choice(NAMES); while(b === a) b = choice(NAMES); return [a,b]; }
+function simplifyFrac(n, d){ const g = gcd(Math.abs(n), Math.abs(d)) || 1; return [n/g, d/g]; }
+function fracText(n, d){ const [a,b] = simplifyFrac(n,d); return b === 1 ? String(a) : `${a}/${b}`; }
+/* a whole-plus-fraction answer, written the way the rest of the site writes it */
+function mixedText(whole, n, d){
+  if(n === 0) return String(whole);
+  const [a,b] = simplifyFrac(n,d);
+  return whole === 0 ? `${a}/${b}` : `${whole} and ${a}/${b}`;
+}
+function tidy(x){ return Math.round(x * 1000) / 1000; }
+const ROMAN = [[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];
+function toRoman(n){ let out = ""; for(const [v,s] of ROMAN){ while(n >= v){ out += s; n -= v; } } return out; }
+
+/* =====================================================================
+   NUMBER & PLACE VALUE -- 5N1-5N6, 6N2-6N6
+   ===================================================================== */
 function genNumPlace(diff){
-  if(diff === 0){
-    // Y3/4: rounding to 10/100, place value in 3-4 digit numbers,
-    // reading (not writing) simple Roman numerals -- no 6-7 digit place
-    // value or multi-step negative-number word problems yet.
-    const kind0 = choice(["round0","placevalue0"]);
-    if(kind0 === "round0"){
-      const r = choice([10,100]);
-      const n = randInt(r, r*49) + randInt(0,r-1);
-      const rounded = Math.round(n/r)*r;
-      return { text:`Round ${n} to the nearest ${r}.`, answer:rounded,
-        steps:[`Look at the digit in the ${r===10?'ones':'tens'} place to decide whether to round up or down.`, `${n} rounds to ${rounded}.`] };
-    }
-    const n = randInt(1000,9999);
-    const digits = String(n).split('');
-    const pos = randInt(0,2);
-    const placeNames = ["ones","tens","hundreds","thousands"];
-    const placeIdx = digits.length-1-pos;
-    const digit = digits[pos];
-    const value = Number(digit) * Math.pow(10,placeIdx);
-    return { text:`What is the value of the digit ${digit} in ${n}?`, answer:value,
-      steps:[`Count the digit's position from the right: it's in the ${placeNames[placeIdx]} place.`, `${digit} in the ${placeNames[placeIdx]} place is worth ${value}.`] };
+  const kinds = diff === 0
+    ? ["round_small","digitvalue_small","moreless_small","compare_small","roman_read"]
+    : diff === 1
+      ? ["digitvalue","round","moreless","countpower","roman_read","negtemp","compare"]
+      : diff === 2
+        ? ["digitvalue","round","moreless","countpower","roman_write","negtemp","neginterval","compare","order"]
+        : ["digitvalue","round","countpower","roman_write","neginterval","compare","order","negcount"];
+  const kind = bagChoice("numplace" + diff, kinds);
+
+  if(kind === "round_small"){
+    const n = randInt(112, 989), to = choice([10, 100]);
+    const ans = Math.round(n / to) * to;
+    return { code:"4N4a", text:`Round ${n} to the nearest ${to}.`, answer: ans,
+      steps:[`Look at the digit to the right of the ${to === 10 ? "tens" : "hundreds"} column.`,
+             `${n} rounds to ${commas(ans)}.`] };
   }
-  const kind = choice(diff===1 ? ["round","order"] : diff===3 ? ["placevalue","roman","negword"] : ["round","placevalue","negword"]);
+  if(kind === "digitvalue_small"){
+    const n = randInt(1000, 9999), pos = randInt(0, 3);
+    const s = String(n), digit = Number(s[pos]);
+    const place = [1000, 100, 10, 1][pos];
+    return { code:"4N2a", text:`In the number ${commas(n)}, what is the value of the digit ${digit}?`, answer: digit * place,
+      steps:[`The digit ${digit} sits in the ${["thousands","hundreds","tens","ones"][pos]} column.`,
+             `So it is worth ${digit} × ${place} = ${commas(digit*place)}.`] };
+  }
+  if(kind === "moreless_small"){
+    const n = randInt(1200, 8800), step = choice([10, 100, 1000]), up = Math.random() < 0.5;
+    const ans = up ? n + step : n - step;
+    return { code:"4N1", text:`What number is ${commas(step)} ${up ? "more" : "less"} than ${commas(n)}?`, answer: ans,
+      steps:[`${up ? "Add" : "Subtract"} ${commas(step)} ${up ? "to" : "from"} ${commas(n)}.`, `The answer is ${commas(ans)}.`] };
+  }
+  if(kind === "compare_small"){
+    const a = randInt(220, 980), b = randInt(220, 980);
+    if(a === b) return genNumPlace(diff);
+    const want = choice(["largest","smallest"]);
+    const c = randInt(220, 980);
+    const set = [a,b,c];
+    const ans = want === "largest" ? Math.max(...set) : Math.min(...set);
+    return { code:"4N2b", text:`Which of these numbers is the ${want}: ${set.join(", ")}?`, answer: ans,
+      steps:["Compare the hundreds digits first, then the tens, then the ones.", `The ${want} is ${ans}.`] };
+  }
+  if(kind === "roman_read"){
+    const n = diff === 0 ? randInt(1, 39) : randInt(1, 999);
+    return { code: diff === 0 ? "4N6" : "5N3b", text:`What number does the Roman numeral ${toRoman(n)} represent?`, answer: n,
+      steps:["Roman numerals add up left to right, except when a smaller letter comes before a larger one, which subtracts.",
+             `${toRoman(n)} = ${n}.`] };
+  }
+  if(kind === "roman_write"){
+    const n = randInt(12, 999);
+    return { code:"5N3b", text:`Write ${n} as a Roman numeral.`, answer: toRoman(n),
+      steps:["Work down from the largest value: M=1000, D=500, C=100, L=50, X=10, V=5, I=1.",
+             "Use the subtraction pairs where they apply: CM=900, CD=400, XC=90, XL=40, IX=9, IV=4.",
+             `${n} = ${toRoman(n)}.`] };
+  }
+  if(kind === "digitvalue"){
+    const digits = diff === 3 ? 7 : diff === 2 ? 6 : 5;
+    let n = randInt(Math.pow(10, digits-1), Math.pow(10, digits) - 1);
+    const s = String(n), pos = randInt(0, s.length - 1), digit = Number(s[pos]);
+    if(digit === 0) return genNumPlace(diff);
+    const place = Math.pow(10, s.length - 1 - pos);
+    const names = {1:"ones",10:"tens",100:"hundreds",1000:"thousands",10000:"ten thousands",100000:"hundred thousands",1000000:"millions"};
+    return { code: digits >= 7 ? "6N3" : "5N3a", text:`In the number ${commas(n)}, what is the value of the digit ${digit}?`, answer: digit * place,
+      steps:[`The digit ${digit} is in the ${names[place]} column.`,
+             `Its value is ${digit} × ${commas(place)} = ${commas(digit*place)}.`] };
+  }
   if(kind === "round"){
-    const rounders = diff===1 ? [10,100] : [1000,10000];
-    const r = choice(rounders);
-    const n = randInt(r, r*99) + randInt(0, r-1);
-    const rounded = Math.round(n/r)*r;
-    return { text:`Round ${commas(n)} to the nearest ${commas(r)}.`, answer: rounded,
-      steps:[`Look at the digit in the ${r===10?'ones':r===100?'tens':r===1000?'hundreds':'thousands'} place to decide whether to round up or down.`,
-             `${commas(n)} rounds to ${commas(rounded)}.`] };
+    const digits = diff === 3 ? 7 : 6;
+    const n = randInt(Math.pow(10, digits-1), Math.pow(10, digits) - 1);
+    const to = choice(diff === 3 ? [1000, 10000, 100000, 1000000] : [10, 100, 1000, 10000]);
+    const ans = Math.round(n / to) * to;
+    return { code: diff === 3 ? "6N4" : "5N4", text:`Round ${commas(n)} to the nearest ${commas(to)}.`, answer: ans,
+      steps:[`Find the ${commas(to)} column, then look at the digit immediately to its right.`,
+             "5 or more rounds up; 4 or less rounds down.", `${commas(n)} rounds to ${commas(ans)}.`] };
   }
-  if(kind === "order"){
-    const nums = Array.from({length:4}, () => randInt(100, diff===1?9999:999999));
-    const sorted = [...nums].sort((a,b)=>a-b);
-    return { text:`Write these in order, smallest first: ${nums.map(commas).join(', ')}`, answer: sorted.join(', '),
-      steps:[`Compare the numbers by their number of digits first, then digit-by-digit from the left.`,
-             `In order: ${sorted.map(commas).join(', ')}`] };
+  if(kind === "moreless"){
+    const n = randInt(100000, 8999999), step = choice([1000, 10000, 100000]), up = Math.random() < 0.5;
+    const ans = up ? n + step : n - step;
+    return { code:"6N2", text:`What number is ${commas(step)} ${up ? "more" : "less"} than ${commas(n)}?`, answer: ans,
+      steps:[`Only the ${commas(step)} column changes (unless it makes the next column tip over).`,
+             `${commas(n)} ${up ? "+" : "−"} ${commas(step)} = ${commas(ans)}.`] };
   }
-  if(kind === "placevalue"){
-    const n = randInt(diff===3?1000000:100000, diff===3?9999999:999999);
-    const digits = String(n).split('');
-    const pos = randInt(0, digits.length-2);
-    const placeNames = ["ones","tens","hundreds","thousands","ten thousands","hundred thousands","millions"];
-    const placeIdx = digits.length - 1 - pos;
-    const digit = digits[pos];
-    const value = Number(digit) * Math.pow(10, placeIdx);
-    return { text:`What is the value of the digit ${digit} in ${commas(n)}?`, answer: value,
-      steps:[`Count the digit's position from the right: it's in the ${placeNames[placeIdx]} place.`,
-             `${digit} in the ${placeNames[placeIdx]} place is worth ${commas(value)}.`] };
-  }
-  if(kind === "roman"){
-    const romanMap = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
-    function toRoman(num){ let res=''; for(const [v,s] of romanMap){ while(num>=v){ res+=s; num-=v; } } return res; }
-    const n = randInt(1, 100);
-    return { text:`Write ${n} as a Roman numeral.`, answer: toRoman(n),
-      steps:[`Build it from the largest values down: thousands, then hundreds, tens, ones — using subtraction pairs like IV (4) and IX (9) where needed.`,
-             `${n} = ${toRoman(n)}`] };
-  }
-  // negword
-  const temps = [randInt(-15,-1), randInt(1,20)];
-  const [a,b] = temps;
-  return { text:`The temperature was ${a}°C. It rose by ${b - a > 0 ? '' : ''}${Math.abs(b-a)}°C to reach ${b}°C. True or check: how many degrees did it rise?`, answer: b-a,
-    steps:[`Find the distance from ${a} to ${b} on a number line.`, `${b} − (${a}) = ${b-a}°C`] };
-}
-
-function genFdpPro(diff){
-  if(diff === 0){
-    // Y3/4: unit-fraction-of-amount only, small numbers -- percentages are
-    // Y5/6-only in the curriculum, not included at this level.
-    const d = randInt(2,10);
-    const total = d * randInt(2,10);
-    const result = total/d;
-    return { text:`A jar has ${total} sweets. 1/${d} of them are red. How many sweets are red?`, answer:result,
-      steps:[`Dividing by ${d} finds one part: ${total} ÷ ${d} = ${result}.`, `1/${d} of ${total} = ${result}`] };
-  }
-  const kind = choice(diff===1 ? ["fracof","compare"] : diff===3 ? ["percentchange","fracof","compare"] : ["percentof","fracof","compare"]);
-  if(kind === "fracof"){
-    // Pick the denominator first and build the total from it. Choosing the
-    // total first and then filtering for a denominator that divides it left
-    // no candidates whenever the total was a prime like 49 -- choice([])
-    // returned undefined and the question rendered as "NaN/undefined of them".
-    const d = choice([2,3,4,5,6,8]);
-    const n = randInt(1, d-1);
-    const total = d * (diff===3 ? randInt(4,14) : randInt(2,10));
-    const result = total/d*n;
-    return { text:`A baker made ${total} cakes. ${fmtFrac(n,d)} of them were chocolate. How many chocolate cakes were there?`, answer: result,
-      steps:[`Divide the total by the denominator: ${total} ÷ ${d} = ${total/d}.`, `Multiply by the numerator: ${total/d} × ${n} = ${result}.`] };
-  }
-  if(kind === "percentof"){
-    const pct = choice([10,20,25,50,75,5,15,40,60]);
-    const total = randInt(4,60) * choice([5,10]);
-    const result = (pct/100)*total;
-    return { text:`There are ${total} children in a school club. ${pct}% of them are boys. How many boys are there?`, answer: result,
-      steps:[`Find 10% by dividing by 10: ${(total/10).toFixed(1)}.`, `Scale up to ${pct}%: ${result}.`] };
-  }
-  if(kind === "percentchange"){
-    const start = randInt(20,200) * choice([1,2,5]);
-    const pct = choice([10,20,25,50]);
-    const up = Math.random() < 0.5;
-    const change = (pct/100)*start;
-    const result = up ? start+change : start-change;
-    return { text:`A shop had ${start} items in stock. The stock ${up?'increased':'decreased'} by ${pct}%. How many items are there now?`, answer: result,
-      steps:[`Find ${pct}% of ${start}: ${change}.`, `${up?'Add':'Subtract'} that to the original: ${start} ${up?'+':'−'} ${change} = ${result}.`] };
-  }
-  // compare
-  const d1 = choice([2,3,4]), d2 = choice([5,6,8].filter(x=>x!==d1));
-  const n1 = randInt(1,d1-1), n2 = randInt(1,d2-1);
-  const cross1 = n1*d2, cross2 = n2*d1;
-  const bigger = cross1 > cross2 ? fmtFrac(n1,d1) : cross2 > cross1 ? fmtFrac(n2,d2) : "equal";
-  return { text:`Which is bigger: ${fmtFrac(n1,d1)} or ${fmtFrac(n2,d2)}?`, answer: bigger,
-    steps:[`Give them a common denominator by cross-multiplying: ${n1}×${d2}=${cross1}, and ${n2}×${d1}=${cross2}.`,
-           `${cross1} ${cross1>cross2?'>':cross1<cross2?'<':'='} ${cross2}, so ${bigger} is bigger.`] };
-}
-
-function genRatio(diff){
-  if(diff !== 3 || Math.random() < 0.6){
-    const r1 = randInt(1,4), r2 = randInt(1,4);
-    const parts = r1+r2;
-    const perPart = randInt(2, diff===1?8:20);
-    const total = parts * perPart;
-    return { text:`Share ${total} sweets in the ratio ${r1}:${r2}. How many does the first person get?`, answer: r1*perPart,
-      steps:[`Add the ratio parts: ${r1} + ${r2} = ${parts} parts total.`,
-             `Divide the total by the number of parts: ${total} ÷ ${parts} = ${perPart} per part.`,
-             `The first person gets ${r1} parts: ${r1} × ${perPart} = ${r1*perPart}.`] };
-  }
-  const scale = choice([2,3,4]);
-  const smallSide = randInt(3,12);
-  const bigSide = smallSide*scale;
-  return { text:`Two similar rectangles have a scale factor of ${scale}. The smaller rectangle has a side of ${smallSide}cm. What is the matching side on the larger rectangle?`, answer: bigSide,
-    steps:[`Multiply the small side by the scale factor: ${smallSide} × ${scale} = ${bigSide}cm.`] };
-}
-
-function genAlgebra(diff){
-  const kind = choice(diff===1 ? ["missing1"] : diff===3 ? ["formula","sequence","twounknown"] : ["missing2","sequence"]);
-  if(kind === "missing1"){
-    const x = randInt(2,20), b = randInt(2,15);
-    const total = x+b;
-    return { text:`x + ${b} = ${total}. What is x?`, answer: x,
-      steps:[`Subtract ${b} from both sides: x = ${total} − ${b}.`, `x = ${x}`] };
-  }
-  if(kind === "missing2"){
-    const x = randInt(2,15), m = randInt(2,6), b = randInt(1,20);
-    const total = m*x+b;
-    return { text:`${m} × x + ${b} = ${total}. What is x?`, answer: x,
-      steps:[`Subtract ${b} from both sides: ${m} × x = ${total-b}.`, `Divide by ${m}: x = ${x}.`] };
-  }
-  if(kind === "sequence"){
-    const start = randInt(1,20), step = randInt(2,9);
-    const seq = [0,1,2,3].map(i => start+i*step);
-    const next = start+4*step;
-    return { text:`What is the next number in this sequence? ${seq.join(', ')}, ?`, answer: next,
-      steps:[`Find the pattern between each term: it goes up by ${step} each time.`, `${seq[3]} + ${step} = ${next}`] };
-  }
-  if(kind === "formula"){
-    const a = randInt(2,10), b = randInt(2,10);
-    return { text:`Using the formula T = 2a + b, find T when a = ${a} and b = ${b}.`, answer: 2*a+b,
-      steps:[`Substitute the values in: T = 2 × ${a} + ${b}.`, `T = ${2*a} + ${b} = ${2*a+b}`] };
-  }
-  const x = randInt(1,8), y = randInt(1,8);
-  return { text:`x + y = ${x+y}, and x is ${x}. What is y?`, answer: y,
-    steps:[`Substitute x = ${x}: ${x} + y = ${x+y}.`, `y = ${x+y} − ${x} = ${y}`] };
-}
-
-function genMeasurement(diff){
-  const kind = choice(diff===1 ? ["perimeter","money"] : diff===3 ? ["area2","time2","volume"] : ["area","time","convert"]);
-  if(kind === "perimeter"){
-    const l = randInt(3, diff===1?15:40), w = randInt(3, diff===1?15:40);
-    return { text:`A rectangle is ${l}cm by ${w}cm. What is its perimeter?`, answer: 2*(l+w),
-      steps:[`Perimeter = 2 × (length + width).`, `2 × (${l} + ${w}) = ${2*(l+w)}cm`] };
-  }
-  if(kind === "area"){
-    const l = randInt(3,20), w = randInt(3,20);
-    return { text:`A rectangle is ${l}cm by ${w}cm. What is its area?`, answer: l*w,
-      steps:[`Area = length × width.`, `${l} × ${w} = ${l*w}cm²`] };
-  }
-  if(kind === "area2"){
-    const base = randInt(4,20), height = randInt(4,20);
-    return { text:`A triangle has a base of ${base}cm and a height of ${height}cm. What is its area?`, answer: (base*height)/2,
-      steps:[`Area of a triangle = (base × height) ÷ 2.`, `(${base} × ${height}) ÷ 2 = ${(base*height)/2}cm²`] };
-  }
-  if(kind === "volume"){
-    const l = randInt(2,10), w = randInt(2,10), h = randInt(2,10);
-    return { text:`A cuboid measures ${l}cm × ${w}cm × ${h}cm. What is its volume?`, answer: l*w*h,
-      steps:[`Volume = length × width × height.`, `${l} × ${w} × ${h} = ${l*w*h}cm³`] };
-  }
-  if(kind === "money"){
-    const price = randInt(150, 899)/100;
-    // Only offer notes big enough to cover the price -- a £5 note against an
-    // £6.48 item asked for change of "-1.48", which isn't a real question.
-    const paid = choice([5,10,20].filter(n => n > price));
-    const change = Number((paid - price).toFixed(2));
-    return { text:`An item costs £${price.toFixed(2)}. You pay with a £${paid} note. How much change do you get?`, answer: change,
-      steps:[`Subtract the price from the amount paid: £${paid} − £${price.toFixed(2)}.`, `Change = £${change.toFixed(2)}`] };
-  }
-  if(kind === "time"){
-    const startH = randInt(9,15), startM = choice([0,15,30,45]);
-    const durMin = randInt(20,90);
-    let totalMin = startH*60+startM+durMin;
-    const endH = Math.floor(totalMin/60)%24, endM = totalMin%60;
-    const fmt = (h,m) => `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-    return { text:`A film starts at ${fmt(startH,startM)} and lasts ${durMin} minutes. What time does it finish?`, answer: fmt(endH,endM),
-      steps:[`Add the duration to the start time: ${fmt(startH,startM)} + ${durMin} minutes.`, `It finishes at ${fmt(endH,endM)}.`] };
-  }
-  const h1 = randInt(1,3), m1 = choice([0,15,30,45]);
-  const h2 = h1 + randInt(1,3), m2 = choice([0,15,30,45]);
-  let totalMinutes = (h2*60+m2) - (h1*60+m1);
-  return { text:`A journey starts at ${String(h1).padStart(2,'0')}:${String(m1).padStart(2,'0')} and ends at ${String(h2).padStart(2,'0')}:${String(m2).padStart(2,'0')}. How many minutes did it take?`, answer: totalMinutes,
-    steps:[`Find the difference between the two times.`, `${totalMinutes} minutes`] };
-}
-
-function genShapes(diff){
-  const kind = choice(diff===1 ? ["line"] : diff===3 ? ["quad","vertical"] : ["triangle","point"]);
-  if(kind === "line"){
-    const a = randInt(20,150);
-    return { text:`Two angles sit on a straight line. One is ${a}°. What is the other angle?`, answer: 180-a,
-      steps:[`Angles on a straight line add up to 180°.`, `180° − ${a}° = ${180-a}°`] };
-  }
-  if(kind === "point"){
-    const a = randInt(60,150), b = randInt(60,150);
-    const rem = 360-a-b;
-    return { text:`Three angles meet at a point: ${a}°, ${b}°, and an unknown angle. What is the unknown angle?`, answer: rem,
-      steps:[`Angles around a point add up to 360°.`, `360° − ${a}° − ${b}° = ${rem}°`] };
-  }
-  if(kind === "triangle"){
-    const a = randInt(30,100), b = randInt(30,100-((a>100)?0:0));
-    const c = 180-a-b;
-    if(c<=0) return genShapes(diff);
-    return { text:`A triangle has angles of ${a}° and ${b}°. What is the third angle?`, answer: c,
-      steps:[`Angles in a triangle add up to 180°.`, `180° − ${a}° − ${b}° = ${c}°`] };
-  }
-  if(kind === "quad"){
-    const a = randInt(60,120), b = randInt(60,120), c = randInt(60,120);
-    const d = 360-a-b-c;
-    if(d<=0) return genShapes(diff);
-    return { text:`A quadrilateral has angles of ${a}°, ${b}° and ${c}°. What is the fourth angle?`, answer: d,
-      steps:[`Angles in a quadrilateral add up to 360°.`, `360° − ${a}° − ${b}° − ${c}° = ${d}°`] };
-  }
-  const a = randInt(20,160);
-  return { text:`Two lines cross. One of the angles formed is ${a}°. What is the angle vertically opposite it?`, answer: a,
-    steps:[`Vertically opposite angles (across the crossing point) are always equal.`, `The opposite angle is also ${a}°.`] };
-}
-
-function genPosition(diff){
-  const kind = diff===1 ? "translate" : choice(["translate","reflect"]);
-  const range = diff===3 ? [-10,10] : [0,10];
-  const x = randInt(range[0], range[1]), y = randInt(range[0], range[1]);
-  if(kind === "translate"){
-    const dx = randInt(diff===1?1:-8, 8), dy = randInt(diff===1?1:-8, 8);
-    const nx = x+dx, ny = y+dy;
-    return { text:`A point starts at (${x}, ${y}). It moves ${Math.abs(dx)} ${dx>=0?'right':'left'} and ${Math.abs(dy)} ${dy>=0?'up':'down'}. What are its new coordinates?`, answer: `(${nx}, ${ny})`,
-      steps:[`Add the horizontal move to the x-coordinate: ${x} ${dx>=0?'+':'−'} ${Math.abs(dx)} = ${nx}.`,
-             `Add the vertical move to the y-coordinate: ${y} ${dy>=0?'+':'−'} ${Math.abs(dy)} = ${ny}.`,
-             `New coordinates: (${nx}, ${ny})`] };
-  }
-  const axis = choice(["x-axis","y-axis"]);
-  const rx = axis === "y-axis" ? -x : x;
-  const ry = axis === "x-axis" ? -y : y;
-  return { text:`A point is at (${x}, ${y}). What are its coordinates after being reflected in the ${axis}?`, answer: `(${rx}, ${ry})`,
-    steps:[`Reflecting in the ${axis} flips the sign of the ${axis==='x-axis'?'y':'x'}-coordinate.`, `New coordinates: (${rx}, ${ry})`] };
-}
-
-function genStatistics(diff){
-  const kind = choice(diff===3 ? ["findmissing","mean"] : ["mean","compare"]);
-  const n = diff===1 ? 4 : diff===3 ? 6 : 5;
-  const nums = Array.from({length:n}, () => randInt(diff===1?1:5, diff===1?20:diff===3?100:50));
-  if(kind === "mean"){
-    const sum = nums.reduce((a,b)=>a+b,0);
-    const mean = sum/n;
-    return { text:`Find the mean of: ${nums.join(', ')}`, answer: Number(mean.toFixed(2)),
-      steps:[`Add all the numbers together: ${nums.join(' + ')} = ${sum}.`, `Divide by how many numbers there are (${n}): ${sum} ÷ ${n} = ${mean.toFixed(2)}.`] };
+  if(kind === "countpower"){
+    const start = randInt(20, 90) * 10000, step = choice([10, 100, 1000, 10000]);
+    const back = Math.random() < 0.5, terms = randInt(3, 5);
+    const ans = back ? start - step * terms : start + step * terms;
+    return { code:"5N1", text:`Count ${back ? "back" : "on"} in steps of ${commas(step)} from ${commas(start)}. What is the ${terms}${terms===3?"rd":"th"} number you say?`, answer: ans,
+      steps:[`Each step ${back ? "subtracts" : "adds"} ${commas(step)}.`,
+             `After ${terms} steps: ${commas(start)} ${back ? "−" : "+"} (${terms} × ${commas(step)}) = ${commas(ans)}.`] };
   }
   if(kind === "compare"){
-    const idx1 = 0, idx2 = randInt(1,n-1);
-    const diffVal = Math.abs(nums[idx1]-nums[idx2]);
-    return { text:`Here are the results of a survey: ${nums.map((v,i)=>`item ${i+1}: ${v}`).join(', ')}. What is the difference between item 1 and item ${idx2+1}?`, answer: diffVal,
-      steps:[`Subtract the smaller from the larger: |${nums[idx1]} − ${nums[idx2]}|.`, `Difference = ${diffVal}`] };
+    const mk = () => randInt(100000, 9999999);
+    const set = [mk(), mk(), mk()];
+    const want = choice(["largest","smallest"]);
+    const ans = want === "largest" ? Math.max(...set) : Math.min(...set);
+    return { code:"6N2", text:`Which of these numbers is the ${want}: ${set.map(commas).join("  ")}?`, answer: ans,
+      steps:["Line the numbers up by their columns and compare from the left.", `The ${want} is ${commas(ans)}.`] };
   }
-  const mean = randInt(10,30);
-  const knownNums = Array.from({length:n-1}, () => randInt(5,40));
-  const missingVal = mean*n - knownNums.reduce((a,b)=>a+b,0);
-  if(missingVal <= 0) return genStatistics(diff);
-  return { text:`${n} numbers have a mean of ${mean}. ${n-1} of them are: ${knownNums.join(', ')}. What is the missing number?`, answer: missingVal,
-    steps:[`Total of all ${n} numbers = mean × count = ${mean} × ${n} = ${mean*n}.`,
-           `Total of the known numbers: ${knownNums.join(' + ')} = ${knownNums.reduce((a,b)=>a+b,0)}.`,
-           `Missing number = ${mean*n} − ${knownNums.reduce((a,b)=>a+b,0)} = ${missingVal}`] };
+  if(kind === "order"){
+    const mk = () => randInt(10000, 999999);
+    const set = [mk(), mk(), mk(), mk()];
+    const sorted = [...set].sort((a,b) => a-b);
+    return { code:"6N2", text:`Write these numbers in order, smallest first: ${set.map(commas).join("  ")}. (Separate them with commas.)`,
+      answer: sorted.map(commas).join(", "), answerAliases:[sorted.join(", "), sorted.join(",")],
+      steps:["Compare the number of digits first — more digits means a bigger number.",
+             "Where two numbers have the same number of digits, compare from the left.",
+             `In order: ${sorted.map(commas).join(", ")}.`] };
+  }
+  if(kind === "negtemp"){
+    const start = -randInt(1, 12), rise = randInt(3, 20), up = Math.random() < 0.5;
+    const ans = up ? start + rise : start - rise;
+    const place = choice(["Aberdeen","the summit","the freezer aisle","the ice rink","Oslo","the greenhouse"]);
+    return { code:"5N5", text:`The temperature in ${place} is ${start}°C. It ${up ? "rises" : "falls"} by ${rise} degrees. What is the new temperature, in °C?`, answer: ans,
+      steps:[`Start at ${start} and count ${up ? "up" : "down"} ${rise}.`,
+             up ? `Counting up through zero: ${start} + ${rise} = ${ans}.` : `${start} − ${rise} = ${ans}.`] };
+  }
+  if(kind === "neginterval"){
+    const lo = -randInt(2, 18), hi = randInt(1, 20);
+    return { code:"6N5", text:`How many degrees is it from ${lo}°C to ${hi}°C?`, answer: hi - lo,
+      steps:[`Count from ${lo} up to 0: that is ${-lo} degrees.`,
+             `Then from 0 up to ${hi}: that is ${hi} degrees.`,
+             `Altogether ${-lo} + ${hi} = ${hi - lo} degrees.`] };
+  }
+  /* negcount */
+  const from = randInt(3, 15), step = randInt(3, 9), terms = randInt(3, 5);
+  const ansN = from - step * terms;
+  return { code:"6N5", text:`Count back in steps of ${step} from ${from}. What is the ${terms}${terms===3?"rd":"th"} number you say?`, answer: ansN,
+    steps:[`${terms} steps of ${step} is ${terms * step}.`,
+           `${from} − ${terms * step} = ${ansN}, so the count crosses zero into negative numbers.`] };
 }
 
+/* =====================================================================
+   FRACTIONS, DECIMALS & PERCENTAGES -- 5F2-5F12, 6F2-6F10
+   ===================================================================== */
+function genFdpPro(diff){
+  const kinds = diff === 0
+    ? ["fracof_unit","equivalent","addsame","comparefrac","tenths"]
+    : diff === 1
+      ? ["fracof","equivalent","addsame","comparefrac","mixed_to_improper","percentof","roundec","decimal_place"]
+      : diff === 2
+        ? ["fracof","simplify","addsame","addunlike","comparefrac","mixed_to_improper","improper_to_mixed","percentof","percent_equiv","roundec","decimal_place","orderdec","multwhole"]
+        : ["simplify","addunlike","submixed","multfrac","divfrac","multwhole","frac_to_dec","percentof","percent_equiv","percentchange","decimal_place","thousandths","orderdec"];
+  const kind = bagChoice("fdppro" + diff, kinds);
+  const [who] = twoNames();
+
+  if(kind === "fracof_unit"){
+    const d = choice([2,3,4,5,10]), total = d * randInt(2, 9);
+    const col = choice(COLOURS);
+    return { code:"3F1b", text:`A ${choice(CONTAINERS)} holds ${total} ${choice(PLURALS)}. 1/${d} of them are ${col}. How many are ${col}?`, answer: total/d,
+      steps:[`Finding 1/${d} means dividing by ${d}.`, `${total} ÷ ${d} = ${total/d}.`] };
+  }
+  if(kind === "fracof"){
+    const d = choice([2,3,4,5,6,8,10]), n = randInt(1, d-1);
+    const total = d * (diff === 3 ? randInt(4, 14) : randInt(2, 10));
+    const res = total / d * n;
+    const col = choice(COLOURS);
+    return { code:"5F12", text:`${who} has ${total} ${choice(PLURALS)}. ${n}/${d} of them are ${col}. How many are ${col}?`, answer: res,
+      steps:[`Divide by the denominator to find one part: ${total} ÷ ${d} = ${total/d}.`,
+             `Multiply by the numerator: ${total/d} × ${n} = ${res}.`] };
+  }
+  if(kind === "equivalent"){
+    const d = choice([2,3,4,5,6,8]), n = randInt(1, d-1), mult = randInt(2, 6);
+    const askTop = Math.random() < 0.5;
+    return askTop
+      ? { code:"5F2b", text:`Complete the equivalent fraction: ${n}/${d} = ?/${d*mult}`, answer: n*mult,
+          steps:[`The denominator went from ${d} to ${d*mult}, so it was multiplied by ${mult}.`,
+                 `Do the same to the numerator: ${n} × ${mult} = ${n*mult}.`] }
+      : { code:"5F2b", text:`Complete the equivalent fraction: ${n*mult}/${d*mult} = ${n}/?`, answer: d,
+          steps:[`The numerator went from ${n*mult} to ${n}, so it was divided by ${mult}.`,
+                 `Do the same to the denominator: ${d*mult} ÷ ${mult} = ${d}.`] };
+  }
+  if(kind === "simplify"){
+    const [n, d] = [randInt(2, 9), choice([12, 16, 18, 20, 24, 30, 36])];
+    const g = randInt(2, 4), num = n * g, den = d;
+    if(num >= den) return genFdpPro(diff);
+    const [sn, sd] = simplifyFrac(num, den);
+    if(sn === num) return genFdpPro(diff);
+    return { code:"6F2", text:`Write ${num}/${den} in its simplest form.`, answer: `${sn}/${sd}`,
+      steps:[`Find the highest common factor of ${num} and ${den}: it is ${gcd(num,den)}.`,
+             `Divide both parts by ${gcd(num,den)}: ${num}/${den} = ${sn}/${sd}.`] };
+  }
+  if(kind === "addsame"){
+    const d = choice([5,6,7,8,9,10,12]), a = randInt(1, d-2), b = randInt(1, d-a-1);
+    const sub = Math.random() < 0.4;
+    const [x, y] = sub ? [Math.max(a,b) + 1, Math.min(a,b)] : [a, b];
+    const res = sub ? x - y : x + y;
+    return { code:"5F4", text:`${x}/${d} ${sub ? "−" : "+"} ${y}/${d} = ?  (Simplify your answer if you can.)`,
+      answer: fracText(res, d), answerAliases:[`${res}/${d}`],
+      steps:[`The denominators are the same, so just ${sub ? "subtract" : "add"} the numerators.`,
+             `${x} ${sub ? "−" : "+"} ${y} = ${res}, giving ${res}/${d}.`,
+             fracText(res,d) === `${res}/${d}` ? "That is already in its simplest form." : `Simplified, that is ${fracText(res,d)}.`] };
+  }
+  if(kind === "addunlike"){
+    const d1 = choice([2,3,4,5,6]), mult = randInt(2, 4), d2 = d1 * mult;
+    const n1 = randInt(1, d1-1), n2 = randInt(1, d2-1);
+    const num = n1 * mult + n2;
+    if(num >= d2) return genFdpPro(diff);
+    return { code:"6F4", text:`${n1}/${d1} + ${n2}/${d2} = ?  (Simplify your answer if you can.)`,
+      answer: fracText(num, d2), answerAliases:[`${num}/${d2}`],
+      steps:[`${d2} is a multiple of ${d1}, so change ${n1}/${d1} into ${d2}ths.`,
+             `${n1}/${d1} = ${n1*mult}/${d2}.`,
+             `${n1*mult}/${d2} + ${n2}/${d2} = ${num}/${d2}${fracText(num,d2) === `${num}/${d2}` ? "." : ` = ${fracText(num,d2)}.`}`] };
+  }
+  if(kind === "submixed"){
+    const d = choice([3,4,5,6,8]), w1 = randInt(2, 5), n1 = randInt(1, d-1);
+    const w2 = randInt(1, w1-1), n2 = randInt(1, d-1);
+    const top1 = w1*d + n1, top2 = w2*d + n2;
+    const res = top1 - top2;
+    return { code:"6F4", text:`${mixedText(w1,n1,d)} − ${mixedText(w2,n2,d)} = ?  (Give your answer as a whole number and a fraction if you need to.)`,
+      answer: mixedText(Math.floor(res/d), res % d, d), answerAliases:[`${res}/${d}`],
+      steps:[`Change both to improper fractions: ${top1}/${d} and ${top2}/${d}.`,
+             `${top1}/${d} − ${top2}/${d} = ${res}/${d}.`,
+             `Change back: ${res}/${d} = ${mixedText(Math.floor(res/d), res % d, d)}.`] };
+  }
+  if(kind === "mixed_to_improper"){
+    const d = choice([2,3,4,5,6,8]), w = randInt(2, 6), n = randInt(1, d-1);
+    return { code:"5F2a", text:`Write ${mixedText(w,n,d)} as an improper fraction.`, answer:`${w*d+n}/${d}`,
+      steps:[`Each whole is ${d}/${d}, so ${w} wholes is ${w} × ${d} = ${w*d} ${d}ths.`,
+             `Add the extra ${n}: ${w*d} + ${n} = ${w*d+n}, giving ${w*d+n}/${d}.`] };
+  }
+  if(kind === "improper_to_mixed"){
+    const d = choice([2,3,4,5,6,8]), w = randInt(2, 6), n = randInt(1, d-1), top = w*d + n;
+    return { code:"5F2a", text:`Write ${top}/${d} as a whole number and a fraction.`, answer: mixedText(w,n,d),
+      steps:[`How many whole ${d}s go into ${top}? ${top} ÷ ${d} = ${w} remainder ${n}.`,
+             `So ${top}/${d} = ${mixedText(w,n,d)}.`] };
+  }
+  if(kind === "comparefrac"){
+    const d1 = choice([2,3,4,5]), d2 = choice([5,6,8,10].filter(x => x !== d1));
+    const n1 = randInt(1, d1-1), n2 = randInt(1, d2-1);
+    const c1 = n1*d2, c2 = n2*d1;
+    if(c1 === c2) return genFdpPro(diff);
+    const bigger = c1 > c2 ? `${n1}/${d1}` : `${n2}/${d2}`;
+    return { code:"6F3", text:`Which fraction is larger: ${n1}/${d1} or ${n2}/${d2}?`, answer: bigger,
+      steps:[`Give them the same denominator by cross-multiplying: ${n1}×${d2} = ${c1}, and ${n2}×${d1} = ${c2}.`,
+             `${c1} ${c1>c2 ? ">" : "<"} ${c2}, so ${bigger} is larger.`] };
+  }
+  if(kind === "multwhole"){
+    const d = choice([3,4,5,6,8]), n = randInt(1, d-1), w = randInt(2, 6);
+    const top = n * w;
+    return { code:"5F5", text:`${n}/${d} × ${w} = ?  (Give your answer as a whole number and a fraction if you need to.)`,
+      answer: mixedText(Math.floor(top/d), top % d, d), answerAliases:[`${top}/${d}`],
+      steps:[`Multiply the numerator only: ${n} × ${w} = ${top}, giving ${top}/${d}.`,
+             `${top}/${d} = ${mixedText(Math.floor(top/d), top % d, d)}.`] };
+  }
+  if(kind === "multfrac"){
+    const d1 = choice([2,3,4,5]), d2 = choice([2,3,4,5,6]);
+    const n1 = randInt(1, d1-1), n2 = randInt(1, d2-1);
+    return { code:"6F5a", text:`${n1}/${d1} × ${n2}/${d2} = ?  (Give your answer in its simplest form.)`,
+      answer: fracText(n1*n2, d1*d2), answerAliases:[`${n1*n2}/${d1*d2}`],
+      steps:["Multiply the numerators together, then the denominators together.",
+             `${n1}×${n2} = ${n1*n2}, and ${d1}×${d2} = ${d1*d2}, giving ${n1*n2}/${d1*d2}.`,
+             `Simplified, that is ${fracText(n1*n2, d1*d2)}.`] };
+  }
+  if(kind === "divfrac"){
+    const d = choice([2,3,4,5]), w = randInt(2, 5);
+    return { code:"6F5b", text:`1/${d} ÷ ${w} = ?  (Give your answer in its simplest form.)`,
+      answer: fracText(1, d*w),
+      steps:[`Dividing by ${w} makes each part ${w} times smaller, so the denominator gets ${w} times bigger.`,
+             `1/${d} ÷ ${w} = 1/${d*w}.`] };
+  }
+  if(kind === "frac_to_dec"){
+    const opts = [[1,2,"0.5"],[1,4,"0.25"],[3,4,"0.75"],[1,5,"0.2"],[2,5,"0.4"],[3,5,"0.6"],[4,5,"0.8"],[1,8,"0.125"],[3,8,"0.375"],[1,10,"0.1"],[7,10,"0.7"],[1,100,"0.01"],[3,20,"0.15"]];
+    const [n,d,dec] = choice(opts);
+    return { code:"6F6", text:`Write ${n}/${d} as a decimal.`, answer: dec,
+      steps:[`A fraction is a division: ${n}/${d} means ${n} ÷ ${d}.`, `${n} ÷ ${d} = ${dec}.`] };
+  }
+  if(kind === "percentof"){
+    const pct = choice([5,10,15,20,25,40,50,60,75,90]);
+    const total = randInt(4, 60) * choice([5,10,20]);
+    const res = tidy(pct/100 * total);
+    const ctx = choice([
+      `There are ${total} children at ${choice(["a swimming gala","a school disco","sports day","a music festival"])}. ${pct}% of them are boys. How many is that?`,
+      `A jacket in ${choice(SHOPS)} costs £${total}. It is reduced by ${pct}%. How much money is taken off the price?`,
+      `A field is ${total} metres long. ${pct}% of it is fenced. How many metres are fenced?`
+    ]);
+    return { code:"6R2", text: ctx, answer: res,
+      steps:[`Find 10% by dividing by 10: ${total} ÷ 10 = ${tidy(total/10)}.`,
+             `Scale that to ${pct}%: ${res}.`] };
+  }
+  if(kind === "percent_equiv"){
+    const rows = [["1/2","50"],["1/4","25"],["3/4","75"],["1/5","20"],["2/5","40"],["3/5","60"],["4/5","80"],["1/10","10"],["3/10","30"],["7/10","70"],["1/100","1"],["1/20","5"],["3/20","15"]];
+    const [frac, pct] = choice(rows);
+    const askPct = Math.random() < 0.5;
+    return askPct
+      ? { code:"5F11", text:`Write ${frac} as a percentage. (Give just the number.)`, answer: Number(pct),
+          steps:["Per cent means parts per hundred, so change the fraction into hundredths.",
+                 `${frac} = ${pct}/100 = ${pct}%.`] }
+      : { code:"5F11", text:`Write ${pct}% as a fraction in its simplest form.`, answer: frac,
+          steps:[`${pct}% means ${pct}/100.`, `Simplified, ${pct}/100 = ${frac}.`] };
+  }
+  if(kind === "percentchange"){
+    const start = randInt(20, 200) * choice([1,2,5]);
+    const pct = choice([10,20,25,50]);
+    const up = Math.random() < 0.5;
+    const change = start * pct / 100, res = tidy(up ? start + change : start - change);
+    return { code:"6R2", text:`A shop had ${start} items in stock. The stock ${up ? "increased" : "decreased"} by ${pct}%. How many items are there now?`, answer: res,
+      steps:[`Find ${pct}% of ${start}: ${tidy(change)}.`,
+             `${up ? "Add it to" : "Subtract it from"} the original: ${start} ${up ? "+" : "−"} ${tidy(change)} = ${res}.`] };
+  }
+  if(kind === "roundec"){
+    const n = tidy(randInt(100, 9999) / 100);
+    const to = choice(["whole number","one decimal place"]);
+    const ans = to === "whole number" ? Math.round(n) : Math.round(n * 10) / 10;
+    return { code:"5F7", text:`Round ${n.toFixed(2)} to the nearest ${to}.`, answer: ans,
+      steps:[to === "whole number" ? "Look at the tenths digit." : "Look at the hundredths digit.",
+             "5 or more rounds up; 4 or less rounds down.", `${n.toFixed(2)} rounds to ${ans}.`] };
+  }
+  if(kind === "orderdec"){
+    const mk = () => tidy(randInt(100, 9999) / 1000);
+    const set = [mk(), mk(), mk()];
+    if(new Set(set).size < 3) return genFdpPro(diff);
+    const want = choice(["largest","smallest"]);
+    const ans = want === "largest" ? Math.max(...set) : Math.min(...set);
+    return { code:"5F8", text:`Which of these decimals is the ${want}: ${set.join("   ")}?`, answer: ans,
+      steps:["Compare the tenths first, then the hundredths, then the thousandths.",
+             `The ${want} is ${ans}.`] };
+  }
+  if(kind === "decimal_place"){
+    const n = tidy(randInt(1000, 9999) / 100);
+    const op = choice(["×","÷"]), by = choice([10, 100, 1000]);
+    const ans = tidy(op === "×" ? n * by : n / by);
+    return { code:"6F9a", text:`${n} ${op} ${by} = ?`, answer: ans,
+      steps:[`${op === "×" ? "Multiplying" : "Dividing"} by ${by} moves every digit ${String(by).length - 1} place${by === 10 ? "" : "s"} to the ${op === "×" ? "left" : "right"}.`,
+             `${n} ${op} ${by} = ${ans}.`] };
+  }
+  if(kind === "tenths"){
+    const n = randInt(1, 9);
+    return { code:"3F1a", text:`What is ${n}/10 written as a decimal?`, answer: tidy(n/10),
+      steps:["Tenths are the first column after the decimal point.", `${n}/10 = ${tidy(n/10)}.`] };
+  }
+  /* thousandths */
+  const th = randInt(101, 999);
+  return { code:"5F6b", text:`Write ${th}/1000 as a decimal.`, answer: tidy(th/1000),
+    steps:["Thousandths are the third column after the decimal point.", `${th}/1000 = ${tidy(th/1000)}.`] };
+}
+
+/* =====================================================================
+   RATIO & PROPORTION -- 6R1-6R4
+   ===================================================================== */
+function genRatio(diff){
+  const kinds = diff === 0
+    ? ["scale_simple","forevery","share_simple"]
+    : diff === 1
+      ? ["scale_simple","forevery","share","recipe","simplify_ratio"]
+      : diff === 2
+        ? ["forevery","share","recipe","simplify_ratio","scalefactor","percent_measure","bestvalue"]
+        : ["share","recipe","scalefactor","percent_measure","bestvalue","unequal","missing_ratio"];
+  const kind = bagChoice("ratio" + diff, kinds);
+  const [a, b] = twoNames();
+
+  if(kind === "scale_simple"){
+    const per = randInt(2, 9), items = randInt(3, 9);
+    // Plurals are stored explicitly -- "box" + "s" gives "boxs".
+    const [unit, units] = choice([["bag","bags"],["box","boxes"],["tray","trays"],["packet","packets"],["bunch","bunches"]]);
+    const thing = choice(["apples","bread rolls","eggs","pencils","satsumas"]);
+    return { code:"6R1", text:`One ${unit} holds ${per} ${thing}. How many ${thing} are there in ${items} ${units}?`,
+      answer: per * items,
+      steps:[`Each ${unit} holds ${per}.`, `${items} × ${per} = ${per*items}.`] };
+  }
+  if(kind === "forevery"){
+    const r1 = randInt(2, 5), r2 = randInt(2, 6), mult = randInt(3, 9);
+    // One material, two colours of it -- pairing "red beads" with "grey tiles"
+    // describes a pattern nobody could actually make.
+    const material = choice(["beads","tiles","counters","bricks","squares"]);
+    const [c1, c2] = (() => { const cs = ["red","blue","green","yellow","white","black","orange"];
+      const a = choice(cs); let b = choice(cs); while(b === a) b = choice(cs); return [a,b]; })();
+    const thing1 = `${c1} ${material}`, thing2 = `${c2} ${material}`;
+    return { code:"6R1", text:`In a pattern, for every ${r1} ${thing1} there are ${r2} ${thing2}. If there are ${r1*mult} ${thing1}, how many ${thing2} are there?`,
+      answer: r2*mult,
+      steps:[`${r1*mult} ÷ ${r1} = ${mult}, so the pattern repeats ${mult} times.`,
+             `Each repeat has ${r2} ${thing2}: ${mult} × ${r2} = ${r2*mult}.`] };
+  }
+  if(kind === "share_simple" || kind === "share"){
+    const r1 = randInt(1, 4), r2 = randInt(1, 5), parts = r1 + r2;
+    const per = randInt(3, 12), total = parts * per;
+    const askBigger = Math.random() < 0.5;
+    const share = askBigger ? Math.max(r1,r2) * per : Math.min(r1,r2) * per;
+    return { code:"6R4", text:`${a} and ${b} share ${total} ${choice(PLURALS)} in the ratio ${r1}:${r2}. How many does the one with the ${askBigger ? "larger" : "smaller"} share get?`,
+      answer: share,
+      steps:[`The ratio ${r1}:${r2} has ${r1} + ${r2} = ${parts} equal parts.`,
+             `One part is ${total} ÷ ${parts} = ${per}.`,
+             `The ${askBigger ? "larger" : "smaller"} share is ${askBigger ? Math.max(r1,r2) : Math.min(r1,r2)} × ${per} = ${share}.`] };
+  }
+  if(kind === "recipe"){
+    const serves = choice([2,3,4,6]), want = serves * randInt(2, 4);
+    const amount = randInt(2, 12) * 25;
+    const ing = choice(["flour","sugar","oats","butter","rice"]);
+    return { code:"6R1", text:`A recipe for ${serves} people uses ${amount}g of ${ing}. How many grams of ${ing} are needed for ${want} people?`,
+      answer: amount * want / serves,
+      steps:[`${want} ÷ ${serves} = ${want/serves}, so the recipe is scaled up ${want/serves} times.`,
+             `${amount} × ${want/serves} = ${amount*want/serves}g.`] };
+  }
+  if(kind === "simplify_ratio"){
+    const g = randInt(2, 8), r1 = randInt(1, 6), r2 = randInt(1, 7);
+    if(gcd(r1, r2) !== 1) return genRatio(diff);
+    return { code:"6R1", text:`Write the ratio ${r1*g}:${r2*g} in its simplest form. (Write it as a ratio, for example 2:3.)`,
+      answer:`${r1}:${r2}`,
+      steps:[`Find the highest common factor of ${r1*g} and ${r2*g}: it is ${g}.`,
+             `Divide both sides by ${g}: ${r1*g}:${r2*g} = ${r1}:${r2}.`] };
+  }
+  if(kind === "scalefactor"){
+    const w = randInt(2, 9), h = randInt(2, 9), sf = randInt(2, 5);
+    const askWhich = choice(["length","factor"]);
+    return askWhich === "length"
+      ? { code:"6R3", text:`A rectangle is ${w}cm by ${h}cm. It is enlarged by a scale factor of ${sf}. How long is the longer side of the new rectangle, in cm?`,
+          answer: Math.max(w,h) * sf,
+          steps:[`Every side is multiplied by ${sf}.`, `The longer side was ${Math.max(w,h)}cm, so it becomes ${Math.max(w,h)} × ${sf} = ${Math.max(w,h)*sf}cm.`] }
+      : { code:"6R3", text:`A photo ${w}cm wide is enlarged so that it is ${w*sf}cm wide. What is the scale factor?`,
+          answer: sf,
+          steps:[`Divide the new width by the old width.`, `${w*sf} ÷ ${w} = ${sf}.`] };
+  }
+  if(kind === "percent_measure"){
+    const pct = choice([5,10,15,20,25,30,40,60,75]);
+    const total = choice([200, 240, 300, 360, 400, 500, 600]);
+    return { code:"6R2", text:`Calculate ${pct}% of ${total}.`, answer: tidy(pct/100*total),
+      steps:[`10% of ${total} is ${total/10}.`,
+             `So ${pct}% is ${tidy(pct/100*total)}.`] };
+  }
+  if(kind === "bestvalue"){
+    const n1 = choice([3,4,5,6]), n2 = n1 * randInt(2,3);
+    const unit = randInt(20, 60);
+    const p1 = n1 * unit, p2 = n2 * (unit - randInt(2, 8));
+    return { code:"6R1", text:`A pack of ${n1} yoghurts costs ${p1}p. A pack of ${n2} costs ${p2}p. How much cheaper, in pence, is one yoghurt from the larger pack?`,
+      answer: tidy(p1/n1 - p2/n2),
+      steps:[`Small pack: ${p1} ÷ ${n1} = ${tidy(p1/n1)}p each.`,
+             `Large pack: ${p2} ÷ ${n2} = ${tidy(p2/n2)}p each.`,
+             `Difference: ${tidy(p1/n1)} − ${tidy(p2/n2)} = ${tidy(p1/n1 - p2/n2)}p.`] };
+  }
+  if(kind === "unequal"){
+    const mult = randInt(2, 5), small = randInt(4, 14);
+    const total = small + small * mult;
+    return { code:"6R4", text:`${a} and ${b} share ${total} ${choice(PLURALS)}. ${b} gets ${mult} times as many as ${a}. How many does ${a} get?`,
+      answer: small,
+      steps:[`If ${a} gets 1 part, ${b} gets ${mult} parts, so there are ${mult+1} parts altogether.`,
+             `${total} ÷ ${mult+1} = ${small}, so ${a} gets ${small}.`] };
+  }
+  /* missing_ratio */
+  const r1 = randInt(2, 6), r2 = randInt(2, 7), k = randInt(3, 8);
+  return { code:"6R1", text:`Two quantities are in the ratio ${r1}:${r2}. If the first is ${r1*k}, what is the second?`,
+    answer: r2*k,
+    steps:[`${r1*k} ÷ ${r1} = ${k}, so both sides are ${k} times bigger.`, `${r2} × ${k} = ${r2*k}.`] };
+}
+
+/* =====================================================================
+   ALGEBRA -- 6A1-6A5
+   ===================================================================== */
+function genAlgebra(diff){
+  const kinds = diff === 0
+    ? ["missing_add","sequence_next","missing_mult"]
+    : diff === 1
+      ? ["missing_add","missing_mult","sequence_next","formula_simple","balance"]
+      : diff === 2
+        ? ["missing_mult","sequence_next","sequence_nth","formula_simple","balance","twostep","substitute"]
+        : ["sequence_nth","sequence_rule","formula","balance","twostep","substitute","two_unknowns","combinations"];
+  const kind = bagChoice("algebra" + diff, kinds);
+
+  if(kind === "missing_add"){
+    const a = randInt(12, 90), b = randInt(12, 90);
+    return { code:"6A1", text:`What number goes in the box?   ${a} + ? = ${a+b}`, answer: b,
+      steps:["Use the inverse: subtraction undoes addition.", `${a+b} − ${a} = ${b}.`] };
+  }
+  if(kind === "missing_mult"){
+    const a = randInt(3, 12), b = randInt(3, 12);
+    return { code:"6A1", text:`What number goes in the box?   ${a} × ? = ${a*b}`, answer: b,
+      steps:["Use the inverse: division undoes multiplication.", `${a*b} ÷ ${a} = ${b}.`] };
+  }
+  if(kind === "balance"){
+    const x = randInt(3, 15), a = randInt(2, 9), b = randInt(1, 30);
+    return { code:"6A1", text:`If ${a}n + ${b} = ${a*x+b}, what is the value of n?`, answer: x,
+      steps:[`Subtract ${b} from both sides: ${a}n = ${a*x}.`,
+             `Divide both sides by ${a}: n = ${x}.`] };
+  }
+  if(kind === "twostep"){
+    const x = randInt(3, 14), a = randInt(2, 8), b = randInt(2, 20);
+    return { code:"6A1", text:`If ${a}n − ${b} = ${a*x-b}, what is the value of n?`, answer: x,
+      steps:[`Add ${b} to both sides: ${a}n = ${a*x}.`, `Divide both sides by ${a}: n = ${x}.`] };
+  }
+  if(kind === "sequence_next"){
+    const start = randInt(2, 20), step = randInt(2, 12), back = diff >= 2 && Math.random() < 0.35;
+    const terms = [0,1,2,3].map(i => back ? start + 40 - step*i : start + step*i);
+    return { code:"6A3", text:`Here is a number sequence: ${terms.join(", ")}, ...  What is the next number?`,
+      answer: back ? terms[3] - step : terms[3] + step,
+      steps:[`Find the difference between terms: it is ${back ? "−" : ""}${step} each time.`,
+             `${terms[3]} ${back ? "−" : "+"} ${step} = ${back ? terms[3]-step : terms[3]+step}.`] };
+  }
+  if(kind === "sequence_nth"){
+    const start = randInt(1, 12), step = randInt(2, 9), n = randInt(6, 12);
+    const terms = [0,1,2,3].map(i => start + step*i);
+    return { code:"6A3", text:`A sequence starts ${terms.join(", ")}, ...  What is the ${n}th term?`,
+      answer: start + step*(n-1),
+      steps:[`The sequence goes up by ${step} each time.`,
+             `From the 1st term to the ${n}th term is ${n-1} steps: ${n-1} × ${step} = ${step*(n-1)}.`,
+             `${start} + ${step*(n-1)} = ${start + step*(n-1)}.`] };
+  }
+  if(kind === "sequence_rule"){
+    const start = randInt(2, 10), step = randInt(3, 11);
+    const terms = [0,1,2,3].map(i => start + step*i);
+    return { code:"6A3", text:`Here is a sequence: ${terms.join(", ")}, ...  Complete the rule: to get the next term, add ?`,
+      answer: step,
+      steps:["Subtract each term from the one after it.",
+             `${terms[1]} − ${terms[0]} = ${step}, and the same gap appears every time.`] };
+  }
+  if(kind === "formula_simple"){
+    const per = randInt(2, 9), base = randInt(2, 20), n = randInt(3, 12);
+    const [who] = twoNames();
+    const jobs = [
+      ["hire a bike", "each hour", "hires one for", "hours"],
+      ["hire the village hall", "each hour", "books it for", "hours"],
+      ["call out a plumber", "each half hour", "needs", "half hours"],
+      ["join the swimming club", "each session", "attends", "sessions"],
+      ["book a climbing wall", "each person", "takes", "people"],
+    ];
+    const [job, perWhat, verb, unit] = choice(jobs);
+    return { code:"6A2", text:`To ${job} costs £${base}, plus £${per} for ${perWhat}. ${who} ${verb} ${n} ${unit}. What is the total cost, in pounds?`,
+      answer: base + per*n,
+      steps:[`The variable part costs ${n} × £${per} = £${per*n}.`,
+             `Add the fixed charge: £${per*n} + £${base} = £${base + per*n}.`] };
+  }
+  if(kind === "formula"){
+    const a = randInt(2, 9), b = randInt(2, 12), n = randInt(3, 12);
+    return { code:"6A2", text:`A formula is written as y = ${a}n + ${b}. What is y when n = ${n}?`,
+      answer: a*n + b,
+      steps:[`Replace n with ${n}: y = ${a} × ${n} + ${b}.`,
+             `${a} × ${n} = ${a*n}, and ${a*n} + ${b} = ${a*n+b}.`] };
+  }
+  if(kind === "substitute"){
+    const a = randInt(2, 9), b = randInt(2, 9), c = randInt(2, 12);
+    return { code:"6A2", text:`If a = ${a} and b = ${b}, what is the value of ${c}a − b?`,
+      answer: c*a - b,
+      steps:[`${c}a means ${c} × a = ${c} × ${a} = ${c*a}.`, `${c*a} − ${b} = ${c*a - b}.`] };
+  }
+  if(kind === "two_unknowns"){
+    const total = randInt(10, 24), x = randInt(2, total-2);
+    const [p, q] = twoNames();
+    const framings = [
+      `Two whole numbers add up to ${total}. One of them is ${x}. What is the other?`,
+      `a + b = ${total}. If a = ${x}, what is b?`,
+      `${p} and ${q} have ${total} ${choice(PLURALS)} between them. ${p} has ${x}. How many does ${q} have?`,
+    ];
+    return { code:"6A4", text: choice(framings),
+      answer: total - x,
+      steps:[`The two amounts must total ${total}.`, `${total} − ${x} = ${total-x}.`] };
+  }
+  /* combinations */
+  const tops = randInt(3, 6), bottoms = randInt(3, 6);
+  const combos = [
+    [`${tops} fillings and ${bottoms} types of bread`, "sandwiches", "one filling and one bread"],
+    [`${tops} flavours of ice cream and ${bottoms} toppings`, "sundaes", "one flavour and one topping"],
+    [`${tops} T-shirt colours and ${bottoms} sizes`, "T-shirts", "one colour and one size"],
+    [`${tops} main courses and ${bottoms} puddings`, "two-course meals", "one of each"],
+    [`${tops} wheel designs and ${bottoms} frame colours`, "bikes", "one design and one colour"],
+  ];
+  const [offer, thing, using] = choice(combos);
+  return { code:"6A5", text:`A shop offers ${offer}. How many different ${thing} can be made using ${using}?`,
+    answer: tops * bottoms,
+    steps:[`Each of the ${tops} first choices can pair with any of the ${bottoms} second choices.`,
+           `${tops} × ${bottoms} = ${tops*bottoms} combinations.`] };
+}
+
+/* =====================================================================
+   MEASUREMENT -- 5M4-5M9, 6M5-6M9
+   ===================================================================== */
+function genMeasurement(diff){
+  const kinds = diff === 0
+    ? ["perimeter","area_rect","money","time_dur","convert_simple"]
+    : diff === 1
+      ? ["perimeter","area_rect","money","time_dur","convert","time_convert","perimeter_missing"]
+      : diff === 2
+        ? ["perimeter","area_rect","area_tri","volume","money","time_dur","convert","time_convert","perimeter_missing","composite","imperial"]
+        : ["area_tri","area_para","volume","composite","convert","miles_km","money","time_dur","same_area","perimeter_missing","imperial"];
+  const kind = bagChoice("measure" + diff, kinds);
+
+  if(kind === "perimeter"){
+    const l = randInt(3, diff === 0 ? 15 : 40), w = randInt(3, diff === 0 ? 15 : 40);
+    const obj = choice(FLATS);
+    return { code:"5M7a", text:`A rectangular ${obj} measures ${l}cm by ${w}cm. What is its perimeter, in cm?`, answer: 2*(l+w),
+      steps:["Perimeter is the distance all the way round: 2 × (length + width).",
+             `2 × (${l} + ${w}) = ${2*(l+w)}cm.`] };
+  }
+  if(kind === "perimeter_missing"){
+    const l = randInt(4, 25), p = 2*(l + randInt(3, 20));
+    const w = p/2 - l;
+    return { code:"5M7a", text:`A rectangle has a perimeter of ${p}cm. One side is ${l}cm. How long is the side next to it, in cm?`,
+      answer: w,
+      steps:[`Half the perimeter is one length plus one width: ${p} ÷ 2 = ${p/2}.`,
+             `${p/2} − ${l} = ${w}cm.`] };
+  }
+  if(kind === "area_rect"){
+    const l = randInt(3, 20), w = randInt(3, 20);
+    const obj = choice(FLATS);
+    return { code:"5M7b", text:`A rectangular ${obj} measures ${l}cm by ${w}cm. What is its area, in cm²?`, answer: l*w,
+      steps:["Area of a rectangle = length × width.", `${l} × ${w} = ${l*w}cm².`] };
+  }
+  if(kind === "area_tri"){
+    const base = randInt(4, 20), h = randInt(4, 20) * 2 / 2;
+    const bh = base * h;
+    if(bh % 2 !== 0) return genMeasurement(diff);
+    return { code:"6M7b", text:`A triangle has a base of ${base}cm and a perpendicular height of ${h}cm. What is its area, in cm²?`,
+      answer: bh/2,
+      steps:["Area of a triangle = (base × height) ÷ 2.", `(${base} × ${h}) ÷ 2 = ${bh/2}cm².`] };
+  }
+  if(kind === "area_para"){
+    const base = randInt(4, 20), h = randInt(3, 15);
+    return { code:"6M7b", text:`A parallelogram has a base of ${base}cm and a perpendicular height of ${h}cm. What is its area, in cm²?`,
+      answer: base*h,
+      steps:["Area of a parallelogram = base × perpendicular height (no halving).",
+             `${base} × ${h} = ${base*h}cm².`] };
+  }
+  if(kind === "composite"){
+    const a = randInt(4, 12), b = randInt(3, 10), c = randInt(2, 8), d = randInt(2, 8);
+    const area = a*b + c*d;
+    return { code:"5M7b", text:`An L-shape is made from two rectangles joined together: one is ${a}cm by ${b}cm, the other is ${c}cm by ${d}cm. What is the total area, in cm²?`,
+      answer: area,
+      steps:[`Work out each rectangle separately: ${a} × ${b} = ${a*b}, and ${c} × ${d} = ${c*d}.`,
+             `Add them: ${a*b} + ${c*d} = ${area}cm².`] };
+  }
+  if(kind === "same_area"){
+    const a = choice([12, 16, 18, 24, 36]);
+    const pairs = [];
+    for(let w = 1; w <= a; w++) if(a % w === 0) pairs.push([w, a/w]);
+    const [w1, l1] = pairs[randInt(0, pairs.length-1)];
+    return { code:"6M7a", text:`A rectangle has an area of ${a}cm². One of its sides is ${w1}cm. What is its perimeter, in cm?`,
+      answer: 2*(w1 + l1),
+      steps:[`The other side is ${a} ÷ ${w1} = ${l1}cm.`,
+             `Perimeter = 2 × (${w1} + ${l1}) = ${2*(w1+l1)}cm.`] };
+  }
+  if(kind === "volume"){
+    const l = randInt(2, 12), w = randInt(2, 10), h = randInt(2, 10);
+    const obj = choice(BOXES);
+    return { code:"6M8a", text:`A ${obj} is a cuboid measuring ${l}cm by ${w}cm by ${h}cm. What is its volume, in cm³?`,
+      answer: l*w*h,
+      steps:["Volume of a cuboid = length × width × height.", `${l} × ${w} × ${h} = ${l*w*h}cm³.`] };
+  }
+  if(kind === "convert_simple" || kind === "convert"){
+    const opts = [
+      ["cm","mm",10],["m","cm",100],["km","m",1000],["kg","g",1000],["litres","ml",1000],["m","mm",1000]
+    ];
+    const [big, small, factor] = choice(opts);
+    const up = Math.random() < 0.5;
+    if(up){
+      const v = diff >= 2 ? tidy(randInt(15, 950)/10) : randInt(2, 40);
+      return { code:"6M5", text:`Convert ${v} ${big} into ${small}.`, answer: tidy(v*factor),
+        steps:[`There are ${commas(factor)} ${small} in 1 ${big}.`, `${v} × ${commas(factor)} = ${commas(tidy(v*factor))} ${small}.`] };
+    }
+    const v = randInt(2, 40) * factor / (diff >= 2 ? 2 : 1);
+    return { code:"6M5", text:`Convert ${commas(tidy(v))} ${small} into ${big}.`, answer: tidy(v/factor),
+      steps:[`There are ${commas(factor)} ${small} in 1 ${big}.`, `${commas(tidy(v))} ÷ ${commas(factor)} = ${tidy(v/factor)} ${big}.`] };
+  }
+  if(kind === "miles_km"){
+    const toKm = Math.random() < 0.5;
+    const miles = choice([5,10,15,20,25,30,40,50]);
+    return toKm
+      ? { code:"6M6", text:`5 miles is about 8 kilometres. About how many kilometres is ${miles} miles?`, answer: miles/5*8,
+          steps:[`${miles} ÷ 5 = ${miles/5}.`, `${miles/5} × 8 = ${miles/5*8} kilometres.`] }
+      : { code:"6M6", text:`5 miles is about 8 kilometres. About how many miles is ${miles/5*8} kilometres?`, answer: miles,
+          steps:[`${miles/5*8} ÷ 8 = ${miles/5}.`, `${miles/5} × 5 = ${miles} miles.`] };
+  }
+  if(kind === "imperial"){
+    const opts = [["1 inch is about 2.5 cm","inches","cm",2.5],["1 kilogram is about 2.2 pounds","kilograms","pounds",2.2],["1 litre is about 1.75 pints","litres","pints",1.75]];
+    const [fact, from, to, f] = choice(opts);
+    const v = randInt(2, 12);
+    return { code:"5M6", text:`${fact}. About how many ${to} is ${v} ${from}?`, answer: tidy(v*f),
+      steps:[`Multiply by ${f}.`, `${v} × ${f} = ${tidy(v*f)} ${to}.`] };
+  }
+  if(kind === "time_convert"){
+    const opts = [["minutes","seconds",60],["hours","minutes",60],["days","hours",24],["weeks","days",7],["years","months",12]];
+    const [big, small, f] = choice(opts);
+    const v = randInt(2, 12);
+    return { code:"5M4", text:`How many ${small} are there in ${v} ${big}?`, answer: v*f,
+      steps:[`There are ${f} ${small} in 1 ${big}.`, `${v} × ${f} = ${v*f}.`] };
+  }
+  if(kind === "money"){
+    const price = tidy(randInt(150, 899)/100);
+    const paid = choice([5,10,20].filter(n => n > price));
+    return { code:"5M9a", text:`An item costs £${price.toFixed(2)}. You pay with a £${paid} note. How much change do you get, in pounds?`,
+      answer: tidy(paid - price),
+      steps:[`Subtract the price from the amount paid: £${paid} − £${price.toFixed(2)}.`,
+             `Change = £${tidy(paid-price).toFixed(2)}.`] };
+  }
+  /* time_dur */
+  const startH = randInt(8, 20), startM = choice([0,5,10,15,20,25,30,35,40,45,50,55]);
+  const dur = randInt(20, 150);
+  const total = startH*60 + startM + dur;
+  const fmt = (h, m) => `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
+  const askEnd = Math.random() < 0.6;
+  if(askEnd){
+    return { code:"5M4", text:`A ${choice(["film","train journey","rehearsal","swimming session"])} starts at ${fmt(startH, startM)} and lasts ${dur} minutes. What time does it finish? (Use 24-hour time, for example 16:35.)`,
+      answer: fmt(Math.floor(total/60)%24, total%60),
+      steps:[`${dur} minutes is ${Math.floor(dur/60)} hour${Math.floor(dur/60) === 1 ? "" : "s"} and ${dur%60} minutes.`,
+             `${fmt(startH,startM)} + ${dur} minutes = ${fmt(Math.floor(total/60)%24, total%60)}.`] };
+  }
+  return { code:"5M4", text:`A journey starts at ${fmt(startH, startM)} and ends at ${fmt(Math.floor(total/60)%24, total%60)}. How many minutes does it take?`,
+    answer: dur,
+    steps:["Count on from the start time to the next whole hour, then on to the end time.",
+           `Altogether that is ${dur} minutes.`] };
+}
+
+/* =====================================================================
+   GEOMETRY: PROPERTIES OF SHAPES -- 5G2-5G4, 6G2-6G5
+   ===================================================================== */
+function genShapes(diff){
+  const kinds = diff === 0
+    ? ["angle_type","shape_sides","right_angles","faces"]
+    : diff === 1
+      ? ["angle_type","shape_sides","straight_line","faces","rect_angle"]
+      : diff === 2
+        ? ["straight_line","point","triangle_missing","quad_missing","faces","circle","polygon_regular","vertically_opposite"]
+        : ["triangle_missing","quad_missing","polygon_interior","circle","vertically_opposite","point","straight_line","isosceles"];
+  const kind = bagChoice("shapes" + diff, kinds);
+
+  if(kind === "angle_type"){
+    const a = randInt(10, 350);
+    const type = a < 90 ? "acute" : a === 90 ? "a right angle" : a < 180 ? "obtuse" : a === 180 ? "a straight line" : "reflex";
+    if(a === 90 || a === 180) return genShapes(diff);
+    return { code:"5G4a", text:`Is an angle of ${a}° acute, obtuse or reflex?`, answer: type,
+      steps:["Acute is less than 90°, obtuse is between 90° and 180°, reflex is more than 180°.",
+             `${a}° is ${type}.`] };
+  }
+  if(kind === "shape_sides"){
+    const shapes = [["pentagon",5],["hexagon",6],["heptagon",7],["octagon",8],["decagon",10],["quadrilateral",4],["triangle",3]];
+    const [name, n] = choice(shapes);
+    return { code:"6G2a", text:`How many sides does a ${name} have?`, answer: n,
+      steps:[`A ${name} has ${n} sides.`, "The name gives the clue: penta = 5, hexa = 6, hepta = 7, octa = 8, deca = 10."] };
+  }
+  if(kind === "right_angles"){
+    const turns = choice([[1,90],[2,180],[3,270],[4,360]]);
+    return { code:"4G4", text:`How many degrees are there in ${turns[0]} right angle${turns[0] === 1 ? "" : "s"}?`, answer: turns[1],
+      steps:["One right angle is 90°.", `${turns[0]} × 90 = ${turns[1]}°.`] };
+  }
+  if(kind === "faces"){
+    const solids = [["cube","faces",6],["cube","edges",12],["cube","vertices",8],["cuboid","faces",6],["cuboid","edges",12],
+                    ["square-based pyramid","faces",5],["square-based pyramid","vertices",5],["triangular prism","faces",5],["triangular prism","edges",9]];
+    const [solid, what, n] = choice(solids);
+    return { code:"6G2b", text:`How many ${what} does a ${solid} have?`, answer: n,
+      steps:[`Picture the ${solid} and count its ${what} carefully.`, `A ${solid} has ${n} ${what}.`] };
+  }
+  if(kind === "rect_angle"){
+    const a = randInt(20, 70);
+    return { code:"5G2a", text:`A diagonal line cuts a corner of a rectangle into two angles. One is ${a}°. What is the other, in degrees?`,
+      answer: 90 - a,
+      steps:["Every corner of a rectangle is a right angle, which is 90°.", `90 − ${a} = ${90-a}°.`] };
+  }
+  if(kind === "straight_line"){
+    const parts = randInt(2, 3);
+    const angles = [];
+    let left = 180;
+    for(let i = 0; i < parts-1; i++){ const v = randInt(20, Math.max(25, left - 20*(parts-i-1))); angles.push(v); left -= v; }
+    return { code:"6G4b", text:`Angles of ${angles.join("° and ")}° sit on a straight line, together with one more angle. What is the missing angle, in degrees?`,
+      answer: left,
+      steps:["Angles on a straight line add up to 180°.",
+             `180 − (${angles.join(" + ")}) = ${left}°.`] };
+  }
+  if(kind === "point"){
+    const parts = randInt(2, 3);
+    const angles = [];
+    let left = 360;
+    for(let i = 0; i < parts; i++){ const v = randInt(40, Math.max(45, left - 40*(parts-i))); angles.push(v); left -= v; }
+    return { code:"6G4b", text:`Angles of ${angles.join("°, ")}° meet at a point, together with one more angle. What is the missing angle, in degrees?`,
+      answer: left,
+      steps:["Angles that meet at a point add up to 360°.",
+             `360 − (${angles.join(" + ")}) = ${left}°.`] };
+  }
+  if(kind === "vertically_opposite"){
+    const a = randInt(25, 155);
+    return { code:"6G4b", text:`Two straight lines cross. One of the angles made is ${a}°. What is the angle vertically opposite it, in degrees?`,
+      answer: a,
+      steps:["When two straight lines cross, the angles opposite each other are equal.",
+             `So the vertically opposite angle is also ${a}°.`] };
+  }
+  if(kind === "triangle_missing"){
+    const a = randInt(25, 100), b = randInt(25, 175 - a);
+    const framings = [
+      `Two angles in a triangle are ${a}° and ${b}°. What is the third angle, in degrees?`,
+      `A triangle has angles of ${a}°, ${b}° and x°. What is the value of x?`,
+      `In triangle ABC, angle A is ${a}° and angle B is ${b}°. How many degrees is angle C?`,
+      `A triangular ${choice(["sail","road sign","piece of bunting","garden bed","tile"])} has two angles measuring ${a}° and ${b}°. What is the third angle, in degrees?`,
+    ];
+    return { code:"6G4a", text: choice(framings),
+      answer: 180 - a - b,
+      steps:["The angles in a triangle always add up to 180°.",
+             `180 − ${a} − ${b} = ${180-a-b}°.`] };
+  }
+  if(kind === "isosceles"){
+    const apex = randInt(20, 120);
+    if((180 - apex) % 2 !== 0) return genShapes(diff);
+    return { code:"6G4a", text:`An isosceles triangle has an apex angle of ${apex}°. What is the size of each of the two equal base angles, in degrees?`,
+      answer: (180-apex)/2,
+      steps:["The angles in a triangle add up to 180°, and the two base angles of an isosceles triangle are equal.",
+             `180 − ${apex} = ${180-apex}, and ${180-apex} ÷ 2 = ${(180-apex)/2}°.`] };
+  }
+  if(kind === "quad_missing"){
+    const a = randInt(50, 120), b = randInt(50, 120), c = randInt(40, Math.max(45, 350 - a - b));
+    const d = 360 - a - b - c;
+    if(d < 15) return genShapes(diff);
+    return { code:"6G4a", text:`Three angles in a quadrilateral are ${a}°, ${b}° and ${c}°. What is the fourth angle, in degrees?`,
+      answer: d,
+      steps:["The angles in a quadrilateral add up to 360°.",
+             `360 − ${a} − ${b} − ${c} = ${d}°.`] };
+  }
+  if(kind === "polygon_regular"){
+    const shapes = [["pentagon",5],["hexagon",6],["octagon",8],["decagon",10]];
+    const [name, n] = choice(shapes);
+    return { code:"6G4a", text:`What is the size of each exterior angle of a regular ${name}, in degrees?`, answer: 360/n,
+      steps:["The exterior angles of any polygon add up to 360°.",
+             `A regular ${name} has ${n} equal exterior angles: 360 ÷ ${n} = ${360/n}°.`] };
+  }
+  if(kind === "polygon_interior"){
+    const shapes = [["pentagon",5],["hexagon",6],["octagon",8],["decagon",10]];
+    const [name, n] = choice(shapes);
+    const interior = 180 - 360/n;
+    return { code:"6G4a", text:`What is the size of each interior angle of a regular ${name}, in degrees?`, answer: interior,
+      steps:[`Each exterior angle is 360 ÷ ${n} = ${360/n}°.`,
+             `An interior angle and its exterior angle sit on a straight line: 180 − ${360/n} = ${interior}°.`] };
+  }
+  /* circle */
+  const r = randInt(2, 30);
+  const askDia = Math.random() < 0.5;
+  return askDia
+    ? { code:"6G5", text:`A circle has a radius of ${r}cm. What is its diameter, in cm?`, answer: r*2,
+        steps:["The diameter is twice the radius.", `${r} × 2 = ${r*2}cm.`] }
+    : { code:"6G5", text:`A circle has a diameter of ${r*2}cm. What is its radius, in cm?`, answer: r,
+        steps:["The radius is half the diameter.", `${r*2} ÷ 2 = ${r}cm.`] };
+}
+
+/* =====================================================================
+   GEOMETRY: POSITION & DIRECTION -- 4P2-4P3, 5P2, 6P2-6P3
+   ===================================================================== */
+function genPosition(diff){
+  const kinds = diff === 0
+    ? ["translate","reflect_axis","read_point"]
+    : diff === 1
+      ? ["translate","reflect_axis","read_point","describe_move"]
+      : diff === 2
+        ? ["translate","reflect_axis","describe_move","quadrant","missing_vertex"]
+        : ["translate","reflect_axis","describe_move","quadrant","missing_vertex","midpoint"];
+  const kind = bagChoice("position" + diff, kinds);
+  const range = diff >= 2 ? [-8, 8] : [0, 10];
+  const x = randInt(range[0], range[1]), y = randInt(range[0], range[1]);
+
+  if(kind === "translate"){
+    const dx = randInt(diff === 0 ? 1 : -7, 7), dy = randInt(diff === 0 ? 1 : -7, 7);
+    if(dx === 0 && dy === 0) return genPosition(diff);
+    const parts = [];
+    if(dx !== 0) parts.push(`${Math.abs(dx)} ${dx > 0 ? "right" : "left"}`);
+    if(dy !== 0) parts.push(`${Math.abs(dy)} ${dy > 0 ? "up" : "down"}`);
+    return { code:"6P2", text:`A point is at (${x}, ${y}). It is translated ${parts.join(" and ")}. What are its new coordinates? (Write them as (x, y).)`,
+      answer:`(${x+dx}, ${y+dy})`, answerAliases:[`${x+dx},${y+dy}`, `${x+dx}, ${y+dy}`],
+      steps:[`Left and right change the x-coordinate: ${x} ${dx >= 0 ? "+" : "−"} ${Math.abs(dx)} = ${x+dx}.`,
+             `Up and down change the y-coordinate: ${y} ${dy >= 0 ? "+" : "−"} ${Math.abs(dy)} = ${y+dy}.`,
+             `New coordinates: (${x+dx}, ${y+dy}).`] };
+  }
+  if(kind === "reflect_axis"){
+    const axis = choice(["x-axis","y-axis"]);
+    const rx = axis === "y-axis" ? -x : x, ry = axis === "x-axis" ? -y : y;
+    return { code:"6P2", text:`A point is at (${x}, ${y}). It is reflected in the ${axis}. What are its new coordinates? (Write them as (x, y).)`,
+      answer:`(${rx}, ${ry})`, answerAliases:[`${rx},${ry}`, `${rx}, ${ry}`],
+      steps:[`Reflecting in the ${axis} flips the sign of the ${axis === "x-axis" ? "y" : "x"}-coordinate.`,
+             `The other coordinate stays the same, giving (${rx}, ${ry}).`] };
+  }
+  if(kind === "read_point"){
+    const steps = [`The first number is how far across, the second is how far up.`];
+    return { code:"4P2", text:`A counter is ${x} squares across and ${y} squares up from the origin. What are its coordinates? (Write them as (x, y).)`,
+      answer:`(${x}, ${y})`, answerAliases:[`${x},${y}`],
+      steps: steps.concat([`So the coordinates are (${x}, ${y}).`]) };
+  }
+  if(kind === "describe_move"){
+    const dx = randInt(1, 8), dy = randInt(1, 8);
+    const dir = choice(["right","left"]), vert = choice(["up","down"]);
+    const nx = dir === "right" ? x + dx : x - dx;
+    const ny = vert === "up" ? y + dy : y - dy;
+    return { code:"6P2", text:`A point moves from (${x}, ${y}) to (${nx}, ${ny}). How many squares does it move ${dir}?`,
+      answer: dx,
+      steps:[`Compare the x-coordinates: ${x} and ${nx}.`,
+             `The difference is ${dx}, so it moves ${dx} squares ${dir}.`] };
+  }
+  if(kind === "quadrant"){
+    const px = choice([-1,1]) * randInt(1, 8), py = choice([-1,1]) * randInt(1, 8);
+    const q = px > 0 && py > 0 ? 1 : px < 0 && py > 0 ? 2 : px < 0 && py < 0 ? 3 : 4;
+    return { code:"6P3", text:`In which quadrant of the coordinate grid does the point (${px}, ${py}) lie? Give your answer as a number from 1 to 4, counting anticlockwise from the top right.`,
+      answer: q,
+      steps:["Quadrant 1 is top right (both positive), 2 is top left, 3 is bottom left, 4 is bottom right.",
+             `x is ${px > 0 ? "positive" : "negative"} and y is ${py > 0 ? "positive" : "negative"}, so the point is in quadrant ${q}.`] };
+  }
+  if(kind === "missing_vertex"){
+    const x2 = x + randInt(2, 7), y2 = y + randInt(2, 7);
+    return { code:"6P3", text:`Three corners of a rectangle are at (${x}, ${y}), (${x2}, ${y}) and (${x}, ${y2}). What are the coordinates of the fourth corner? (Write them as (x, y).)`,
+      answer:`(${x2}, ${y2})`, answerAliases:[`${x2},${y2}`, `${x2}, ${y2}`],
+      steps:["In a rectangle, opposite sides are equal and parallel to the axes.",
+             `The fourth corner shares its x-coordinate with (${x2}, ${y}) and its y-coordinate with (${x}, ${y2}).`,
+             `That gives (${x2}, ${y2}).`] };
+  }
+  /* midpoint */
+  const mx = x + randInt(1, 6) * 2, my = y + randInt(1, 6) * 2;
+  return { code:"6P3", text:`A line joins (${x}, ${y}) to (${mx}, ${my}). What are the coordinates of its midpoint? (Write them as (x, y).)`,
+    answer:`(${(x+mx)/2}, ${(y+my)/2})`, answerAliases:[`${(x+mx)/2},${(y+my)/2}`],
+    steps:[`The midpoint is halfway along, so average each coordinate.`,
+           `x: (${x} + ${mx}) ÷ 2 = ${(x+mx)/2}. y: (${y} + ${my}) ÷ 2 = ${(y+my)/2}.`] };
+}
+
+/* =====================================================================
+   STATISTICS -- 4S1-4S2, 5S1-5S2, 6S1, 6S3
+   ===================================================================== */
+function genStatistics(diff){
+  const kinds = diff === 0
+    ? ["table_read","table_total","difference"]
+    : diff === 1
+      ? ["table_read","table_total","difference","mean","timetable"]
+      : diff === 2
+        ? ["table_total","difference","mean","mean_missing","timetable","linegraph","compare_two"]
+        : ["mean","mean_missing","timetable","linegraph","compare_two","piechart","piechart_pct"];
+  const kind = bagChoice("stats" + diff, kinds);
+  const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+
+  if(kind === "table_read" || kind === "table_total" || kind === "difference" || kind === "compare_two"){
+    const vals = DAYS.map(() => randInt(4, 60));
+    const table = DAYS.map((d,i) => `${d} ${vals[i]}`).join(", ");
+    const thing = choice(["books borrowed","cakes sold","tickets sold","visitors","raffle tickets sold"]);
+    if(kind === "table_total"){
+      return { code:"5S1", text:`A table shows the number of ${thing} each day: ${table}. How many were there altogether?`,
+        answer: vals.reduce((a,b) => a+b, 0),
+        steps:["Add every value in the table.", `${vals.join(" + ")} = ${vals.reduce((a,b)=>a+b,0)}.`] };
+    }
+    if(kind === "difference" || kind === "compare_two"){
+      const i = randInt(0, 4); let j = randInt(0, 4); while(j === i) j = randInt(0, 4);
+      // Ask about the genuinely larger day, so the question is never
+      // "how many more on Monday than on Monday" or a negative difference.
+      if(vals[i] === vals[j]) return genStatistics(diff);
+      const hi = vals[i] > vals[j] ? i : j, lo = hi === i ? j : i;
+      return { code:"5S1", text:`A table shows the number of ${thing} each day: ${table}. How many more were there on ${DAYS[hi]} than on ${DAYS[lo]}?`,
+        answer: vals[hi] - vals[lo],
+        steps:["Find both values in the table, then subtract the smaller from the larger.",
+               `${vals[hi]} − ${vals[lo]} = ${vals[hi] - vals[lo]}.`] };
+    }
+    const i = randInt(0, 4);
+    return { code:"5S1", text:`A table shows the number of ${thing} each day: ${table}. How many were there on ${DAYS[i]}?`,
+      answer: vals[i],
+      steps:[`Find the ${DAYS[i]} row in the table.`, `It shows ${vals[i]}.`] };
+  }
+  if(kind === "mean"){
+    const n = diff >= 3 ? randInt(5, 6) : randInt(4, 5);
+    const nums = Array.from({length: n}, () => randInt(2, 40));
+    const total = nums.reduce((a,b) => a+b, 0);
+    if(total % n !== 0) return genStatistics(diff);
+    return { code:"6S3", text:`Find the mean of these numbers: ${nums.join(", ")}.`, answer: total/n,
+      steps:["The mean is the total divided by how many numbers there are.",
+             `${nums.join(" + ")} = ${total}.`, `${total} ÷ ${n} = ${total/n}.`] };
+  }
+  if(kind === "mean_missing"){
+    const n = randInt(4, 5), mean = randInt(5, 25);
+    const known = Array.from({length: n-1}, () => randInt(2, mean*2));
+    const missing = mean*n - known.reduce((a,b) => a+b, 0);
+    if(missing < 1) return genStatistics(diff);
+    return { code:"6S3", text:`The mean of ${n} numbers is ${mean}. ${n-1} of them are ${known.join(", ")}. What is the missing number?`,
+      answer: missing,
+      steps:[`If the mean is ${mean}, the total of all ${n} numbers is ${mean} × ${n} = ${mean*n}.`,
+             `The known numbers add to ${known.reduce((a,b)=>a+b,0)}.`,
+             `${mean*n} − ${known.reduce((a,b)=>a+b,0)} = ${missing}.`] };
+  }
+  if(kind === "timetable"){
+    const h = randInt(7, 20), m = choice([0,6,12,18,24,30,36,42,48,54]);
+    const gap = choice([18, 22, 26, 34, 47, 55]);
+    const total = h*60 + m + gap;
+    const fmt = (hh, mm) => `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
+    return { code:"5S1", text:`A bus timetable shows a bus leaving the station at ${fmt(h,m)} and arriving at the leisure centre at ${fmt(Math.floor(total/60)%24, total%60)}. How many minutes does the journey take?`,
+      answer: gap,
+      steps:["Count on from the departure time to the arrival time.",
+             `From ${fmt(h,m)} to ${fmt(Math.floor(total/60)%24, total%60)} is ${gap} minutes.`] };
+  }
+  if(kind === "linegraph"){
+    const start = randInt(4, 20), vals = [start];
+    for(let i = 0; i < 4; i++) vals.push(Math.max(1, vals[vals.length-1] + randInt(-6, 9)));
+    const label = choice(["the temperature in °C","the number of visitors, in hundreds","the height of a plant in cm"]);
+    const i = randInt(1, 4);
+    const rise = vals[i] - vals[i-1];
+    return { code:"5S2", text:`A line graph shows ${label} at five points in the day: ${vals.join(", ")}. What is the change between reading ${i} and reading ${i+1}? (Use a minus sign if it went down.)`,
+      answer: rise,
+      steps:[`Reading ${i} is ${vals[i-1]} and reading ${i+1} is ${vals[i]}.`,
+             `${vals[i]} − ${vals[i-1]} = ${rise}.`] };
+  }
+  if(kind === "piechart"){
+    const total = choice([60, 90, 120, 180, 240, 360]);
+    const frac = choice([[1,2,180],[1,3,120],[1,4,90],[1,6,60],[1,8,45],[3,4,270]]);
+    return { code:"6S1", text:`In a pie chart, one section takes up ${frac[2]}° of the circle. What fraction of the whole chart is that? (Give your answer in its simplest form.)`,
+      answer: fracText(frac[2], 360),
+      steps:["A whole pie chart is 360°.",
+             `${frac[2]}/360 simplifies to ${fracText(frac[2], 360)}.`] };
+  }
+  /* piechart_pct */
+  const deg = choice([36, 72, 90, 108, 144, 180, 216]);
+  return { code:"6S1", text:`In a pie chart, a section measures ${deg}°. What percentage of the total does it represent?`,
+    answer: tidy(deg/360*100),
+    steps:["A whole pie chart is 360°, which represents 100%.",
+           `${deg} ÷ 360 = ${tidy(deg/360)}, and × 100 gives ${tidy(deg/360*100)}%.`] };
+}
 const GENERATORS = {
   numplace: genNumPlace, fdppro: genFdpPro, ratio: genRatio, algebra: genAlgebra,
   measurement: genMeasurement, shapes: genShapes, position: genPosition, statistics: genStatistics,
@@ -862,7 +1602,11 @@ function loadQuestionAt(i){
   session.currentQ = GENERATORS[topicId](getDifficulty());
   session.currentQ.topicId = topicId;
 
-  document.getElementById('modalTopicTag').textContent = `${topic.icon} ${topic.name}`;
+  // Show the KS2 content domain reference alongside the topic, the way the
+  // reading page shows 2a-2h, so it is visible which bit of the curriculum
+  // this question is actually practising.
+  document.getElementById('modalTopicTag').textContent =
+    `${topic.icon} ${topic.name}${session.currentQ.code ? ' · ' + session.currentQ.code : ''}`;
   document.getElementById('modalTopicTag').style.background = topicColorsLight[topic.color];
   document.getElementById('modalTopicTag').style.color = topicColors[topic.color];
   document.getElementById('sessionProgress').textContent = `Question ${i+1} of ${session.topicIds.length}`;
