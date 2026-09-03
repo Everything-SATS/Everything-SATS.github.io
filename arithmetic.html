@@ -1028,6 +1028,11 @@ function loadQuestionAt(i){
   document.getElementById('sessionProgress').textContent = `Question ${i+1} of ${session.topicIds.length}`;
   document.getElementById('questionText').textContent = session.currentQ.text;
   document.getElementById('answerInput').value = '';
+  // A phone's number keypad has no minus, slash or letters, so answers like
+  // "-9", "3/4" or "8 remainder 5" simply cannot be typed on it. Pick the
+  // keyboard from the answer this question actually expects.
+  document.getElementById('answerInput').setAttribute('inputmode',
+    /^[0-9.]+$/.test(String(session.currentQ.answer)) ? 'decimal' : 'text');
   document.getElementById('answerInput').disabled = false;
   document.getElementById('submitBtn').style.display = 'inline-block';
   document.getElementById('feedbackBox').className = 'feedback-box';

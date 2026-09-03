@@ -498,9 +498,13 @@ function genFdpPro(diff){
   }
   const kind = choice(diff===1 ? ["fracof","compare"] : diff===3 ? ["percentchange","fracof","compare"] : ["percentof","fracof","compare"]);
   if(kind === "fracof"){
-    const total = randInt(2,12) * (diff===3?randInt(4,12):randInt(2,8));
-    const d = choice([2,3,4,5,6,8].filter(x=>total%x===0));
+    // Pick the denominator first and build the total from it. Choosing the
+    // total first and then filtering for a denominator that divides it left
+    // no candidates whenever the total was a prime like 49 -- choice([])
+    // returned undefined and the question rendered as "NaN/undefined of them".
+    const d = choice([2,3,4,5,6,8]);
     const n = randInt(1, d-1);
+    const total = d * (diff===3 ? randInt(4,14) : randInt(2,10));
     const result = total/d*n;
     return { text:`A baker made ${total} cakes. ${fmtFrac(n,d)} of them were chocolate. How many chocolate cakes were there?`, answer: result,
       steps:[`Divide the total by the denominator: ${total} ÷ ${d} = ${total/d}.`, `Multiply by the numerator: ${total/d} × ${n} = ${result}.`] };
@@ -604,7 +608,9 @@ function genMeasurement(diff){
   }
   if(kind === "money"){
     const price = randInt(150, 899)/100;
-    const paid = choice([5,10,20]);
+    // Only offer notes big enough to cover the price -- a £5 note against an
+    // £6.48 item asked for change of "-1.48", which isn't a real question.
+    const paid = choice([5,10,20].filter(n => n > price));
     const change = Number((paid - price).toFixed(2));
     return { text:`An item costs £${price.toFixed(2)}. You pay with a £${paid} note. How much change do you get?`, answer: change,
       steps:[`Subtract the price from the amount paid: £${paid} − £${price.toFixed(2)}.`, `Change = £${change.toFixed(2)}`] };
@@ -862,6 +868,11 @@ function loadQuestionAt(i){
   document.getElementById('sessionProgress').textContent = `Question ${i+1} of ${session.topicIds.length}`;
   document.getElementById('questionText').textContent = session.currentQ.text;
   document.getElementById('answerInput').value = '';
+  // A phone's number keypad has no minus, comma, colon, bracket or letters, so
+  // answers like "(2, -3)", "16:35", "4/5" or "XLIV" cannot be typed on it.
+  // Pick the keyboard from the answer this question actually expects.
+  document.getElementById('answerInput').setAttribute('inputmode',
+    /^[0-9.]+$/.test(String(session.currentQ.answer)) ? 'decimal' : 'text');
   document.getElementById('answerInput').disabled = false;
   document.getElementById('submitBtn').style.display = 'inline-block';
   document.getElementById('feedbackBox').className = 'feedback-box';

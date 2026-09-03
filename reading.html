@@ -333,7 +333,9 @@
   .q-text{font-weight:700; font-size:1rem; margin-bottom:12px}
   .q-answer-row{display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap}
   .q-answer-row input, .q-answer-row textarea{
-    flex:1; min-width:200px; font-size:.95rem; padding:10px 12px; border-radius:10px;
+    /* 1rem, not .95rem: phones zoom the whole page in when you tap a box with
+       text under 16px, which throws the reader off the question they're on. */
+    flex:1; min-width:200px; font-size:1rem; padding:10px 12px; border-radius:10px;
     border:2px solid var(--line); background:var(--bg); color:var(--ink); font-family:inherit; resize:vertical;
   }
   .q-answer-row input:focus, .q-answer-row textarea:focus{outline:none; border-color:var(--blue)}
@@ -345,9 +347,14 @@
   .q-grid-table{width:100%; border-collapse:collapse; margin-bottom:12px; font-size:.9rem}
   .q-grid-table th, .q-grid-table td{border:1px solid var(--line); padding:8px 10px; text-align:center}
   .q-grid-table td:first-child{text-align:left}
+  /* The whole cell is the tap target, not just the button -- a bare 13px radio
+     is far too small to hit reliably with a finger. */
+  .q-grid-table td.pick{padding:0}
+  .q-grid-table td.pick label{display:flex; align-items:center; justify-content:center; min-height:44px; padding:8px; cursor:pointer}
+  .q-grid-table input[type=radio]{width:20px; height:20px}
   .q-order-list{display:flex; flex-direction:column; gap:8px; margin-bottom:12px}
   .q-order-row{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; border:2px solid var(--line); background:var(--bg)}
-  .q-order-row select{padding:6px 8px; border-radius:8px; border:2px solid var(--line); font-family:inherit; font-size:.9rem; background:var(--bg-alt); color:var(--ink)}
+  .q-order-row select{padding:8px 10px; min-height:44px; border-radius:8px; border:2px solid var(--line); font-family:inherit; font-size:1rem; background:var(--bg-alt); color:var(--ink)}
   .library-card{background:var(--bg-alt); border-radius:16px; box-shadow:var(--shadow); padding:20px; margin-top:20px}
 </style>
 
@@ -716,12 +723,12 @@ function renderQuestions(){
     } else if(q.type === 'truefalse'){
       body = `<table class="q-grid-table"><thead><tr><th></th><th>True</th><th>False</th></tr></thead><tbody>
         ${q.statements.map((s,si)=>`<tr><td>${s.text}</td>
-          <td><input type="radio" name="qTf${i}_${si}" value="true"></td>
-          <td><input type="radio" name="qTf${i}_${si}" value="false"></td></tr>`).join('')}
+          <td class="pick"><label><input type="radio" name="qTf${i}_${si}" value="true"></label></td>
+          <td class="pick"><label><input type="radio" name="qTf${i}_${si}" value="false"></label></td></tr>`).join('')}
         </tbody></table>`;
     } else if(q.type === 'match'){
       body = `<table class="q-grid-table"><thead><tr><th></th>${q.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>
-        ${q.rows.map((r,ri)=>`<tr><td>${r.text}</td>${q.columns.map(c=>`<td><input type="radio" name="qMatch${i}_${ri}" value="${c}"></td>`).join('')}</tr>`).join('')}
+        ${q.rows.map((r,ri)=>`<tr><td>${r.text}</td>${q.columns.map(c=>`<td class="pick"><label><input type="radio" name="qMatch${i}_${ri}" value="${c}"></label></td>`).join('')}</tr>`).join('')}
         </tbody></table>`;
     } else if(q.type === 'order'){
       const order = seededShuffle(q.items.map((_,idx)=>idx), currentPassage.id+'-'+i);
