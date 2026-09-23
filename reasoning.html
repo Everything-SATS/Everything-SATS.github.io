@@ -431,14 +431,14 @@
 <script>
 /* ---------- Topic definitions ---------- */
 const TOPICS = [
-  { id:"numplace", name:"Number & Place Value", icon:"🔢", sub:"Large numbers, rounding, negatives, Roman numerals", color:"blue" },
-  { id:"fdppro", name:"Fractions, Decimals & %", icon:"🍰", sub:"Word problems, equivalence, comparing", color:"red" },
-  { id:"ratio", name:"Ratio & Proportion", icon:"⚖️", sub:"Scaling, sharing, comparing with %", color:"gold" },
-  { id:"algebra", name:"Algebra", icon:"🔤", sub:"Missing numbers, formulae, sequences", color:"purple" },
-  { id:"measurement", name:"Measurement", icon:"📏", sub:"Perimeter, area, volume, time, money", color:"green" },
-  { id:"shapes", name:"Geometry — Shapes", icon:"📐", sub:"Angles, 2D/3D shapes, circles", color:"blue" },
-  { id:"position", name:"Geometry — Position", icon:"🗺️", sub:"Coordinates, translation, reflection", color:"purple" },
-  { id:"statistics", name:"Statistics", icon:"📊", sub:"Charts, tables, mean average", color:"gold" },
+  { id:"numplace", name:"Number & Place Value", icon:"🔢", sub:"Large numbers, rounding, negatives, Roman numerals", color:"blue" , examWeight:3 },  // rounding 5.7% + factors/primes 4.1% + negatives 1.2%
+  { id:"fdppro", name:"Fractions, Decimals & %", icon:"🍰", sub:"Word problems, equivalence, comparing", color:"red" , examWeight:4 },  // fractions 7.8% + percentages 4.5%
+  { id:"ratio", name:"Ratio & Proportion", icon:"⚖️", sub:"Scaling, sharing, comparing with %", color:"gold" , examWeight:1 },  // 1.2% - 3 questions in five years
+  { id:"algebra", name:"Algebra", icon:"🔤", sub:"Missing numbers, formulae, sequences", color:"purple" , examWeight:1 },  // 1.2% - 3 questions in five years
+  { id:"measurement", name:"Measurement", icon:"📏", sub:"Perimeter, area, volume, time, money", color:"green" , examWeight:8 },  // measures 10.6% + money 9.8% + time 7.8%
+  { id:"shapes", name:"Geometry — Shapes", icon:"📐", sub:"Angles, 2D/3D shapes, circles", color:"blue" , examWeight:5 },  // shape 9% + angles 4.5% + area 1.6% + perimeter 1.2%
+  { id:"position", name:"Geometry — Position", icon:"🗺️", sub:"Coordinates, translation, reflection", color:"purple" , examWeight:2 },  // coordinates 5.3%
+  { id:"statistics", name:"Statistics", icon:"📊", sub:"Charts, tables, mean average", color:"gold" , examWeight:3 },  // tables & charts 8.2% + mean 1.6%
 ];
 
 /* ---------- Utility ---------- */
@@ -1619,7 +1619,7 @@ let session = { topicIds:[], questions:[], index:0, currentQ:null };
 
 function buildDailyQueue(){
   // Weight topics by inverse box (lower box = more due) -- simple weighted pick
-  const weights = TOPICS.map(t => ({ id:t.id, w: 6 - progress[t.id].box }));
+  const weights = TOPICS.map(t => ({ id:t.id, w: (6 - progress[t.id].box) * (t.examWeight || 1) }));
   const totalW = weights.reduce((s,x)=>s+x.w, 0);
   const queue = [];
   for(let i=0; i<appSettings.sessionLength; i++){

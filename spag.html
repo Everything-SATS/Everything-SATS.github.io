@@ -432,12 +432,14 @@
 /* ---------- Topic definitions ---------- */
 /* ---------- Topic definitions ---------- */
 const TOPICS = [
-  { id:"wordclass", name:"Word Classes", icon:"🔤", sub:"Nouns, verbs, adjectives, adverbs and more", color:"blue" },
-  { id:"sentencetype", name:"Sentence Types", icon:"❓", sub:"Statements, questions, exclamations, commands", color:"green" },
-  { id:"apostrophes", name:"Apostrophes", icon:"✍️", sub:"Contractions and possession", color:"gold" },
-  { id:"punctuation", name:"Punctuation Marks", icon:"❗", sub:"Commas, semicolons, colons and more", color:"red" },
-  { id:"clauses", name:"Clauses & Connectives", icon:"🔗", sub:"Main, subordinate and relative clauses", color:"purple" },
-  { id:"standardenglish", name:"Words & Standard English", icon:"🗣️", sub:"Synonyms, antonyms, active & passive voice", color:"blue" },
+  { id:"wordclass", name:"Word Classes", icon:"🔤", sub:"Nouns, verbs, adjectives, adverbs and more", color:"blue" , examWeight:6 },  // 22% - the single biggest, 10-13 questions every year
+  { id:"sentencetype", name:"Sentence Types", icon:"❓", sub:"Statements, questions, exclamations, commands", color:"green" , examWeight:3 },  // 8.2%
+  { id:"apostrophes", name:"Apostrophes", icon:"✍️", sub:"Contractions and possession", color:"gold" , examWeight:2 },  // 2.4%
+  { id:"punctuation", name:"Punctuation Marks", icon:"❗", sub:"Commas, semicolons, colons and more", color:"red" , examWeight:6 },  // roughly a quarter of the paper across eleven marks
+  { id:"clauses", name:"Clauses & Connectives", icon:"🔗", sub:"Main, subordinate and relative clauses", color:"purple" , examWeight:3 },  // 9%
+  { id:"standardenglish", name:"Words & Standard English", icon:"🗣️", sub:"Synonyms, antonyms, active & passive voice", color:"blue" , examWeight:2 },  // 5.5%
+  { id:"prefixsuffix", name:"Prefixes & Suffixes", icon:"🧩", sub:"Building and changing words", color:"green" , examWeight:3 },  // prefix and suffix questions in every paper
+  { id:"verbforms", name:"Verb Forms", icon:"⏳", sub:"Tenses, progressive, perfect, modals, subjunctive", color:"red" , examWeight:2 },  // progressive every year; modal and subjunctive in recent papers
 ];
 
 function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -1080,6 +1082,20 @@ function genStandardEnglish(diff){
       steps: [ `In Standard English, "${item.wrong}" should be "${item.correct}" here.`, `Correct sentence: "${item.s.replace(item.wrong, item.correct)}"` ],
     };
   }
+  /* Passive voice appears about once in every real paper, so it stays - but it
+     used to be the whole of this tier, which made the answer always "active"
+     or "passive". Formal register now shares the tier. */
+  if(Math.random() < 0.5){
+    const [informal, formal] = bagChoice('stdeng3-formal', FORMAL_PAIRS);
+    return {
+      text: `Which word or phrase is the more formal choice: "${informal}" or "${formal}"?`,
+      answer: formal,
+      steps: [
+        `Formal writing avoids everyday, conversational wording.`,
+        `"${formal}" is the formal choice; "${informal}" would suit a chat with a friend.`
+      ],
+    };
+  }
   const item = genVoicePair();
   const showActive = Math.random() < 0.5;
   if(showActive){
@@ -1096,9 +1112,208 @@ function genStandardEnglish(diff){
   };
 }
 
+/* ---------- Prefixes, suffixes and verb forms ----------
+   Counted in the real GPS papers 2022-2026: prefix and suffix questions appear
+   in every single paper, as do progressive verbs; modal verbs and the
+   subjunctive appear in the three most recent. The site had no topic for any
+   of them. */
+const PREFIX_OPPOSITES = [
+  ["happy","un"],["kind","un"],["lock","un"],["fair","un"],["usual","un"],["tidy","un"],
+  ["agree","dis"],["appear","dis"],["obey","dis"],["honest","dis"],["like","dis"],
+  ["possible","im"],["patient","im"],["polite","im"],["perfect","im"],
+  ["correct","in"],["visible","in"],["complete","in"],["active","in"],
+  ["regular","ir"],["responsible","ir"],["relevant","ir"],
+  ["legal","il"],["logical","il"],["legible","il"],
+  ["behave","mis"],["spell","mis"],["understand","mis"],["lead","mis"],
+  ["sense","non"],["fiction","non"],["stop","non"]
+];
+const PREFIX_MEANINGS = [
+  ["re","again","rebuild"],["pre","before","preview"],["inter","between","interact"],
+  ["sub","under","submarine"],["super","above or beyond","supermarket"],
+  ["auto","by itself or by oneself","automatic"],["anti","against","anticlockwise"],
+  ["mis","wrongly","misjudge"],["semi","half","semicircle"],["trans","across","transport"],
+  ["micro","very small","microscope"],["bi","two","bicycle"],["tri","three","triangle"],
+  ["ex","out or former","exit"],["co","together","cooperate"],["over","too much","overcook"],
+  ["under","too little","undercook"],["de","to remove or reverse","defrost"]
+];
+const SUFFIX_FORMS = [
+  ["enjoy","ment","enjoyment","noun"],["treat","ment","treatment","noun"],
+  ["punish","ment","punishment","noun"],["kind","ness","kindness","noun"],
+  ["dark","ness","darkness","noun"],["happy","ness","happiness","noun"],
+  ["act","ion","action","noun"],["decide","ion","decision","noun"],
+  ["teach","er","teacher","noun"],["invent","or","inventor","noun"],
+  ["care","ful","careful","adjective"],["hope","ful","hopeful","adjective"],
+  ["harm","less","harmless","adjective"],["end","less","endless","adjective"],
+  ["child","ish","childish","adjective"],["danger","ous","dangerous","adjective"],
+  ["comfort","able","comfortable","adjective"],["sense","ible","sensible","adjective"],
+  ["wood","en","wooden","adjective"],["nation","al","national","adjective"]
+];
+const SUFFIX_TRICKY = [
+  ["rely","able","reliable"],["possible","ly","possibly"],["beauty","ful","beautiful"],
+  ["courage","ous","courageous"],["happy","ly","happily"],["gentle","ly","gently"],
+  ["argue","ment","argument"],["nine","th","ninth"],["true","ly","truly"],
+  ["forget","ing","forgetting"],["begin","er","beginner"],["apply","ance","appliance"],
+  ["rely","ance","reliance"],["obey","ed","obeyed"],["carry","ed","carried"]
+];
+const IRREGULAR_PAST = [
+  ["run","ran"],["go","went"],["catch","caught"],["bring","brought"],["think","thought"],
+  ["teach","taught"],["buy","bought"],["swim","swam"],["sing","sang"],["drink","drank"],
+  ["begin","began"],["write","wrote"],["ride","rode"],["choose","chose"],["freeze","froze"],
+  ["break","broke"],["speak","spoke"],["steal","stole"],["hide","hid"],["fly","flew"],
+  ["grow","grew"],["know","knew"],["throw","threw"],["draw","drew"],["eat","ate"],
+  ["fall","fell"],["feel","felt"],["keep","kept"],["leave","left"],["lose","lost"]
+];
+const PROGRESSIVE_FRAMES = [
+  ["She","walk","home from school"],["The dog","bark","at the postman"],
+  ["We","wait","for the bus"],["He","read","his library book"],
+  ["They","paint","the fence"],["The children","play","in the garden"],
+  ["I","write","a letter"],["The cat","sleep","on the windowsill"],
+  ["My brother","practise","the piano"],["The team","train","for the match"]
+];
+const PERFECT_FRAMES = [
+  ["They","finish","their homework"],["We","eat","all the sandwiches"],
+  ["She","forget","her packed lunch"],["The builders","build","a new wall"],
+  ["I","lose","my reading book"],["He","break","the world record"],
+  ["The class","write","their reports"],["You","grow","so much this year"]
+];
+const MODAL_SENTENCES = [
+  ["You must remember to lock the door.","must"],
+  ["She might come with us tomorrow.","might"],
+  ["We should leave before it gets dark.","should"],
+  ["He could swim before he was four.","could"],
+  ["They will arrive at six o'clock.","will"],
+  ["I can hear the sea from here.","can"],
+  ["You may borrow my umbrella.","may"],
+  ["The parcel would have come today.","would"],
+  ["Children shall be collected at three.","shall"],
+  ["We ought to apologise.","ought"]
+];
+const FORMAL_PAIRS = [
+  ["got","received"],["kids","children"],["a bit","slightly"],["loads of","many"],
+  ["sort out","resolve"],["find out","discover"],["put off","postpone"],
+  ["get rid of","remove"],["ask for","request"],["go up","increase"],
+  ["look into","investigate"],["tell","inform"],["show","demonstrate"],["need","require"]
+];
+function genPrefixSuffix(diff){
+  if(diff === 0){
+    const [word, prefix] = bagChoice('pfx0', PREFIX_OPPOSITES);
+    return {
+      text: `Which prefix makes the opposite of "${word}"? Write just the prefix.`,
+      answer: prefix,
+      answerAliases: [prefix + "-"],
+      steps: [
+        `A prefix goes on the front of a word and changes its meaning.`,
+        `"${prefix}" + "${word}" makes "${prefix}${word}", which means not ${word}.`
+      ],
+    };
+  }
+  if(diff === 1){
+    const [root, suffix, result, type] = bagChoice('sfx1', SUFFIX_FORMS);
+    const article = /^[aeiou]/i.test(type) ? 'an' : 'a';
+    return {
+      text: `Add a suffix to "${root}" to make ${article} ${type}. Write the whole new word.`,
+      answer: result,
+      steps: [
+        `A suffix goes on the end of a word and often changes its word class.`,
+        `"${root}" + "-${suffix}" makes "${result}", which is a ${type}.`
+      ],
+    };
+  }
+  if(diff === 2){
+    const [prefix, meaning, example] = bagChoice('pfx2', PREFIX_MEANINGS);
+    return {
+      text: `What does the prefix "${prefix}-" mean, as in the word "${example}"?`,
+      answer: meaning,
+      steps: [
+        `Think about what "${example}" means, and which part of that meaning the prefix supplies.`,
+        `"${prefix}-" means ${meaning}.`
+      ],
+    };
+  }
+  const [root, suffix, result] = bagChoice('sfx3', SUFFIX_TRICKY);
+  return {
+    text: `Add the suffix "-${suffix}" to "${root}". Write the new word, spelled correctly.`,
+    answer: result,
+    steps: [
+      `Adding "-${suffix}" to "${root}" changes the spelling of the root, so it is not simply the two parts stuck together.`,
+      `The correct spelling is "${result}".`
+    ],
+  };
+}
+
+function genVerbForms(diff){
+  if(diff === 0){
+    const [present, past] = bagChoice('vf0', IRREGULAR_PAST);
+    return {
+      text: `Write the past tense of the verb "${present}".`,
+      answer: past,
+      steps: [
+        `"${present}" is an irregular verb, so the past tense does not simply add -ed.`,
+        `Today I ${present}; yesterday I ${past}.`
+      ],
+    };
+  }
+  if(diff === 1){
+    const [subject, verb, rest] = bagChoice('vf1', PROGRESSIVE_FRAMES);
+    const past = (subject === 'We' || subject === 'They' || subject === 'The children' || subject === 'The team') ? 'were' : (subject === 'I' ? 'was' : 'was');
+    const ing = verb.endsWith('e') ? verb.slice(0, -1) + 'ing' : verb + 'ing';
+    return {
+      text: `Write the past progressive form of the verb in brackets: "${subject} ___ (${verb}) ${rest}."`,
+      answer: `${past} ${ing}`,
+      steps: [
+        `The past progressive describes an action that was going on at the time.`,
+        `It is formed with "was" or "were" plus the -ing form: "${subject} ${past} ${ing} ${rest}."`
+      ],
+    };
+  }
+  if(diff === 2){
+    const [subject, verb, rest] = bagChoice('vf2', PERFECT_FRAMES);
+    const singular = !(subject === 'They' || subject === 'We' || subject === 'You' || subject === 'The builders' || subject === 'The class');
+    const aux = singular ? 'has' : 'have';
+    const PP = { finish:'finished', eat:'eaten', forget:'forgotten', build:'built', lose:'lost', break:'broken', write:'written', grow:'grown' };
+    const pp = PP[verb] || (verb + 'ed');
+    return {
+      text: `Write the present perfect form of the verb in brackets: "${subject} ___ (${verb}) ${rest}."`,
+      answer: `${aux} ${pp}`,
+      steps: [
+        `The present perfect links a past action to now, and is formed with "has" or "have" plus the past participle.`,
+        `"${subject} ${aux} ${pp} ${rest}."`
+      ],
+    };
+  }
+  const kind = choice(['modal', 'modal', 'subjunctive']);
+  if(kind === 'modal'){
+    const [sentence, modal] = bagChoice('vf3-modal', MODAL_SENTENCES);
+    return {
+      text: `Which word is the modal verb in this sentence? \u2014 "${sentence}"`,
+      answer: modal,
+      steps: [
+        `A modal verb sits in front of another verb and changes how certain, possible or necessary it is.`,
+        `Here the modal verb is "${modal}".`
+      ],
+    };
+  }
+  const sub = bagChoice('vf3-subj', [
+    ["If I ___ you, I would apologise.", "were"],
+    ["The head teacher insists that every child ___ on time.", "be"],
+    ["I wish it ___ the summer holidays.", "were"],
+    ["It is essential that he ___ told immediately.", "be"],
+    ["If she ___ here, she would know what to do.", "were"]
+  ]);
+  return {
+    text: `Write the subjunctive form that belongs in the gap: "${sub[0]}"`,
+    answer: sub[1],
+    steps: [
+      `The subjunctive is used for something wished for, suggested or insisted on rather than something factual.`,
+      `In the subjunctive the answer here is "${sub[1]}", not the everyday form.`
+    ],
+  };
+}
+
 const GENERATORS = {
   wordclass: genWordClass, sentencetype: genSentenceType, apostrophes: genApostrophes,
   punctuation: genPunctuation, clauses: genClauses, standardenglish: genStandardEnglish,
+  prefixsuffix: genPrefixSuffix, verbforms: genVerbForms,
 };
 
 /* ---------- Spaced repetition (simple Leitner system) ----------
@@ -1221,7 +1436,7 @@ let session = { topicIds:[], questions:[], index:0, currentQ:null };
 
 function buildDailyQueue(){
   // Weight topics by inverse box (lower box = more due) -- simple weighted pick
-  const weights = TOPICS.map(t => ({ id:t.id, w: 6 - progress[t.id].box }));
+  const weights = TOPICS.map(t => ({ id:t.id, w: (6 - progress[t.id].box) * (t.examWeight || 1) }));
   const totalW = weights.reduce((s,x)=>s+x.w, 0);
   const queue = [];
   for(let i=0; i<appSettings.sessionLength; i++){

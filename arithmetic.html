@@ -431,14 +431,14 @@
 <script>
 /* ---------- Topic definitions ---------- */
 const TOPICS = [
-  { id:"addsub", name:"Addition & Subtraction", icon:"➕", sub:"Column methods, multi-digit numbers", color:"blue" },
-  { id:"mult", name:"Multiplication", icon:"✖️", sub:"Short & long multiplication", color:"purple" },
-  { id:"div", name:"Division", icon:"➗", sub:"Short & long division, with remainders", color:"green" },
-  { id:"bodmas", name:"Order of Operations", icon:"🔢", sub:"Brackets, ×÷ before +−", color:"gold" },
-  { id:"fractions", name:"Fractions", icon:"🍰", sub:"Add, subtract, multiply, divide", color:"red" },
-  { id:"decimals", name:"Decimals", icon:"🔟", sub:"Add, subtract, multiply, divide, ×÷10/100/1000", color:"blue" },
-  { id:"percent", name:"Percentages", icon:"💯", sub:"Percentage of an amount", color:"purple" },
-  { id:"negatives", name:"Negative Numbers", icon:"❄️", sub:"Calculating across zero", color:"green" },
+  { id:"addsub", name:"Addition & Subtraction", icon:"➕", sub:"Column methods, multi-digit numbers", color:"blue" , examWeight:8 },  // add 19.7% + sub 18.5% of real Paper 1
+  { id:"mult", name:"Multiplication", icon:"✖️", sub:"Short & long multiplication", color:"purple" , examWeight:6 },  // mult 18.5% + long mult 7.5%
+  { id:"div", name:"Division", icon:"➗", sub:"Short & long division, with remainders", color:"green" , examWeight:3 },  // 11.6%
+  { id:"bodmas", name:"Order of Operations", icon:"🔢", sub:"Brackets, ×÷ before +−", color:"gold" , examWeight:1 },  // brackets appeared ONCE in five years
+  { id:"fractions", name:"Fractions", icon:"🍰", sub:"Add, subtract, multiply, divide", color:"red" , examWeight:2 },  // 5.8% - exactly 2 questions every year
+  { id:"decimals", name:"Decimals", icon:"🔟", sub:"Add, subtract, multiply, divide, ×÷10/100/1000", color:"blue" , examWeight:4 },  // 16.2%
+  { id:"percent", name:"Percentages", icon:"💯", sub:"Percentage of an amount", color:"purple" , examWeight:2 },  // 8.1%
+  { id:"negatives", name:"Negative Numbers", icon:"❄️", sub:"Calculating across zero", color:"green" , examWeight:1 },  // not tested in Paper 1; it is a reasoning topic
 ];
 
 /* ---------- Utility ---------- */
@@ -1039,7 +1039,7 @@ let session = { topicIds:[], questions:[], index:0, currentQ:null };
 
 function buildDailyQueue(){
   // Weight topics by inverse box (lower box = more due) -- simple weighted pick
-  const weights = TOPICS.map(t => ({ id:t.id, w: 6 - progress[t.id].box }));
+  const weights = TOPICS.map(t => ({ id:t.id, w: (6 - progress[t.id].box) * (t.examWeight || 1) }));
   const totalW = weights.reduce((s,x)=>s+x.w, 0);
   const queue = [];
   for(let i=0; i<appSettings.sessionLength; i++){

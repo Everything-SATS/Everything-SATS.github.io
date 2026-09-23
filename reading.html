@@ -724,8 +724,30 @@ function renderPassages(){
 
 let currentPassage = null;
 
+/* Across the whole collection the tick-one answer sat in option B 70% of the
+   time and option C the rest -- never A, never D. A child who always picked B
+   scored 70% without reading a word. Shuffling the options as the passage opens
+   fixes every passage at once, including any added later, and keeps the stored
+   answer correct by remapping its index. */
+function shuffleOptions(passage){
+  for(const q of passage.questions){
+    if(!Array.isArray(q.options) || q.options.length < 2) continue;
+    const order = q.options.map((_, i) => i);
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    const newPos = new Map(order.map((originalIndex, nowAt) => [originalIndex, nowAt]));
+    q.options = order.map(o => q.options[o]);
+    q.correct = Array.isArray(q.correct)
+      ? q.correct.map(c => newPos.get(c)).sort((a, b) => a - b)
+      : newPos.get(q.correct);
+  }
+}
+
 function openPassage(id){
   currentPassage = PASSAGES.find(p => p.id === id);
+  shuffleOptions(currentPassage);
   document.getElementById('homeView').classList.add('hidden');
   document.getElementById('passageView').classList.remove('hidden');
   document.getElementById('passageTitle').textContent = `${currentPassage.genre === 'Fiction' ? '📖' : '📰'} ${currentPassage.title}`;
