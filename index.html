@@ -255,6 +255,10 @@
   }
   .btn-primary{background:var(--blue); color:#fff}
 
+
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+main section{scroll-margin-top:14px}
 </style>
 </head>
 <body>
@@ -267,6 +271,11 @@
     <span>No sign-up, no adverts, no subscription &mdash; every child deserves the same shot at doing well.</span>
   </button>
   <div class="header-tiles">
+    <a class="header-tile clickable ht-jump" href="#maths"><span class="ht-icon">🔢</span><span class="ht-title">Maths</span></a>
+    <a class="header-tile clickable ht-jump" href="#english"><span class="ht-icon">📚</span><span class="ht-title">English</span></a>
+    <a class="header-tile clickable ht-jump" href="#resources"><span class="ht-icon">📄</span><span class="ht-title">Resources</span></a>
+    <a class="header-tile clickable ht-jump" href="#explore"><span class="ht-icon">🌍</span><span class="ht-title">Explore</span></a>
+    <a class="header-tile clickable ht-jump" href="#wellbeing"><span class="ht-icon">🧘</span><span class="ht-title">Exam stress</span></a>
     <button class="header-tile clickable" onclick="openColourPicker()"><span class="ht-icon">🎨</span><span class="ht-title">Reading colour</span></button>
     <button class="header-tile clickable" onclick="openCalmSoundPicker()"><span class="ht-icon">🎵</span><span class="ht-title">Calming sounds</span></button>
     <button class="header-tile clickable" onclick="openWhy()"><span class="ht-icon">📖</span><span class="ht-title">Why we built this</span></button>
@@ -288,7 +297,7 @@
 </div>
 
 <main>
-  <section>
+  <section id="maths">
     <div class="section-title">Maths</div>
     <div class="tiles-grid">
       <a class="tile live t-blue" href="arithmetic.html">
@@ -310,7 +319,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="english">
     <div class="section-title">English</div>
     <div class="tiles-grid">
       <a class="tile live t-amber" href="reading.html">
@@ -340,7 +349,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="resources">
     <div class="section-title">Resources</div>
     <div class="tiles-grid">
       <a class="tile live t-teal" href="past-papers.html">
@@ -378,7 +387,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="explore">
     <div class="section-title">Explore & Discover</div>
     <p class="section-note">Other genuinely free places to learn something new — not exam practice, just good stuff.</p>
     <div class="tiles-grid">
@@ -433,7 +442,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="wellbeing">
     <div class="section-title">Feeling stressed about exams?</div>
     <p class="section-note">That's really common, and it's okay to ask for help. These are real, free, confidential services — not exam practice, just people to talk to.</p>
     <div class="tiles-grid">
@@ -470,7 +479,7 @@
 
 <footer>
   <p class="footer-tagline">Built to make sure a paywall never stands between a kid and doing well in these exams.</p>
-  <p class="footer-legal">© 2026 Everything SATS™ — free, always. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
+  <p class="footer-legal">© 2026 Everything SATS™ — free, always. Owned and built by William Munro. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
 </footer>
 
 <script>

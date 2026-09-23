@@ -1057,15 +1057,39 @@ function startSession(kind){
     session.topicIds = new Array(8).fill(kind);
   }
   session.index = 0;
+  session.recentAnswers = [];
   openModal();
   loadQuestionAt(0);
+}
+
+/* ---------- Answer-variety guard ----------
+   A topic generator can be perfectly varied in its wording and still hand out
+   the same ANSWER over and over: a whole session where every answer is a comma
+   teaches "type a comma", not punctuation. Before showing a question, re-draw
+   it a few times if its answer matches one already seen in the last few
+   questions. Some answer spaces are genuinely tiny (statement / question /
+   command / exclamation is all there is), so this gives up after a fixed
+   number of attempts and accepts the repeat rather than looping forever. */
+const ANSWER_WINDOW = 4;   // how far back a repeat still counts
+const ANSWER_TRIES  = 10;  // attempts before accepting a repeat
+
+function drawQuestion(topicId, diff){
+  const recent = session.recentAnswers || (session.recentAnswers = []);
+  let q = GENERATORS[topicId](diff);
+  for(let attempt = 1; attempt < ANSWER_TRIES; attempt++){
+    if(!recent.includes(String(q.answer).trim())) break;
+    q = GENERATORS[topicId](diff);
+  }
+  recent.push(String(q.answer).trim());
+  if(recent.length > ANSWER_WINDOW) recent.shift();
+  return q;
 }
 
 function loadQuestionAt(i){
   if(i >= session.topicIds.length){ closeModal(); return; }
   const topicId = session.topicIds[i];
   const topic = TOPICS.find(t => t.id === topicId);
-  session.currentQ = GENERATORS[topicId](getDifficulty());
+  session.currentQ = drawQuestion(topicId, getDifficulty());
   session.currentQ.topicId = topicId;
 
   document.getElementById('modalTopicTag').textContent = `${topic.icon} ${topic.name}`;
@@ -1689,7 +1713,7 @@ applyReadingBg();
 
 
 <footer>
-  <p>© 2026 Everything SATS™ — free, always. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
+  <p>© 2026 Everything SATS™ — free, always. Owned and built by William Munro. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
   <p id="visitCount"></p>
 </footer>
 <script data-goatcounter="https://everything-sats.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

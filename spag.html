@@ -682,7 +682,9 @@ const PUNCT_T0_FLAVOURS = [
 ];
 const PUNCT_NAMES = ["Sam","Ellie","Leo","Aisha","Oliver","Sophie","Jamal","Priya","Noah","Grandad"];
 const PUNCT_SPEAKERS = ["The teacher","Mia","The captain","Dad","The coach","She","The guide","He","The referee","Grandma","The pilot","The presenter","The vet","The scientist","Mum"];
-const PUNCT_REPORT_VERBS = ["said","shouted","announced","whispered","called out","asked","explained","muttered","warned","began"];
+/* No interrogative verbs here: the quotes in PUNCT_QUOTES are statements, so
+   "asked" would introduce a sentence that is not a question. */
+const PUNCT_REPORT_VERBS = ["said","shouted","announced","whispered","called out","explained","muttered","warned","began","replied","added"];
 const PUNCT_QUOTES = ["Please sit down.","Look out!","We are ready to sail.","Don't wake the baby.","Well played, everyone!","What time is it?","This castle is 800 years old.","This isn't going to work.","Foul!","Dinner is ready.","We are beginning our descent.","Watch your step.","Welcome to the show.","Your dog just needs some rest.","We've made an incredible discovery.","Stand back, please.","It's time to go.","Hold on tight!","Follow me.","Well done, team!"];
 const PUNCT_ADVERBIALS = ["Later that day","After the long journey","Without a map","Eventually","Suddenly","Before the match started","In the distance","Despite the rain","After a moment's hesitation","Meanwhile","Within minutes","Against all odds","Early the next morning","Without warning","By the end of the day","After a while","Before long","In the end","Just then","All of a sudden"];
 const PUNCT_MAIN_CLAUSES = ["I heard the surprising news","the tired explorers reached camp","the hikers quickly became lost","the storm passed and the sun came out","the lights went out","the players warmed up","thunder rumbled ominously","the fete went ahead as planned","she knocked on the door","the fire was dying out back at the camp","the whole street had lost power","the team fought back to win","we set off for the coast","the ground began to shake","everyone was exhausted","the rain finally stopped","the truth came out","we found the answer","the alarm went off","the crowd cheered"];
@@ -707,27 +709,126 @@ const PUNCT_SEMICOLON_PAIRS = [
   ["The tide came in fast","the footprints disappeared within minutes"], ["He forgot his lines","the audience never noticed"],
 ];
 
+/* Extra punctuation banks. The original generator could only ever answer with a
+   comma below tier 3; the real papers test eleven different marks. */
+const PUNCT_TRAILING_SPEAKERS = ["Mia", "Dad", "Mum", "Grandma", "the teacher",
+  "the captain", "the coach", "the guide", "the referee", "the vet", "my sister",
+  "Mr Hall", "the pilot", "the presenter"];
+const PUNCT_T0_QUESTIONS = [
+  "Are we nearly there", "What time does the film start", "Can I have a turn",
+  "Where did you put my shoes", "Is that your dog", "How many are left",
+  "Who left the gate open", "Would you like a hand", "Why is the light still on",
+  "Did you remember your lunch", "Shall we walk or take the bus", "Are those yours"
+];
+const PUNCT_T0_STATEMENTS = [
+  "The bus was late again", "My sister collects stamps", "We walked all the way home",
+  "The kettle has just boiled", "Our class won the quiz", "It rained for three days",
+  "The library shuts at five", "He forgot his reading book", "The garden needs weeding",
+  "There is a nest in the hedge", "The film lasted two hours", "She plays the trumpet"
+];
+const PUNCT_T0_EXCLAIMS = [
+  "What a mess", "How cold it is in here", "What a brilliant goal",
+  "How fast that train is going", "What a lovely surprise", "How tall you have grown",
+  "What a terrible smell", "How quickly the time went", "What an enormous dog"
+];
+const PUNCT_APOSTROPHE_SINGULAR = [
+  ["Sam", "bike"], ["my gran", "garden"], ["the teacher", "desk"], ["Priya", "coat"],
+  ["the dog", "lead"], ["our neighbour", "cat"], ["the driver", "seat"],
+  ["Mr Hall", "car"], ["the baby", "bottle"], ["my brother", "room"]
+];
+const PUNCT_APOSTROPHE_PLURAL = [
+  ["the boys", "changing room"], ["the girls", "football team"], ["the teachers", "staffroom"],
+  ["the players", "kit"], ["the visitors", "entrance"], ["the students", "lockers"],
+  ["the dogs", "water bowls"], ["the neighbours", "driveway"]
+];
+const PUNCT_SPEECH_QUESTIONS = [
+  "Where have you put the scissors", "Are we going out later", "Who wants the last one",
+  "Have you seen my keys", "Is it still raining", "What happened to your knee"
+];
+const PUNCT_SPEECH_EXCLAIMS = [
+  "Look out", "That is amazing", "We won", "I cannot believe it", "Stop right there",
+  "What a catch"
+];
+const PUNCT_DASH_PAIRS = [
+  ["She had one rule", "never look down"],
+  ["He knew what was coming", "another long wait"],
+  ["There was only one thing left to do", "start again"],
+  ["The answer was obvious", "nobody had checked the plug"],
+  ["Only one thing could explain it", "the window had been open all night"],
+  ["We all wanted the same thing", "to go home"]
+];
+const PUNCT_PARENTHETICAL = [
+  ["My uncle", "who lives in Leeds", "is coming on Friday"],
+  ["The oldest tree in the park", "a huge oak", "was planted in 1840"],
+  ["Our teacher", "who never raises her voice", "went very quiet"],
+  ["The last bus", "which is always late", "did not come at all"],
+  ["My best friend", "a girl called Nadia", "moved here last year"],
+  ["The village shop", "open since 1902", "closes next month"]
+];
+
 function genPunctuation(diff){
   const collapse = s => s.replace(/ {2,}/g, ' ');
   let s, mark, why;
   if(diff === 0){
-    const flavour = choice(PUNCT_T0_FLAVOURS);
-    const items = sample3(flavour.items);
-    s = flavour.frame(items);
-    mark = ','; why = "Commas separate items in a list.";
+    /* comma (list), full stop, question mark, exclamation mark */
+    const kind = choice(['list', 'list', 'question', 'statement', 'exclaim']);
+    if(kind === 'list'){
+      const flavour = choice(PUNCT_T0_FLAVOURS);
+      const items = sample3(flavour.items);
+      s = flavour.frame(items);
+      mark = ','; why = "Commas separate items in a list.";
+    } else if(kind === 'question'){
+      s = `${bagChoice('p0-question', PUNCT_T0_QUESTIONS)}{{b}}`;
+      mark = '?'; why = "A sentence that asks something ends with a question mark.";
+    } else if(kind === 'statement'){
+      s = `${bagChoice('p0-statement', PUNCT_T0_STATEMENTS)}{{b}}`;
+      mark = '.'; why = "A sentence that simply tells you something ends with a full stop.";
+    } else {
+      s = `${bagChoice('p0-exclaim', PUNCT_T0_EXCLAIMS)}{{b}}`;
+      mark = '!'; why = "A sentence starting with What or How that shows strong feeling ends with an exclamation mark.";
+    }
   } else if(diff === 1){
-    const speaker = bagChoice('p1-speaker', PUNCT_SPEAKERS);
-    const verb = bagChoice('p1-verb', PUNCT_REPORT_VERBS);
-    const quote = bagChoice('p1-quote', PUNCT_QUOTES);
-    s = `${speaker} ${verb}{{b}} "${quote}"`;
-    mark = ','; why = "A comma goes after the reporting clause, before the spoken words begin.";
+    /* comma before speech, apostrophes, question and exclamation marks in speech */
+    const kind = choice(['speech', 'speech', 'apostrophe', 'speechq', 'speechex']);
+    if(kind === 'speech'){
+      const speaker = bagChoice('p1-speaker', PUNCT_SPEAKERS);
+      const verb = bagChoice('p1-verb', PUNCT_REPORT_VERBS);
+      const quote = bagChoice('p1-quote', PUNCT_QUOTES);
+      s = `${speaker} ${verb}{{b}} "${quote}"`;
+      mark = ','; why = "A comma goes after the reporting clause, before the spoken words begin.";
+    } else if(kind === 'apostrophe'){
+      const [owner, thing] = bagChoice('p1-apos', PUNCT_APOSTROPHE_SINGULAR);
+      s = `That is ${owner}{{b}}s ${thing}.`;
+      mark = "'"; why = "An apostrophe before the s shows that something belongs to one person or thing.";
+    } else if(kind === 'speechq'){
+      const q = bagChoice('p1-speechq', PUNCT_SPEECH_QUESTIONS);
+      s = `"${q}{{b}}" asked ${bagChoice('p1-speaker-q', PUNCT_TRAILING_SPEAKERS)}.`;
+      mark = '?'; why = "The question mark goes inside the inverted commas, because the spoken words are the question.";
+    } else {
+      const q = bagChoice('p1-speechex', PUNCT_SPEECH_EXCLAIMS);
+      s = `"${q}{{b}}" shouted ${bagChoice('p1-speaker-ex', PUNCT_TRAILING_SPEAKERS)}.`;
+      mark = '!'; why = "The exclamation mark goes inside the inverted commas, with the words that were shouted.";
+    }
   } else if(diff === 2){
-    const adverbial = bagChoice('p2-adverbial', PUNCT_ADVERBIALS);
-    const main = bagChoice('p2-main', PUNCT_MAIN_CLAUSES);
-    s = `${adverbial}{{b}} ${main}.`;
-    mark = ','; why = "A comma goes after a fronted adverbial (a phrase moved to the front of the sentence).";
+    /* fronted adverbial comma, plural possession, dash */
+    const kind = choice(['adverbial', 'adverbial', 'plural', 'dash']);
+    if(kind === 'adverbial'){
+      const adverbial = bagChoice('p2-adverbial', PUNCT_ADVERBIALS);
+      const main = bagChoice('p2-main', PUNCT_MAIN_CLAUSES);
+      s = `${adverbial}{{b}} ${main}.`;
+      mark = ','; why = "A comma goes after a fronted adverbial (a phrase moved to the front of the sentence).";
+    } else if(kind === 'plural'){
+      const [owners, thing] = bagChoice('p2-plural', PUNCT_APOSTROPHE_PLURAL);
+      s = `We found it next to ${owners}{{b}} ${thing}.`;
+      mark = "'"; why = "When the owners are plural and already end in s, the apostrophe goes after the s.";
+    } else {
+      const [before, after] = bagChoice('p2-dash', PUNCT_DASH_PAIRS);
+      s = `${before}{{b}} ${after}.`;
+      mark = '-'; why = "A dash can introduce a dramatic pause before the rest of the sentence.";
+    }
   } else {
-    const kind = choice(['list','colon','semicolon']);
+    /* colon, semicolon, dash, parenthetical commas */
+    const kind = choice(['list', 'colon', 'semicolon', 'parenthesis']);
     if(kind === 'list'){
       const setup = bagChoice('p3-kitsetup', PUNCT_KIT_SETUPS);
       const items = sample3(PUNCT_KIT_ITEMS);
@@ -737,13 +838,17 @@ function genPunctuation(diff){
       const [c1, c2] = bagChoice('p3-colonpair', PUNCT_COLON_PAIRS);
       s = `${c1}{{b}} ${c2}.`;
       mark = ':'; why = "A colon introduces an explanation or elaboration of what came before it.";
-    } else {
+    } else if(kind === 'semicolon'){
       const [c1, c2] = bagChoice('p3-semicolonpair', PUNCT_SEMICOLON_PAIRS);
       s = `${c1}{{b}} ${c2}.`;
       mark = ';'; why = "A semicolon can join two independent clauses that are closely related, instead of starting a new sentence.";
+    } else {
+      const [before, middle, after] = bagChoice('p3-parenthesis', PUNCT_PARENTHETICAL);
+      s = `${before}{{b}} ${middle}, ${after}.`;
+      mark = ','; why = "A pair of commas can hold extra information inside a sentence, like a pair of brackets would.";
     }
   }
-  const displaySentence = collapse(s.replace('{{b}}', ' ___ '));
+  const displaySentence = collapse(s.replace('{{b}}', ' ___ ')).trim();
   return {
     text: `What punctuation mark belongs in the gap? — "${displaySentence}"`,
     answer: mark,
@@ -777,11 +882,36 @@ const CL_WHERE_PLACES = ["house","park","beach","classroom","garden","street","v
 const CL_WHERE_CONNECTIONS = ["I grew up","we used to play","the shipwreck was found","we had our first lesson","my grandparents met","the treasure was buried","the accident happened","she learned to swim","the festival takes place","the dog got lost","they filmed the movie","the battle was fought","we first met","the fire started","the concert was held"];
 const CL_WHY_REASONS = ["the trip was postponed","she was late this morning","the concert was cancelled","the match was delayed","he missed the bus","the shop closed early","the picnic was moved indoors","she couldn't come","the flight was grounded","the game was abandoned","they turned back early","the lesson overran","the parcel never arrived","the road was closed","the event sold out"];
 
+/* Tier-0 clause banks. Past tense, third or first person, so they sit with the
+   existing CL_ACTIONS openings without any agreement problems. */
+const CL_WHEN_EVENTS = [
+  "the bell rang", "it started to rain", "the film finished", "the sun came out",
+  "the lights went off", "her name was called", "the whistle blew", "the door opened",
+  "the music stopped", "the kettle boiled", "the bus finally arrived", "the storm passed"
+];
+const CL_AFTER_EVENTS = [
+  "the match had finished", "we had eaten", "the rain had stopped", "she had said sorry",
+  "the guests had gone home", "he had finished his homework", "the bell had gone",
+  "the tide had turned", "everyone had left", "the cake had cooled"
+];
+const CL_BEFORE_EVENTS = [
+  "the shop closed", "it got dark", "the others arrived", "the rain started",
+  "the film began", "anyone noticed", "the bus came", "her mum got home",
+  "the ice melted", "the whistle went"
+];
+
 function genClauses(diff){
   if(diff === 0){
+    /* All subordinating conjunctions, so the explanation holds for each. */
     const action = bagChoice('cl0-action', CL_ACTIONS);
-    const reason = bagChoice('cl0-because', CL_BECAUSE_REASONS);
-    return clauseResult(`${action} because ${reason}.`, 'because', false);
+    const kind = choice(['because', 'when', 'if', 'after', 'before']);
+    let clause;
+    if(kind === 'because')    clause = bagChoice('cl0-because', CL_BECAUSE_REASONS);
+    else if(kind === 'when')  clause = bagChoice('cl0-when', CL_WHEN_EVENTS);
+    else if(kind === 'if')    clause = bagChoice('cl0-if', CL_IF_CONDITIONS);
+    else if(kind === 'after') clause = bagChoice('cl0-after', CL_AFTER_EVENTS);
+    else                      clause = bagChoice('cl0-before', CL_BEFORE_EVENTS);
+    return clauseResult(`${action} ${kind} ${clause}.`, kind, false);
   }
   if(diff === 1){
     const kind = choice(['if','until','so']);
@@ -1109,15 +1239,39 @@ function startSession(kind){
     session.topicIds = new Array(8).fill(kind);
   }
   session.index = 0;
+  session.recentAnswers = [];
   openModal();
   loadQuestionAt(0);
+}
+
+/* ---------- Answer-variety guard ----------
+   A topic generator can be perfectly varied in its wording and still hand out
+   the same ANSWER over and over: a whole session where every answer is a comma
+   teaches "type a comma", not punctuation. Before showing a question, re-draw
+   it a few times if its answer matches one already seen in the last few
+   questions. Some answer spaces are genuinely tiny (statement / question /
+   command / exclamation is all there is), so this gives up after a fixed
+   number of attempts and accepts the repeat rather than looping forever. */
+const ANSWER_WINDOW = 4;   // how far back a repeat still counts
+const ANSWER_TRIES  = 10;  // attempts before accepting a repeat
+
+function drawQuestion(topicId, diff){
+  const recent = session.recentAnswers || (session.recentAnswers = []);
+  let q = GENERATORS[topicId](diff);
+  for(let attempt = 1; attempt < ANSWER_TRIES; attempt++){
+    if(!recent.includes(String(q.answer).trim())) break;
+    q = GENERATORS[topicId](diff);
+  }
+  recent.push(String(q.answer).trim());
+  if(recent.length > ANSWER_WINDOW) recent.shift();
+  return q;
 }
 
 function loadQuestionAt(i){
   if(i >= session.topicIds.length){ closeModal(); return; }
   const topicId = session.topicIds[i];
   const topic = TOPICS.find(t => t.id === topicId);
-  session.currentQ = GENERATORS[topicId](getDifficulty());
+  session.currentQ = drawQuestion(topicId, getDifficulty());
   session.currentQ.topicId = topicId;
 
   document.getElementById('modalTopicTag').textContent = `${topic.icon} ${topic.name}`;
@@ -1736,7 +1890,7 @@ applyReadingBg();
 
 
 <footer>
-  <p>© 2026 Everything SATS™ — free, always. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
+  <p>© 2026 Everything SATS™ — free, always. Owned and built by William Munro. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
   <p id="visitCount"></p>
 </footer>
 <script data-goatcounter="https://everything-sats.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
