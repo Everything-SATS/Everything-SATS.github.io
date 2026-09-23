@@ -1020,4 +1020,595 @@ for any song I know.`,
       { code:"2h", marks:2, q:"Compare what the speaker thought about the forecast as a child with what they think about it now.", keywords:[["child","young","thought","used to","poem"],["now","still","understand","realise","people","care","meet","not swap"]], answerExpected:"As a child they thought it was a poem; now they still love it, but because of who it is for.", answerGreaterDepth:"As a child the speaker thought the forecast was simply a poem, drawn in by the sound of the names. As an adult they say they were “not, as it turns out, entirely wrong”, but their reason has changed: what moves them now is not the language but the fact that it is read with total accuracy, every night, to people they will never meet, by someone who will not be thanked.", steps:["Find the childhood view in the second section.","Find what the speaker values by the end — accuracy, care, strangers.","Explain the shift: from liking the sound to understanding the purpose."] }
     ]
   },
+  {
+    id: "night-shift",
+    genre: "Fiction",
+    title: "The Night Shift",
+    teaser: "Mira has never seen where her mum works. One Thursday, at twenty to four, she finally goes.",
+    text: `Mira had never once seen the bakery.
+
+She knew the smell of it. It came home in her mum's hair and on the shoulders of her coat, warm and slightly sweet, and it was still there at breakfast when her mum was upstairs asleep. But the place itself was a rumour. It happened in the dark, while Mira was unconscious, and by the time she got up there was only flour in the sink to prove it.
+
+"Take me with you," she said, on a Tuesday, for about the ninth time.
+
+Her mum looked at her over the top of a cup of tea. "It is four in the morning, Mira."
+
+"I know what time it is."
+
+"You say that now."
+
+But on Thursday her mum shook her shoulder at twenty to four, and Mira was awake immediately, which surprised them both.
+
+The street was a different street. That was the first thing. No cars, no people, the takeaway shut, the postbox wearing a little cap of frost. Their footsteps were enormous. Mira kept wanting to whisper.
+
+"You can talk normally," her mum said.
+
+"It feels rude."
+
+"To who?"
+
+Mira did not have an answer for that.
+
+The bakery was down a side road she had walked past a hundred times without looking at. From outside it was a metal door and one window with the blind pulled down. Then her mum opened the door and the heat came out at them like something alive, and the noise came with it — a radio, a fan, a machine turning over at the back — and Mira stopped in the doorway with her mouth open.
+
+It was so bright. That was the thing nobody had told her. Four in the morning outside, and in here it was the middle of the day.
+
+"Shoes off, hat on," said her mum, handing her a hairnet without looking, and went in.
+
+And then her mum was gone.
+
+Not gone. She was right there, eleven feet away, tipping a trough of dough onto a steel table. But the person doing it was not quite the person who sat on the end of Mira's bed and got the names of her friends wrong. This one moved fast. This one had her sleeves pushed up and her weight forward, and she was talking to a man called Des about a delivery, and she was not asking him anything. She was telling him.
+
+Des said, "You're the boss."
+
+Mira sat on an upturned crate by the wall, where she had been put, and watched.
+
+Her mum cut the dough into pieces without weighing them. Then she weighed one, to check, and it was right, and she did not look pleased about it, because being right was normal.
+
+She shaped a loaf in about four seconds. She did it again. She did it forty more times. Her hands went round and under, and the shapeless lump became a thing with a top and a bottom and a tightness in its skin, and Mira could not see the moment it changed.
+
+At half past five the first trays went in. Her mum leaned back against the bench, drank cold tea, and let out a long breath, and for eleven minutes she was Mira's mum again.
+
+"Well?" she said.
+
+Mira was trying to work out how to say it.
+
+She had always thought of the night shift as a thing that was done to her mum. Something she got through. Something that made her tired at parents' evening and asleep on Sundays, and that she would stop doing when things got better.
+
+It had never once crossed Mira's mind that her mum might be extremely good at it.
+
+"Des called you the boss," she said.
+
+"Des calls everyone the boss."
+
+"He didn't call me the boss."
+
+Her mum laughed, properly, and the man at the oven looked round, and Mira understood that this laugh did not happen at home much, because at home her mum was mostly asleep.
+
+At ten past six the bread came out.
+
+Mira had eaten bread from this bakery all her life. She had never watched it arrive. The trays came out and the smell changed completely — the raw smell became the real one, the one off her mum's coat, and there was suddenly far too much of it to fit inside the room.
+
+"Go on," said her mum. "You'll be late."
+
+Mira walked to school in the light, with her hair smelling of the bakery.
+
+Nobody said anything about it.
+
+She kept catching it all day.`,
+    questions: [
+      { code:"2b", type:"tick-one", marks:1, q:"What surprised Mira most when she first stepped inside the bakery?",
+        options:["How quiet and empty it was","How bright and warm it was","How small it was","How little it smelled of anything"], correct:1,
+        explanation:"“It was so bright. That was the thing nobody had told her. Four in the morning outside, and in here it was the middle of the day.” The heat is described as coming out at them “like something alive”." },
+
+      { code:"2a", marks:1, q:"Find and copy one word from the description of the early-morning street that shows how cold it was.",
+        keywords:[["frost"]], answerExpected:"frost",
+        answerGreaterDepth:"frost — the postbox is “wearing a little cap of frost”.",
+        steps:["Look at the paragraph that begins “The street was a different street.”","Find the detail about the postbox."] },
+
+      { code:"2d", marks:2, q:"The writer says “And then her mum was gone,” and then immediately says “Not gone. She was right there, eleven feet away.” What does the writer mean by this?",
+        keywords:[["different","not the same","changed","another person","someone else","stranger"],["work","working","baker","at home","home"]],
+        answerExpected:"Her mum was still there, but she behaved like a different person at work from the one Mira knows at home.",
+        answerGreaterDepth:"Physically her mum had not gone anywhere — she was eleven feet away. What had gone was the version of her Mira recognises: the one who sits on the end of her bed and gets her friends' names wrong. At work she is fast, certain and in charge, so Mira experiences it as her mum being replaced by somebody else.",
+        steps:["Notice the writer corrects himself straight away: “Not gone.”","Compare the two descriptions of her mum — the one at home, and the one at the steel table.","Explain that what disappears is a way of behaving, not a person."] },
+
+      { code:"2g", marks:2, q:"The heat “came out at them like something alive”. What does this comparison suggest about the bakery?",
+        keywords:[["strong","powerful","force","sudden","hit","pushed","physical","solid"],["alive","living","creature","breathing","own","animal"]],
+        answerExpected:"It suggests the heat was so strong and sudden that it felt like a living thing pushing out at them.",
+        answerGreaterDepth:"Heat normally just exists in a room, but this heat acts — it comes out at them, as though it has its own will. The comparison makes the bakery feel powerful and almost like a creature, which fits Mira stopping dead in the doorway. It also sets up the contrast with the frozen, empty street she has just left.",
+        steps:["Think about what “alive” adds that “hot” would not.","Something alive can move towards you and act on its own.","Link this to how Mira reacts in the doorway."] },
+
+      { code:"2c", marks:2, q:"Summarise what Mira does and sees from the moment she sits on the crate to the moment the bread comes out.",
+        keywords:[["watch","watches","watched","sat","sits"],["shape","shaping","dough","loaves","loaf","cut","weigh"],["tea","break","breath","laugh","bread","trays","out"]],
+        answerExpected:"She sits and watches her mum cut and shape dough quickly, then her mum takes a short break with cold tea and laughs, and at ten past six the bread comes out.",
+        answerGreaterDepth:"Mira is put on a crate by the wall and watches. Her mum cuts dough without weighing it, checks one piece and is right, then shapes loaf after loaf so fast that Mira cannot see the moment the lump becomes a loaf. At half past five the first trays go in and her mum rests for eleven minutes with cold tea, laughing properly at Mira's joke about Des. At ten past six the trays come out and the smell of real bread fills the room.",
+        steps:["Track the times given in the text: half past five, then ten past six.","Pick out the main actions in order, not every detail.","Keep it to the events between the crate and the bread."] },
+
+      { code:"2b", type:"truefalse", marks:2, q:"Using information from the story, tick one box in each row to show whether each statement is true or false.",
+        statements:[
+          { text:"Mira had asked to come to the bakery several times before.", answer:true },
+          { text:"Mira's mum weighed every piece of dough she cut.", answer:false },
+          { text:"Mira had walked past the road the bakery is on before.", answer:true },
+          { text:"Mira's mum laughs often when she is at home.", answer:false }
+        ],
+        explanation:"Mira asks “for about the ninth time”. Her mum “cut the dough into pieces without weighing them”, then weighed only one to check. The bakery is “down a side road she had walked past a hundred times”. Mira realises the laugh “did not happen at home much, because at home her mum was mostly asleep”." },
+
+      { code:"2h", marks:2, q:"Compare how Mira's mum behaves while she is working with how she behaves during the eleven minutes after the trays go in.",
+        keywords:[["fast","quick","busy","in charge","boss","telling","working","certain"],["rest","rests","leaned","breath","tea","mum again","relax","laugh"]],
+        answerExpected:"While working she is fast, certain and in charge; in the eleven minutes she rests against the bench with cold tea and becomes Mira's mum again.",
+        answerGreaterDepth:"At the table she moves quickly, pushes her sleeves up, shapes a loaf in four seconds and tells Des what is happening rather than asking. During the break she leans back, drinks cold tea, lets out a long breath and laughs properly — the writer says that for eleven minutes “she was Mira's mum again”, which shows the working version had temporarily replaced the home one.",
+        steps:["Find the details of how she works: speed, sleeves, the way she speaks to Des.","Find what she does in the eleven minutes after half past five.","Use the writer's own phrase “Mira's mum again” to explain the difference."] },
+
+      { code:"2e", marks:2, q:"Using evidence from the story, predict how Mira will think about her mum's job from now on.",
+        keywords:[["good at","skilled","skill","respect","proud","admire","expert","talent"],["not","no longer","stop","instead","rather than","used to","before"]],
+        answerExpected:"She will no longer see it as something done to her mum, but as something her mum is genuinely good at.",
+        answerGreaterDepth:"The story tells us exactly what Mira used to think — that the night shift was something her mum “got through” and would stop when things got better. Watching her cut dough by eye, shape loaves in four seconds and give Des instructions replaces that with admiration, and the line “It had never once crossed Mira's mind that her mum might be extremely good at it” marks the change. From now on she is likely to see the job as skilled work rather than as something unfair.",
+        steps:["Find the sentence that says what Mira used to believe about the night shift.","Find what she sees at the bakery that contradicts it.","Predict the new view, and support it with one piece of evidence."] },
+
+      { code:"2e", marks:1, q:"Predict what Mira is most likely to ask her mum for next. Explain your answer using the ending.",
+        keywords:[["again","come back","next time","another","go with","take her","come too"]],
+        answerExpected:"To come to the bakery again — she spends the whole day still noticing the smell.",
+        answerGreaterDepth:"To come again. The ending shows no regret at all: she walks to school in the light, nobody comments on the smell, and “she kept catching it all day”, which suggests she is holding on to the morning rather than being glad it is over.",
+        steps:["Look at how Mira feels in the last three lines.","Decide whether that feeling would make her want to repeat the morning or avoid it."] }
+    ]
+  },
+  {
+    id: "second-language",
+    genre: "Fiction",
+    title: "Second Language",
+    teaser: "Yusuf has translated at every parents' evening since Year 3. This year, a teacher says something he wants to hide.",
+    text: `There were four teachers to get through, and Yusuf had to be all eight people.
+
+That was how it worked. Baba asked a question in Kurdish. Yusuf turned to the teacher and asked it in English. The teacher answered — mostly to Yusuf, which was the part he hated — and then Yusuf turned back and gave it to Baba in Kurdish, keeping his face still while he did it.
+
+He had been doing this since Year 3. He was good at it now. He knew the words the way other people knew song lyrics. Progress. Target. Attainment. Working at the expected standard.
+
+Mrs Achebe was first, and Mrs Achebe was easy. She liked him. She said "working hard" twice and "a pleasure to teach" once, and Yusuf translated all of it, including "a pleasure to teach", and Baba nodded slowly with both hands on his knees.
+
+Then Mrs Achebe said, to Yusuf, "Tell your dad he should be very proud."
+
+"She says you should be proud," Yusuf said, in Kurdish.
+
+"Ask her what he needs to do better," said Baba.
+
+Yusuf did not ask her.
+
+"He says thank you very much," he told Mrs Achebe.
+
+They moved down the hall. The chairs were the small ones from the infants, and Baba sat on them without complaining, with his knees up near the table, in the grey jacket he wore to everything important.
+
+Mr Hallam did maths. Mr Hallam did not look up straight away.
+
+"Right," he said. "Yusuf. Yusuf is a puzzle, if I am honest."
+
+Yusuf's stomach went cold.
+
+"He is perfectly capable. He is one of the quickest in the room when he wants to be. But he does the minimum and then he stops. He hands in work that is finished but not thought about. I have told him this. I do not think it has landed."
+
+Mr Hallam looked at Yusuf. "You can tell him that."
+
+And there it was.
+
+Yusuf could feel exactly how easy it would be. He had all the words. He could say: Mr Hallam says you are doing well in maths. He could say: Mr Hallam says keep going. Baba would nod, and put his hands on his knees, and they would go home, and nothing would happen to anybody.
+
+He had done it twenty minutes ago, for a compliment. This was the same trick.
+
+"He says," Yusuf said, in Kurdish, "that I am one of the quickest in the class."
+
+Baba waited.
+
+"And that I do the smallest amount I can, and then I stop. That I hand in work that is finished but that I have not thought about. He says he has told me this and it has not gone in."
+
+He watched his father's face and could not read it, which had never happened before.
+
+Baba was quiet for a moment. Then he said, in Kurdish, "Ask him what he thinks the reason is."
+
+Yusuf asked him.
+
+Mr Hallam opened his mouth, and shut it again.
+
+"That is a good question," he said. "I do not know. Honestly. I have not asked him."
+
+Yusuf translated that too, all of it, including the pause.
+
+Baba said, "Then that is the homework for both of you."
+
+Yusuf translated that as well, and for the first time all evening Mr Hallam was not talking to him. He was talking to Baba — looking at Baba, waiting while Baba spoke, nodding at Baba — and Yusuf was just the wire the words went down, which is what he had wanted since Year 3 without ever managing to say so.
+
+Outside, the car park was wet and orange under the lights. They walked to the bus stop.
+
+"You changed what Mrs Achebe said," said Baba.
+
+Yusuf stopped.
+
+"I could hear it," Baba said. "She spoke for a long time. You spoke for two seconds. I know what thank you very much sounds like, Yusuf. It sounds like that."
+
+"I didn't want to—"
+
+"I know." Baba put his hands in his pockets. "Listen. You are not my voice. You are my son. You give me the words, and you let me decide what to do with them. That is the arrangement."
+
+The bus came. They got on.
+
+"One of the quickest in the room," Baba said, halfway home, to the window.`,
+    questions: [
+      { code:"2b", type:"tick-one", marks:1, q:"Why does Yusuf say his father had to be “all eight people”?",
+        options:["Eight teachers were waiting to see them","He had to speak as both his father and each of the four teachers","There were eight other families in the hall","He had to answer eight questions"], correct:1,
+        explanation:"There were four teachers, and Yusuf spoke for his father and for each teacher in turn — so four conversations meant eight voices." },
+
+      { code:"2a", marks:1, q:"Find and copy the word Mr Hallam uses to describe Yusuf at the start of their meeting.",
+        keywords:[["puzzle"]], answerExpected:"puzzle",
+        answerGreaterDepth:"puzzle — “Yusuf is a puzzle, if I am honest.”",
+        steps:["Look at the first thing Mr Hallam says after he looks up.","Find the single word he uses to sum Yusuf up."] },
+
+      { code:"2d", marks:2, q:"Why do you think Yusuf hated the teachers answering “mostly to Yusuf”?",
+        keywords:[["ignor","left out","past","not to","instead of","overlook","cut out","rude"],["father","dad","baba","parent"]],
+        answerExpected:"Because it meant the teachers were leaving his father out of his own meeting and speaking past him.",
+        answerGreaterDepth:"The meeting is supposed to be between the teacher and Baba, but the teachers direct their answers at Yusuf because he is the one who can reply. That treats his father as if he were not really there, which is why Yusuf later notices with such relief that Mr Hallam is finally “talking to Baba — looking at Baba, waiting while Baba spoke”.",
+        steps:["Think about whose meeting it actually is.","Consider what it feels like to watch someone be talked past.","Use the moment near the end when Mr Hallam finally speaks to Baba directly."] },
+
+      { code:"2e", marks:2, q:"At the point where Yusuf thinks “He had all the words”, predict what he is about to do, and then explain what he actually does.",
+        keywords:[["soften","change","lie","hide","easier","kinder","nice","not tell","leave out"],["truth","all of it","everything","honest","translat","full","exactly"]],
+        answerExpected:"It looks as though he will soften the message, as he did with Mrs Achebe, but he translates all of it honestly instead.",
+        answerGreaterDepth:"Everything points towards him changing it: he has just done exactly that for a compliment, he lists the easy sentences he could use, and he notes that “nothing would happen to anybody”. The line “This was the same trick” is the turn — naming it as a trick is what stops him — and he then gives Baba the criticism in full, including the part about work that is finished but not thought about.",
+        steps:["Look at what Yusuf did twenty minutes earlier with Mrs Achebe.","Notice the sentence where he calls it “the same trick”.","Say what you expected, then what actually happens."] },
+
+      { code:"2c", marks:2, q:"Summarise what Mr Hallam says about Yusuf's work.",
+        keywords:[["capable","quick","quickest","able","clever"],["minimum","smallest","stops","not thought","finished but"]],
+        answerExpected:"He says Yusuf is capable and one of the quickest in the class, but does the minimum and hands in work he has not thought about.",
+        answerGreaterDepth:"Mr Hallam's view has two halves. Yusuf is “perfectly capable” and “one of the quickest in the room when he wants to be”. But he does the smallest amount he can and then stops, handing in work that is finished without being thought about — and Mr Hallam adds that he has said this to Yusuf before and does not believe it has landed.",
+        steps:["Find the praise and the criticism — there is one of each.","Include his comment about having already told Yusuf.","Keep it to what Mr Hallam says, not what Baba says."] },
+
+      { code:"2g", marks:2, q:"Yusuf describes himself as “just the wire the words went down”. Why is this an effective way to describe how he felt?",
+        keywords:[["wire","cable","carry","pass","through","between"],["want","wanted","happy","relie","good","finally","glad","since year 3"]],
+        answerExpected:"A wire only carries a message without changing it, which is exactly the job he had wanted since Year 3.",
+        answerGreaterDepth:"A wire is invisible and does nothing to what passes through it — which sounds insulting, but here it is what Yusuf has always wanted. For once the conversation is genuinely between Mr Hallam and Baba, and Yusuf is not being made into the parent. The flatness of the image is the point: being unimportant in the conversation is the relief.",
+        steps:["Think about what a wire actually does to a message: nothing.","Ask whether Yusuf minds being described this way.","Link it to the phrase “which is what he had wanted since Year 3”."] },
+
+      { code:"2b", type:"truefalse", marks:2, q:"Using information from the story, tick one box in each row to show whether each statement is true or false.",
+        statements:[
+          { text:"Yusuf translated everything Mrs Achebe said accurately.", answer:false },
+          { text:"Mr Hallam could not explain why Yusuf does the minimum.", answer:true },
+          { text:"Baba noticed that Yusuf had shortened Mrs Achebe's words.", answer:true },
+          { text:"Baba was angry with Yusuf at the bus stop.", answer:false }
+        ],
+        explanation:"Yusuf refused to pass on Baba's question and replaced it with “He says thank you very much.” Mr Hallam says, “I do not know. Honestly. I have not asked him.” Baba says, “I could hear it… You spoke for two seconds.” At the bus stop Baba explains the arrangement calmly and then repeats the praise to the window." },
+
+      { code:"2h", marks:2, q:"Compare how Yusuf handles Mrs Achebe's meeting with how he handles Mr Hallam's meeting.",
+        keywords:[["achebe","first","praise","compliment","good"],["hallam","maths","criticism","difficult","hard","bad"],["everything","all of it","full","honest","truth","did not change"]],
+        answerExpected:"With Mrs Achebe he leaves things out to keep it comfortable; with Mr Hallam he passes on the criticism in full, even though it is about him.",
+        answerGreaterDepth:"In the easy meeting Yusuf edits: he refuses to ask Baba's question and invents “He says thank you very much.” In the hard meeting, where he has far more to lose, he translates everything — the criticism, Baba's question back, and even Mr Hallam's admission that he does not know the reason, “including the pause”. The comparison shows him choosing honesty exactly when it costs him something.",
+        steps:["Find what Yusuf leaves out in the first meeting.","Find what he includes in the second, even though it is about himself.","Explain why the second is harder than the first."] },
+
+      { code:"2e", marks:1, q:"Baba's last line is “One of the quickest in the room,” said to the window. Predict what this suggests about what he will do next.",
+        keywords:[["proud","pleased","remember","hold on","kept","praise","encourag","use it","not forget"]],
+        answerExpected:"He is holding on to the praise, so he is likely to encourage Yusuf rather than only tell him off.",
+        answerGreaterDepth:"Of everything said that evening, the line he repeats is the praise, not the criticism — and he says it half to himself, on the way home. That suggests he is proud, and that when the “homework for both of you” begins he is more likely to start from what Yusuf can do than from what he has not done.",
+        steps:["Notice which part of the evening Baba chooses to repeat.","Think about what repeating it quietly, to the window, shows."] }
+    ]
+  },
+  {
+    id: "how-canal-locks-work",
+    genre: "Non-fiction",
+    title: "How a Canal Lock Works",
+    teaser: "A canal lock lifts a loaded boat uphill without a single engine. It uses gravity, two sets of gates and patience.",
+    text: `Water will not flow uphill. This is an enormous problem if you want to move coal across a country, and it is the problem canals were built to solve.
+
+A canal is a man-made river with no current, dug as flat as possible so that a boat can be pulled along it easily. Flat is fine until the land stops being flat. Hills, valleys and river crossings all get in the way, and you cannot simply tilt a canal, because the water would run out of the bottom end.
+
+The answer is the lock: a watertight chamber with a gate at each end, which acts like a step for boats.
+
+HOW THE STEP WORKS
+
+Imagine a boat travelling uphill, with low water behind it and high water ahead.
+
+First, the chamber is emptied down to the level of the low water, so that the bottom gates can be opened. They can only open when the water is level on both sides, because water pressing on one side of a gate is far too heavy to push against.
+
+The boat comes in. The bottom gates are shut behind it.
+
+Now the crew opens the paddles. These are small sliding doors, set into the top gates or into tunnels called culverts that run alongside the chamber. Opening them lets the high water at the far end pour into the chamber.
+
+The chamber fills. The boat rises with it, floating upwards inside the walls until it is sitting level with the canal ahead.
+
+Now the top gates will open, because the water is once again level on both sides. The boat travels out onto the higher stretch, several metres above where it started. To come back down, the same process is run backwards.
+
+NO ENGINE ANYWHERE
+
+The remarkable part is that nothing is pumped. Every drop of water that lifts the boat arrives by gravity, from the canal above. A single crew member with a handle can raise a loaded boat weighing many tonnes, because they are not lifting the boat at all. They are simply opening a hole and letting water do the work.
+
+The gates themselves use the same trick. Most lock gates meet in a shallow V-shape that points towards the higher water. The weight of that water pushes the two gates together, so the harder the water presses, the more tightly the lock seals itself.
+
+WHY BOTH ENDS ARE NEVER OPEN
+
+The one rule that matters is that the top and bottom gates must never be open at the same time. If they were, the canal above would simply drain through the chamber and away down the hill. The lock would stop being a step and become a leak.
+
+THE COST OF GOING UP
+
+Every boat that travels uphill uses one chamber full of water, which flows down from the upper stretch and is never coming back. On a busy canal that adds up to a great deal of water flowing steadily downhill all summer.
+
+This is why canal builders also built reservoirs. High up near the summit, where the canal is at its highest point, reservoirs store water and feed it in to replace what the locks send down. In a dry year the water in those reservoirs, not the boats, decides how many can pass.
+
+A FLIGHT OF LOCKS
+
+Where a canal has to climb a hill quickly, engineers build locks one after another in a flight. At Caen Hill, on the Kennet and Avon Canal in Wiltshire, there are twenty-nine locks in a row, sixteen of them running straight up the hillside in an unbroken line.
+
+Working a boat up the whole flight takes most of a day. Crews arrive early, and they help each other, because a lock is easier with two people and because everybody is going the same speed.
+
+STILL RUNNING
+
+Britain's canals were built for cargo and lost that work to the railways within a lifetime. Many were abandoned, filled in or left to silt up, and Caen Hill itself sat derelict for decades before volunteers restored it.
+
+The locks that survived still work the way they always did. There is no newer version. A gate, a paddle, a chamber and gravity turned out to be difficult to improve on.`,
+    questions: [
+      { code:"2b", type:"tick-one", marks:1, q:"What problem were canal locks invented to solve?",
+        options:["Canal water freezing in winter","Boats needing to travel between different water levels","Boats travelling too quickly on canals","Canals becoming blocked with silt"], correct:1,
+        explanation:"The text opens by explaining that “water will not flow uphill”, and that a canal cannot be tilted. A lock “acts like a step for boats” between a lower level and a higher one." },
+
+      { code:"2a", marks:1, q:"Find and copy the word the text uses for the tunnels that run alongside the chamber.",
+        keywords:[["culvert"]], answerExpected:"culverts",
+        answerGreaterDepth:"culverts — “tunnels called culverts that run alongside the chamber”.",
+        steps:["Look in the section about paddles.","Find the technical word given for the tunnels."] },
+
+      { code:"2c", marks:2, q:"Summarise the steps a boat goes through to travel uphill through a lock.",
+        keywords:[["empt","lower","down to","level"],["in","enters","comes in","shut","close"],["paddle","fill","fills","rises","water in"],["open","out","leaves","top gates"]],
+        answerExpected:"The chamber is emptied to the lower level, the bottom gates open and the boat comes in, the gates shut, the paddles are opened so the chamber fills and the boat rises, then the top gates open and the boat leaves.",
+        answerGreaterDepth:"First the chamber is emptied down to match the low water so the bottom gates can be opened. The boat enters and the bottom gates are shut behind it. The crew then opens the paddles in the top gates or culverts, letting water in from the higher stretch, and the chamber fills so the boat floats upwards. Once the water is level with the canal ahead, the top gates open and the boat travels out several metres higher than it started.",
+        steps:["Find the section headed “How the step works”.","List the stages in order, without copying whole sentences.","Make sure your summary ends with the boat leaving the lock."] },
+
+      { code:"2e", marks:2, q:"Predict what would happen if a crew opened the top paddles while the bottom gates were still open. Use the text to explain.",
+        keywords:[["straight through","through","out","drain","away","escape","pour"],["not fill","would not fill","never fill","no rise","not rise","wasted","waste"]],
+        answerExpected:"The water would pour straight through the chamber and out of the bottom gates, so the chamber would never fill and the boat would not rise.",
+        answerGreaterDepth:"With both ends open the chamber is no longer sealed, so water from the upper stretch would run in at one end and straight out at the other. The level inside could never climb above the lower canal, so the boat would not rise at all. The text warns of exactly this: the canal above “would simply drain through the chamber and away down the hill”, and the lock “would stop being a step and become a leak”, wasting the water that reservoirs exist to replace.",
+        steps:["Find the rule about both sets of gates.","Work out where the water would go if there were nothing to stop it.","Say what this means for the boat, and for the canal above."] },
+
+      { code:"2f", marks:2, q:"Why do you think the writer explains the V-shape of the gates straight after saying that nothing is pumped?",
+        keywords:[["same","also","another","again","both","trick","idea"],["water","pressure","weight","gravity","push","itself","free"]],
+        answerExpected:"Because it is another example of the same idea — the water's own weight does the work instead of machinery.",
+        answerGreaterDepth:"The section is building one argument: that a lock gets its power from water rather than engines. Having shown that the water lifts the boat for free, the writer immediately shows that the same water also seals the gates, since its pressure pushes the V together. Putting them side by side makes the point stronger than either example would alone.",
+        steps:["Look at what the section is arguing overall.","Notice that both examples have water doing a job for free.","Explain why the writer puts them next to each other."] },
+
+      { code:"2b", type:"truefalse", marks:2, q:"Using information from the text, tick one box in each row to show whether each statement is true or false.",
+        statements:[
+          { text:"Lock gates can be opened when the water is higher on one side than the other.", answer:false },
+          { text:"Water is pumped up into the lock chamber by a machine.", answer:false },
+          { text:"Every boat travelling uphill uses a chamber full of water.", answer:true },
+          { text:"Caen Hill has twenty-nine locks.", answer:true }
+        ],
+        explanation:"Gates “can only open when the water is level on both sides”. “Nothing is pumped” — the water arrives by gravity. “Every boat that travels uphill uses one chamber full of water.” At Caen Hill “there are twenty-nine locks in a row”." },
+
+      { code:"2e", marks:2, q:"Predict what might happen on a canal after several months with very little rain. Use the text to explain your answer.",
+        keywords:[["reservoir","store","stored","supply","water level","low"],["fewer","limit","restrict","stop","closed","queue","how many","cannot"]],
+        answerExpected:"The reservoirs would run low, so fewer boats would be allowed through the locks.",
+        answerGreaterDepth:"Each uphill boat sends a chamber of water down the hill for good, and that loss is normally replaced from reservoirs near the summit. With little rain the reservoirs cannot refill, so there is not enough water to keep spending. The text says outright that in a dry year “the water in those reservoirs, not the boats, decides how many can pass”, so restrictions on lock use are the likely result.",
+        steps:["Find out where the water that refills a canal comes from.","Work out what happens to that supply without rain.","Use the sentence about a dry year to support your prediction."] },
+
+      { code:"2h", marks:2, q:"Compare how canals were used when they were first built with how they are used now.",
+        keywords:[["cargo","coal","goods","freight","trade","work"],["railway","lost","abandoned","derelict","silt","filled in"],["restor","volunteer","survive","still","leisure","today","now"]],
+        answerExpected:"They were built to carry cargo such as coal, lost that work to the railways and were abandoned, and the surviving ones were restored and still work today.",
+        answerGreaterDepth:"Canals began as freight routes — the opening paragraph gives moving coal across the country as the reason they exist. Within a lifetime the railways took that trade, and many canals were abandoned, filled in or left to silt up, with Caen Hill itself derelict for decades. What survives has been restored by volunteers and still operates on exactly the original principle, since “there is no newer version” of a gate, a paddle and gravity.",
+        steps:["Find why canals were built in the first place.","Find what happened to them after the railways arrived.","Explain what they are like now, and what has stayed the same."] }
+    ]
+  },
+  {
+    id: "why-bread-goes-stale",
+    genre: "Non-fiction",
+    title: "Why Bread Goes Stale",
+    teaser: "Stale bread has not dried out. Something stranger is happening inside it, and putting it in the fridge makes it worse.",
+    text: `Everybody knows what stale bread is. Yesterday's loaf is softer on the outside and harder on the inside, and toast made from it is never quite the same.
+
+Almost everybody also knows why it happens, and almost everybody is wrong. Bread does not go stale because it dries out.
+
+THE EXPERIMENT THAT PROVES IT
+
+Seal a slice of fresh bread inside an airtight bag so that not a single drop of water can escape. Leave it on the counter for two days. When you open the bag, the bread will be stale.
+
+No water has left the loaf. It is all still in there. Whatever staling is, it is not simply drying.
+
+WHAT IS ACTUALLY HAPPENING
+
+The answer is hiding in the flour, in a substance called starch.
+
+Starch is stored in tiny grains, and inside each grain the starch molecules are packed together in a neat, ordered pattern, rather like bricks stacked in a wall. Raw flour is full of these tidy little packages, which is why uncooked flour tastes of almost nothing and cannot be chewed pleasantly.
+
+Baking wrecks that order, and wrecking it is the whole point. In the heat of the oven, the grains soak up water and swell, and the neat pattern breaks apart into a soft, disorganised, jelly-like mass. That soft disorder is what we mean by fresh bread.
+
+The trouble is that the starch does not want to stay disorganised. Slowly, over hours, the molecules creep back into their ordered pattern. They shuffle towards each other, line up, and lock together again — and as they do, they squeeze out the water they were holding.
+
+Scientists call this retrogradation. The rest of us call it stale.
+
+WHERE THE WATER GOES
+
+The squeezed-out water does not disappear. It moves.
+
+It drifts outwards from the soft middle of the loaf, which bakers call the crumb, towards the crust. This explains the strangest thing about a stale loaf: the crumb becomes hard and dry while the crust, which started out crisp, turns soft and leathery. The loaf has not lost water at all. It has simply moved it from where you wanted it to where you did not.
+
+THE FRIDGE IS THE WORST PLACE
+
+Here is the fact that surprises people most. Starch recrystallises fastest at temperatures just above freezing — which is precisely the temperature inside a domestic fridge.
+
+A loaf in the fridge goes stale several times faster than the same loaf left in a bread bin. Cold slows down mould, which is why the habit persists, but it speeds up staling dramatically. Unless mould is the bigger worry, the bread bin wins.
+
+A freezer is a different matter. Below about minus seven degrees the molecules can barely move at all, so retrogradation nearly stops. Bread frozen on the day it is baked, and defrosted later, is genuinely close to fresh.
+
+THE TRICK THAT UNDOES IT
+
+Staling is one of the very few kitchen processes that can be reversed.
+
+Heat a stale loaf to around sixty degrees and the crystals that have formed simply melt apart again. The starch returns to its soft, disordered state, and the bread comes out of the oven tasting startlingly fresh. This is a real reversal, not a disguise.
+
+There is a catch. Once the loaf cools, the molecules start lining up again immediately, and they do it faster than the first time. A revived loaf goes stale again within hours, and it can only be rescued a small number of times before the water needed for the trick has finally escaped as steam.
+
+WHY ANY OF THIS MATTERS
+
+Around a fifth of the bread bought in Britain is thrown away, and a great deal of it is thrown away stale rather than mouldy.
+
+Stale is not off. It is not spoiled, and it is not unsafe. It is a physical rearrangement that a hot oven can largely undo — which is exactly what bread pudding, croutons, French toast and panzanella were all invented to take advantage of, long before anybody knew what starch was.`,
+    questions: [
+      { code:"2b", type:"tick-one", marks:1, q:"According to the text, why does bread go stale?",
+        options:["Water evaporates out of the loaf","Starch molecules move back into an ordered pattern","Mould grows inside the crumb","Air gets into the bread bin"], correct:1,
+        explanation:"The text says baking breaks starch into a soft, disorganised mass, and that staling happens because “the molecules creep back into their ordered pattern” and squeeze out the water. Scientists call this retrogradation." },
+
+      { code:"2a", marks:1, q:"Find and copy the word bakers use for the soft middle of a loaf.",
+        keywords:[["crumb"]], answerExpected:"crumb",
+        answerGreaterDepth:"crumb — “the soft middle of the loaf, which bakers call the crumb”.",
+        steps:["Look in the section headed “Where the water goes”.","Find the word given for the soft inside part."] },
+
+      { code:"2e", marks:2, q:"A friend buys a fresh loaf on Monday and will not need it until Friday. Predict what the text would advise, and explain why.",
+        keywords:[["freez","freezer","frozen"],["fridge","refrigerat","cold shelf"],["slow","stops","barely move","nearly stops","fastest","worse","speeds"]],
+        answerExpected:"Freeze it straight away, because freezing nearly stops staling, while the fridge would make it stale faster.",
+        answerGreaterDepth:"The text says starch recrystallises fastest just above freezing, so a fridge is the worst possible place and a loaf there goes stale several times faster than one in a bread bin. Below about minus seven degrees the molecules can barely move, so retrogradation nearly stops. Bread frozen on the day it is baked and defrosted later is “genuinely close to fresh”, which makes the freezer the right choice for Friday.",
+        steps:["Find what the text says about the fridge, and why.","Find what it says about the freezer, and why that is different.","Give the advice and the reason together."] },
+
+      { code:"2c", marks:2, q:"Summarise what happens to starch in bread, from raw flour through to a stale loaf.",
+        keywords:[["raw","flour","neat","ordered","packed","tidy","grain"],["bake","oven","heat","swell","soak","break","soft","disorder"],["back","again","line up","lock","recrystall","squeeze","water out"]],
+        answerExpected:"In raw flour the starch is packed in a neat pattern; baking makes it soak up water, swell and break into a soft disordered mass; then it slowly lines up again and squeezes the water out.",
+        answerGreaterDepth:"Starch begins in tiny grains where the molecules are stacked in a tidy, ordered pattern, which is why raw flour is unpleasant to eat. In the oven the grains absorb water and swell, and that order breaks down into a soft, jelly-like disorder — this is fresh bread. Over the following hours the molecules gradually shuffle back into line and lock together again, pushing out the water they had been holding, and the loaf becomes stale.",
+        steps:["Find the three stages: raw flour, baking, and the hours afterwards.","Describe what the starch molecules are doing at each stage.","Keep it to the starch, not the crust."] },
+
+      { code:"2g", marks:2, q:"The writer says baking “wrecks that order, and wrecking it is the whole point.” Why is “wrecks” an effective word choice here?",
+        keywords:[["destroy","violent","damage","break","strong","forceful","total"],["good","point","want","deliberate","purpose","needed","supposed"]],
+        answerExpected:"“Wrecks” sounds destructive and violent, which is surprising when the writer immediately says it is exactly what we want to happen.",
+        answerGreaterDepth:"Wrecking is normally accidental and bad, so the word makes the change sound total and forceful rather than gentle — which is accurate, since the neat structure is completely broken apart. The second half of the sentence then turns the expectation around by saying the wrecking is the whole point, and that contrast makes the idea stick: the damage is the thing you were baking for.",
+        steps:["Think about what “wrecks” usually suggests.","Notice what the writer says immediately afterwards.","Explain the effect of putting those two ideas in one sentence."] },
+
+      { code:"2f", marks:2, q:"Why does the writer describe the airtight bag experiment before explaining what staling actually is?",
+        keywords:[["wrong","dries","drying","disprove","prove","rule out","not"],["before","first","then","ready","accept","believe","explanation"]],
+        answerExpected:"It disproves the common belief that bread dries out, so the reader is ready to accept the real explanation.",
+        answerGreaterDepth:"The writer has just claimed that almost everybody is wrong about staling, and a reader who still believes bread dries out will not accept anything that follows. The sealed bag settles it in one step: no water can escape, and the bread goes stale anyway. Clearing the wrong idea away first means the explanation about starch lands on an open mind rather than an argument.",
+        steps:["Find the belief the writer says is wrong.","Work out what the bag experiment proves.","Explain why proving it first helps the rest of the text."] },
+
+      { code:"2b", type:"truefalse", marks:2, q:"Using information from the text, tick one box in each row to show whether each statement is true or false.",
+        statements:[
+          { text:"Bread sealed in an airtight bag will stay fresh for two days.", answer:false },
+          { text:"The crust of a stale loaf becomes softer than it was.", answer:true },
+          { text:"Staling can be partly reversed by heating the loaf.", answer:true },
+          { text:"Stale bread is unsafe to eat.", answer:false }
+        ],
+        explanation:"Sealed bread still goes stale — no water leaves it. Water moves from crumb to crust, so the crust “turns soft and leathery”. Heating to around sixty degrees melts the crystals apart. The text states plainly that stale “is not off… not spoiled, and it is not unsafe.”" },
+
+      { code:"2h", marks:2, q:"Compare what happens to a loaf kept in a bread bin with what happens to the same loaf kept in a fridge.",
+        keywords:[["bin","counter","room","warm"],["fridge","refrigerat","cold","just above freezing"],["faster","several times","quicker","worse","slower","less"]],
+        answerExpected:"The loaf in the fridge goes stale several times faster than the one in the bread bin, because starch recrystallises fastest just above freezing.",
+        answerGreaterDepth:"Both loaves stale, but at very different speeds. Retrogradation is fastest at temperatures just above freezing, which is exactly the inside of a fridge, so that loaf hardens several times faster than the one in the bin. The fridge does slow mould down, which is why people keep doing it, but unless mould is the bigger worry the text says the bread bin wins.",
+        steps:["Find the temperature at which starch recrystallises fastest.","Match that temperature to one of the two places.","Include the one advantage the fridge does have."] }
+    ]
+  },
+  {
+    id: "poem-wednesday-swimming",
+    genre: "Poetry",
+    title: "Wednesday Swimming",
+    teaser: "A poem about the school swimming lesson, the blue float, and the moment somebody lets go of it.",
+    text: `WEDNESDAY SWIMMING
+
+The coach smelled of other people's crisps
+and we sat in register order,
+which meant I sat by Danny Rees,
+who had already been swimming twice
+that week, privately, with a man called Coach.
+
+The pool smelled like the inside of a kettle.
+
+They put us in three lanes:
+the ones who could,
+the ones who nearly could,
+and us.
+
+We had the shallow end and a woman named Bev
+with a whistle and a voice
+that could get across water,
+which is harder than it sounds.
+
+Bev gave me a blue float,
+and I held it the way you hold a handrail
+on a coach that is going too fast,
+and she said, Lovely. Now let go.
+
+I said, Of it?
+
+She said, Of it.
+
+I want to be honest about the next part.
+I did not let go.
+Not that Wednesday, or the one after,
+or the one after that, when Danny Rees
+swam a length of butterfly
+and the ones who could all watched him
+and the ones who nearly could all watched him
+and Bev said, without looking up,
+Nice. Kevin. Let go of the float.
+
+My name is not Kevin.
+Bev knew that.
+Bev had known that since September.
+It was, I worked out later,
+a joke, and it was, I worked out later,
+the first joke anyone had made
+that I was inside of, rather than underneath.
+
+So on the fourth Wednesday, in March,
+with the windows white with steam
+and my ears full of somebody's whistle,
+I let go of the blue float.
+
+Nothing happened.
+
+I want to be clear that nothing happened.
+I did not sink, and I did not swim.
+I stood in four feet of water
+holding nothing,
+which turns out to be the entire skill,
+and Bev said, There you go, Kevin,
+and turned round to shout at the deep end,
+
+and I stood there, holding nothing,
+for about nine seconds,
+which is not very long
+unless you have spent four weeks
+not doing it.`,
+    questions: [
+      { code:"2b", type:"tick-one", marks:1, q:"Which group is the speaker placed in for the lesson?",
+        options:["The ones who could","The ones who nearly could","The group in the shallow end with Bev","The group with Coach"], correct:2,
+        explanation:"The poem lists three lanes — “the ones who could, / the ones who nearly could, / and us” — and then says “We had the shallow end and a woman named Bev.”" },
+
+      { code:"2g", marks:2, q:"The pool “smelled like the inside of a kettle”. What does this comparison suggest?",
+        keywords:[["warm","hot","steam","damp","humid","muggy","wet air"],["metal","mineral","chemical","chlorine","limescale","sharp","stale"]],
+        answerExpected:"It suggests a warm, steamy, slightly metallic smell — damp air with a chemical edge to it.",
+        answerGreaterDepth:"The inside of a kettle is hot, wet and faintly metallic from limescale, so the comparison captures the heavy, humid air of a pool and the chemical sharpness of chlorine at the same time. It is also an indoor, domestic image, which quietly makes the pool feel closed-in and familiar rather than exciting.",
+        steps:["Picture and smell the inside of a kettle: what is it like in there?","Match those qualities to the air in an indoor pool.","Give both the warmth and the sharpness."] },
+
+      { code:"2d", marks:2, q:"Why does the speaker mention that Danny Rees had “already been swimming twice that week, privately, with a man called Coach”?",
+        keywords:[["extra","private","lessons","advantage","ahead","money","afford","help"],["unfair","difference","gap","compare","contrast","not","while"]],
+        answerExpected:"It shows Danny has extra private lessons the speaker does not, which explains the gap between them.",
+        answerGreaterDepth:"The detail is dropped in casually but does a lot of work. Danny is not simply better — he has more practice and a private coach, which most of the class will not have. Setting that against a speaker still clinging to a float in the shallow end quietly points out that the three lanes are not only about ability, and the capital letter on “Coach” makes the private lessons sound slightly absurd.",
+        steps:["Think about what private extra lessons would cost and who gets them.","Compare Danny's situation with the speaker's.","Explain what the detail adds beyond telling us Danny is good."] },
+
+      { code:"2e", marks:2, q:"After Bev says “Now let go,” predict what you expect to happen next, and explain how the poem surprises you.",
+        keywords:[["let go","lets go","drop","release","straight away","immediately","then"],["did not","doesn't","four","weeks","refuses","keeps holding","not that wednesday"]],
+        answerExpected:"You expect the speaker to let go there and then, but the poem says plainly that they did not, for four weeks.",
+        answerGreaterDepth:"The instruction and the short exchange set up an obvious next step, and most stories would take it. Instead the speaker interrupts to say, “I want to be honest about the next part. / I did not let go,” and lists the Wednesdays that go by. The surprise is the honesty and the delay, which makes the eventual moment matter far more than an instant success would have.",
+        steps:["Say what Bev's instruction leads you to expect.","Find the line where the speaker interrupts to correct that expectation.","Explain the effect of the delay."] },
+
+      { code:"2a", marks:1, q:"Find and copy the word the poet uses to describe the windows in March.",
+        keywords:[["white"]], answerExpected:"white",
+        answerGreaterDepth:"white — “with the windows white with steam”.",
+        steps:["Find the stanza set on the fourth Wednesday.","Look at how the windows are described."] },
+
+      { code:"2f", marks:2, q:"The line “Nothing happened” is repeated, with the second one on its own line. Why is this effective?",
+        keywords:[["repeat","again","twice","emphasis","stress","slow","pause"],["big","matter","important","everything","not nothing","to them","huge"]],
+        answerExpected:"The repetition slows the poem down and insists on the flatness, which is what makes the moment matter so much to the speaker.",
+        answerGreaterDepth:"Saying it twice, the second time as a separate statement, forces the reader to stop on it. It also sets up a contradiction the poem wants: to everyone else, genuinely nothing happened — no sinking, no swimming, no length of butterfly. To the speaker it is the whole achievement. The blankness of the phrase is exactly what gives the ending its weight.",
+        steps:["Notice where the repetition falls and how the lines are broken.","Ask who “nothing happened” is true for.","Explain the gap between how it looks and how it feels."] },
+
+      { code:"2h", marks:2, q:"Compare how the speaker feels about Bev at the start of the poem with how they feel about her by the end.",
+        keywords:[["whistle","voice","shout","instruct","stranger","just","name"],["joke","kevin","inside of","warm","fond","kind","noticed","affection"]],
+        answerExpected:"At the start she is just a woman with a whistle giving instructions; by the end the speaker feels included by her, because of the Kevin joke.",
+        answerGreaterDepth:"Bev is introduced as a job rather than a person — a whistle and a voice that carries over water. The turn comes with the wrong name, which the speaker works out was deliberate and was “the first joke anyone had made / that I was inside of, rather than underneath.” By the end her offhand “There you go, Kevin” reads as warmth, even though she turns away immediately.",
+        steps:["Find how Bev is first described.","Find what the speaker realises about the name Kevin.","Explain the change using the phrase “inside of, rather than underneath”."] },
+
+      { code:"2e", marks:2, q:"Predict what the speaker is likely to do on the fifth Wednesday. Use evidence from the poem.",
+        keywords:[["let go","without","again","float","stand","longer","try"],["nine seconds","four weeks","hardest","already","done it","first time"]],
+        answerExpected:"They will let go again, and probably for longer, because the hardest part was doing it the first time.",
+        answerGreaterDepth:"The poem frames the difficulty as entirely mental: standing in four feet of water holding nothing “turns out to be the entire skill”, and the nine seconds only counts as an achievement because of the four weeks of not doing it. Now that the speaker knows nothing bad happens, there is nothing left to be afraid of, so letting go again — and for longer than nine seconds — is the likely next step.",
+        steps:["Work out what was actually stopping the speaker for four weeks.","Decide whether that obstacle still exists after the fourth Wednesday.","Predict, and back it up with a line from the ending."] }
+    ]
+  },
 ];
