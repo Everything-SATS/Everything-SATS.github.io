@@ -971,6 +971,23 @@ function genClauses(diff){
 }
 function clauseResult(s, conj, isRelative){
   const kind = isRelative ? "relative pronoun that starts the relative clause" : "conjunction that joins the two clauses";
+  /* The real papers say "Underline the subordinate clause" as often as they ask
+     a question about it, so about half the time the sentence is offered as
+     clickable words instead of a question to answer in writing. */
+  if(Math.random() < 0.5){
+    return {
+      text: `Click the ${kind} in this sentence.`,
+      sentence: s,
+      targets: [String(conj).toLowerCase()],
+      answer: conj,
+      steps: [
+        isRelative
+          ? `A relative clause gives extra information about a noun, and starts with a relative pronoun like who, which, where or why.`
+          : `This sentence has a main clause and a subordinate clause, joined by a conjunction.`,
+        `"${conj}" is the answer here.`,
+      ],
+    };
+  }
   return {
     text: `What is the ${kind} in this sentence? — "${s}"`,
     answer: conj,
@@ -1085,13 +1102,15 @@ function genStandardEnglish(diff){
     const [word, syn, ant] = bagChoice('synant', SYN_ANT_BANK);
     if(diff === 1 && Math.random() < 0.5){
       return {
-        text: `Which word means the OPPOSITE of "${word}": "${syn}" or "${ant}"?`,
+        text: `Which word means the OPPOSITE of "${word}"?`,
+        options: Math.random() < 0.5 ? [syn, ant] : [ant, syn],
         answer: ant,
         steps: [ `"${syn}" means almost the same as "${word}" — that's a synonym.`, `"${ant}" means the opposite of "${word}" — that's an antonym, and the answer here.` ],
       };
     }
     return {
-      text: `Which word means almost the SAME as "${word}": "${syn}" or "${ant}"?`,
+      text: `Which word means almost the SAME as "${word}"?`,
+      options: Math.random() < 0.5 ? [syn, ant] : [ant, syn],
       answer: syn,
       steps: [ `"${syn}" means almost the same as "${word}" — this is called a synonym.`, `"${ant}" means the opposite, so it isn't the answer.` ],
     };
@@ -1110,7 +1129,8 @@ function genStandardEnglish(diff){
   if(Math.random() < 0.5){
     const [informal, formal] = bagChoice('stdeng3-formal', FORMAL_PAIRS);
     return {
-      text: `Which word or phrase is the more formal choice: "${informal}" or "${formal}"?`,
+      text: `Which word or phrase is the more formal choice?`,
+      options: Math.random() < 0.5 ? [informal, formal] : [formal, informal],
       answer: formal,
       steps: [
         `Formal writing avoids everyday, conversational wording.`,
@@ -1514,11 +1534,25 @@ const ANSWER_TRIES  = 10;  // attempts before accepting a repeat
    alternatives a child has to rule out, not filler. Topics whose answers are
    open-ended (spell this word, write this verb form) keep the text box, as the
    real papers do for the same kind of question. */
+const PREFIX_POOL = ["un", "dis", "im", "in", "ir", "il", "mis", "non", "re", "pre",
+  "inter", "sub", "super", "auto", "anti", "semi", "trans", "over", "under", "de"];
+const PREFIX_MEANING_POOL = ["not", "again", "before", "between", "under", "above or beyond",
+  "by itself or by oneself", "against", "wrongly", "half", "across", "very small", "two",
+  "three", "out or former", "together", "too much", "too little", "to remove or reverse"];
+const MODAL_POOL = ["must", "might", "should", "could", "will", "can", "may", "would",
+  "shall", "ought"];
+
 const ANSWER_POOLS = {
   punctuation: [",", ".", "?", "!", "'", ":", ";", "-"],
   sentencetype: ["statement", "question", "command", "exclamation"],
   clauses: ["because", "when", "if", "after", "before", "until", "so",
             "although", "while", "since", "whenever", "who", "which", "where", "why"],
+  /* Broad on purpose. The membership test in applyAnswerFormat means these only
+     take effect on the tiers whose answer really is one of the listed items --
+     the tiers that ask for a spelling keep the text box, which is what the real
+     papers do for that kind of question too. */
+  prefixsuffix: PREFIX_POOL.concat(PREFIX_MEANING_POOL),
+  verbforms: MODAL_POOL,
 };
 const TICK_ONE_SHARE = 0.55;   // the rest keep the text box
 
@@ -1538,8 +1572,35 @@ function buildOptions(answer, pool, howMany){
   return all;
 }
 
+/* Apostrophe questions are not a choice from a fixed list -- the alternatives
+   are the same word with the apostrophe in the wrong place, or missing, which
+   is exactly what the real papers put in front of a child. Build those. */
+function apostropheDistractors(answer){
+  const a = String(answer);
+  if(a.indexOf("'") === -1) return null;
+  const out = new Set();
+  out.add(a.replace(/'/g, ""));                       // apostrophe left out
+  if(/'s\b/.test(a)) out.add(a.replace(/'s\b/, "s'"));  // s' instead of 's
+  if(/s'(?!\w)/.test(a)) out.add(a.replace(/s'/, "'s")); // 's instead of s'
+  if(/s'(?!\w)/.test(a)) out.add(a.replace(/s'/, "s's"));  // the common double-s slip
+  out.delete(a);
+  return [...out].filter(Boolean).slice(0, 3);
+}
+
 function applyAnswerFormat(q, topicId){
   if(q.options || q.targets) return q;            // the generator already chose
+  if(topicId === 'apostrophes' && Math.random() < TICK_ONE_SHARE){
+    const wrong = apostropheDistractors(q.answer);
+    if(wrong && wrong.length){
+      const all = wrong.concat([String(q.answer)]);
+      for(let i = all.length - 1; i > 0; i--){
+        const j = randInt(0, i);
+        [all[i], all[j]] = [all[j], all[i]];
+      }
+      q.options = all;
+      return q;
+    }
+  }
   const pool = ANSWER_POOLS[topicId];
   if(!pool) return q;
   // only offer a choice when the answer really is one of the pool
