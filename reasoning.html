@@ -1505,10 +1505,21 @@ const GENERATORS = {
    lower box (recently wrong / new) = more frequent, higher box (mastered) = rarer.
    Correct answer -> box + 1 (max 5). Wrong answer -> box back to 1. */
 function loadProgress(){
+  /* Always build from TOPICS, then fill in whatever was saved. Returning the
+     saved object directly meant that adding a topic broke the page for every
+     returning visitor: the new id had no entry, so progress[t.id].box threw
+     and nothing rendered. Anything saved for a topic that no longer exists is
+     dropped on the way through. */
+  let saved = null;
   const raw = localStorage.getItem('sats_reasoning_progress');
-  if(raw){ try { return JSON.parse(raw); } catch(e){} }
+  if(raw){ try { saved = JSON.parse(raw); } catch(e){} }
   const fresh = {};
-  TOPICS.forEach(t => fresh[t.id] = { box:1, correct:0, attempted:0 });
+  TOPICS.forEach(t => {
+    const prev = saved && saved[t.id];
+    fresh[t.id] = (prev && typeof prev.box === 'number')
+      ? { box: prev.box, correct: prev.correct || 0, attempted: prev.attempted || 0 }
+      : { box:1, correct:0, attempted:0 };
+  });
   return fresh;
 }
 function saveProgress(){ localStorage.setItem('sats_reasoning_progress', JSON.stringify(progress)); }

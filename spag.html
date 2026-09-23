@@ -318,6 +318,23 @@
   footer{max-width:640px; margin:0 auto; padding:24px 20px 12px; text-align:center; color:var(--ink-soft); font-size:.78rem; line-height:1.7}
   footer a{color:var(--ink-soft)}
 
+
+/* Answer formats: a tick-one list, or the sentence as clickable words. */
+.answer-choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.answer-choices.tick{flex-direction:column}
+.answer-choices.tick .choice{width:100%;text-align:left}
+.choice{font:inherit;font-size:16px;padding:10px 14px;border:2px solid var(--line,#d9dee5);
+  border-radius:10px;background:#fff;cursor:pointer;color:inherit}
+.choice:hover{border-color:var(--blue,#2f6fd0)}
+.choice.picked{border-color:var(--blue,#2f6fd0);background:var(--blue-light,#e8f0fc);font-weight:600}
+.choice:focus-visible{outline:3px solid var(--blue,#2f6fd0);outline-offset:2px}
+.word-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+.chip{font:inherit;font-size:16px;padding:4px 8px;border:2px dashed transparent;border-radius:8px;
+  background:transparent;cursor:pointer;color:inherit}
+.chip:hover{border-color:var(--line,#d9dee5)}
+.chip.picked{border-color:var(--blue,#2f6fd0);border-style:solid;background:var(--blue-light,#e8f0fc);font-weight:600}
+.chip.plain{cursor:default;padding-left:0;padding-right:0}
+.chip:focus-visible{outline:3px solid var(--blue,#2f6fd0);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -414,6 +431,7 @@
     <div class="question-text" id="questionText"></div>
     <div class="answer-row">
       <input type="text" id="answerInput" inputmode="text" placeholder="Type your answer" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div class="answer-choices" id="answerChoices" hidden></div>
       <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()">Check</button>
     </div>
     <div class="feedback-box" id="feedbackBox">
@@ -518,7 +536,11 @@ function pickWordClassQuestion(s, classes){
   const article = (targetClass === 'adjective' || targetClass === 'adverb') ? 'an' : 'a';
   const wordList = options.length > 1 ? `"${options.join('" or "')}"` : `"${primary}"`;
   return {
-    text: `Which word in this sentence is ${article} ${targetClass}? — "${s}"`,
+    text: `Click the word in this sentence that is ${article} ${targetClass}.`,
+    /* The real papers say "Circle the adverb", so the sentence is offered as
+       clickable words rather than asking the child to retype one of them. */
+    sentence: s,
+    targets: options.map(o => o.toLowerCase()),
     answer: primary.toLowerCase(),
     answerAliases: options.map(o => o.toLowerCase()),
     steps: [
@@ -1322,10 +1344,21 @@ const GENERATORS = {
    lower box (recently wrong / new) = more frequent, higher box (mastered) = rarer.
    Correct answer -> box + 1 (max 5). Wrong answer -> box back to 1. */
 function loadProgress(){
+  /* Always build from TOPICS, then fill in whatever was saved. Returning the
+     saved object directly meant that adding a topic broke the page for every
+     returning visitor: the new id had no entry, so progress[t.id].box threw
+     and nothing rendered. Anything saved for a topic that no longer exists is
+     dropped on the way through. */
+  let saved = null;
   const raw = localStorage.getItem('sats_spag_progress');
-  if(raw){ try { return JSON.parse(raw); } catch(e){} }
+  if(raw){ try { saved = JSON.parse(raw); } catch(e){} }
   const fresh = {};
-  TOPICS.forEach(t => fresh[t.id] = { box:1, correct:0, attempted:0 });
+  TOPICS.forEach(t => {
+    const prev = saved && saved[t.id];
+    fresh[t.id] = (prev && typeof prev.box === 'number')
+      ? { box: prev.box, correct: prev.correct || 0, attempted: prev.attempted || 0 }
+      : { box:1, correct:0, attempted:0 };
+  });
   return fresh;
 }
 function saveProgress(){ localStorage.setItem('sats_spag_progress', JSON.stringify(progress)); }
@@ -1470,6 +1503,100 @@ function startSession(kind){
 const ANSWER_WINDOW = 4;   // how far back a repeat still counts
 const ANSWER_TRIES  = 10;  // attempts before accepting a repeat
 
+/* ---------- Answer formats ----------
+   Counted in the five real GPS papers: about a third of questions are "tick
+   one", about half are mark-on-the-page (circle / underline / insert) and only
+   about a quarter ask the child to write. This page used to ask them to type
+   every answer, which is the single biggest difference from the real thing.
+
+   A topic listed here has an answer drawn from a known, finite set, which is
+   exactly what makes a fair multiple choice: the wrong options are real
+   alternatives a child has to rule out, not filler. Topics whose answers are
+   open-ended (spell this word, write this verb form) keep the text box, as the
+   real papers do for the same kind of question. */
+const ANSWER_POOLS = {
+  punctuation: [",", ".", "?", "!", "'", ":", ";", "-"],
+  sentencetype: ["statement", "question", "command", "exclamation"],
+  clauses: ["because", "when", "if", "after", "before", "until", "so",
+            "although", "while", "since", "whenever", "who", "which", "where", "why"],
+};
+const TICK_ONE_SHARE = 0.55;   // the rest keep the text box
+
+function buildOptions(answer, pool, howMany){
+  const answerText = String(answer);
+  const others = pool.filter(x => String(x).toLowerCase() !== answerText.toLowerCase());
+  const picked = [];
+  const rest = others.slice();
+  while(picked.length < (howMany || 3) && rest.length){
+    picked.push(rest.splice(randInt(0, rest.length - 1), 1)[0]);
+  }
+  const all = picked.concat([answerText]);
+  for(let i = all.length - 1; i > 0; i--){
+    const j = randInt(0, i);
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  return all;
+}
+
+function applyAnswerFormat(q, topicId){
+  if(q.options || q.targets) return q;            // the generator already chose
+  const pool = ANSWER_POOLS[topicId];
+  if(!pool) return q;
+  // only offer a choice when the answer really is one of the pool
+  if(!pool.some(x => String(x).toLowerCase() === String(q.answer).toLowerCase())) return q;
+  if(Math.random() < TICK_ONE_SHARE) q.options = buildOptions(q.answer, pool);
+  return q;
+}
+
+let chosenAnswer = null;
+
+function renderAnswerUI(q){
+  const box = document.getElementById('answerChoices');
+  const input = document.getElementById('answerInput');
+  chosenAnswer = null;
+  box.innerHTML = '';
+
+  const pick = (value, el) => {
+    chosenAnswer = value;
+    Array.prototype.forEach.call(box.querySelectorAll('.picked'), c => c.classList.remove('picked'));
+    el.classList.add('picked');
+  };
+
+  if(Array.isArray(q.options) && q.options.length){
+    input.hidden = true; box.hidden = false;
+    box.className = 'answer-choices tick';
+    q.options.forEach(opt => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'choice'; b.textContent = opt;
+      b.addEventListener('click', () => pick(opt, b));
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  if(q.sentence && Array.isArray(q.targets)){
+    input.hidden = true; box.hidden = false;
+    box.className = 'answer-choices word-chips';
+    // keep punctuation attached to the word, but ignore it when comparing
+    q.sentence.split(/\s+/).forEach(token => {
+      const bare = token.replace(/^[^A-Za-z']+|[^A-Za-z']+$/g, '');
+      if(!bare){
+        const span = document.createElement('span');
+        span.className = 'chip plain'; span.textContent = token;
+        box.appendChild(span);
+        return;
+      }
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.textContent = token;
+      b.addEventListener('click', () => pick(bare, b));
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  input.hidden = false; box.hidden = true;
+}
+
 function drawQuestion(topicId, diff){
   const recent = session.recentAnswers || (session.recentAnswers = []);
   let q = GENERATORS[topicId](diff);
@@ -1479,7 +1606,7 @@ function drawQuestion(topicId, diff){
   }
   recent.push(String(q.answer).trim());
   if(recent.length > ANSWER_WINDOW) recent.shift();
-  return q;
+  return applyAnswerFormat(q, topicId);
 }
 
 function loadQuestionAt(i){
@@ -1495,6 +1622,7 @@ function loadQuestionAt(i){
   document.getElementById('sessionProgress').textContent = `Question ${i+1} of ${session.topicIds.length}`;
   document.getElementById('questionText').textContent = session.currentQ.text;
   document.getElementById('answerInput').value = '';
+  renderAnswerUI(session.currentQ);
   document.getElementById('answerInput').disabled = false;
   document.getElementById('submitBtn').style.display = 'inline-block';
   document.getElementById('feedbackBox').className = 'feedback-box';
@@ -1531,8 +1659,10 @@ function checkAnswer(userInput, q){
 function submitAnswer(){
   const input = document.getElementById('answerInput');
   const q = session.currentQ;
-  if(!input.value.trim()) return;
-  const correct = checkAnswer(input.value, q);
+  const usingChoices = !document.getElementById('answerChoices').hidden;
+  const given = usingChoices ? chosenAnswer : input.value;
+  if(given === null || given === undefined || !String(given).trim()) return;
+  const correct = checkAnswer(String(given), q);
 
   // update progress
   const p = progress[q.topicId];
