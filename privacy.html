@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* GoatCounter events: counts which features get used (sessions started and
+   finished, Show me, passages, downloads). Anonymous like the page counter:
+   no cookies, nothing about who clicked. Silently does nothing if count.js
+   hasn't loaded or is blocked, so it can never break the page. */
+function gcEvent(path){
+  try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: path, event: true}); }catch(e){}
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -125,6 +134,7 @@
   <div class="notice-card">
     <h2>No ads, no trackers, nothing sold</h2>
     <p>There are no advertising scripts, no third-party trackers, and no analytics beyond the anonymous counter above. We don't sell, share, or rent any data to anyone, for the simple reason that we don't have any to sell.</p>
+    <p>The "chip in on Ko-fi" link at the bottom of each page is just a plain link. Nothing from Ko-fi loads on this site. If you click it you'll be on Ko-fi's own website, and <a href="https://more.ko-fi.com/privacy" target="_blank" rel="noopener">Ko-fi's privacy policy</a> applies there. We only count that the link was clicked, the same anonymous way as everything else.</p>
   </div>
 
   <div class="notice-card">
@@ -141,6 +151,7 @@
 </main>
 
 <footer>
+  <p class="donate-line">Everything here is free, for good. If it's helped, you can <a href="https://ko-fi.com/everythingsats" target="_blank" rel="noopener" style="color:var(--teal-dark); font-weight:700" onclick="gcEvent('donate-click/privacy')">chip in on Ko-fi ☕</a> — never needed, and it unlocks nothing.</p>
   <p>© 2026 Everything SATS™ — free, always. Owned and built by William Munro. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
   <p id="visitCount"></p>
 </footer>

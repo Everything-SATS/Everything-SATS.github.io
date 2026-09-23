@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* GoatCounter events: counts which features get used (sessions started and
+   finished, Show me, passages, downloads). Anonymous like the page counter:
+   no cookies, nothing about who clicked. Silently does nothing if count.js
+   hasn't loaded or is blocked, so it can never break the page. */
+function gcEvent(path){
+  try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: path, event: true}); }catch(e){}
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -237,6 +246,7 @@
 </main>
 
 <footer>
+  <p class="donate-line">Everything here is free, for good. If it's helped, you can <a href="https://ko-fi.com/everythingsats" target="_blank" rel="noopener" style="color:var(--teal-dark); font-weight:700" onclick="gcEvent('donate-click/research-references')">chip in on Ko-fi ☕</a> — never needed, and it unlocks nothing.</p>
   <p>© 2026 Everything SATS™ — free, always. Owned and built by William Munro. <a href="privacy.html">Privacy</a> · <a href="research-references.html">Research &amp; References</a></p>
   <p id="visitCount"></p>
 </footer>
