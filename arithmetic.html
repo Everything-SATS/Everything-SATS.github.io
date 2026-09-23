@@ -318,6 +318,21 @@
   footer{max-width:640px; margin:0 auto; padding:24px 20px 12px; text-align:center; color:var(--ink-soft); font-size:.78rem; line-height:1.7}
   footer a{color:var(--ink-soft)}
 
+
+/* "Show me": the working revealed a step at a time, before answering. */
+.show-me-row{display:flex;justify-content:flex-start;margin:2px 0 8px}
+#showMeBtn{width:100%}
+.working-panel{background:var(--blue-light,#eaf1fd);border:1px solid var(--blue,#2f6fd0);
+  border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.working-title{font-weight:700;margin-bottom:6px;font-size:14px}
+.working-panel ol{margin:0;padding-left:22px}
+.working-panel ol li{margin:7px 0;line-height:1.5}
+.working-panel li.working-answer{list-style:none;margin-left:-22px;margin-top:10px;
+  padding-top:9px;border-top:1px dashed var(--blue,#2f6fd0);font-size:17px}
+@media (prefers-reduced-motion:no-preference){
+  .working-panel ol li{animation:workingIn .22s ease-out}
+  @keyframes workingIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+}
 </style>
 </head>
 <body>
@@ -416,6 +431,10 @@
       <input type="text" id="answerInput" inputmode="decimal" placeholder="Type your answer" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()">Check</button>
     </div>
+    <div class="show-me-row">
+      <button class="btn btn-ghost btn-small" id="showMeBtn" onclick="showMe()">👀 Show me how</button>
+    </div>
+    <div class="working-panel" id="workingPanel" hidden></div>
     <div class="feedback-box" id="feedbackBox">
       <div class="feedback-title" id="feedbackTitle"></div>
       <div id="feedbackBody"></div>
@@ -1096,6 +1115,78 @@ function drawQuestion(topicId, diff){
   return q;
 }
 
+/* ---------- "Show me" ----------
+   The generators already return their working as a list of steps, but it was
+   only ever shown once the child had answered. This reveals it one step at a
+   time beforehand, the way a teacher works a question through on the board.
+
+   Asking to be shown does not mark the question wrong. It sends the topic back
+   to box 1 so it comes round again sooner, which is what someone who needed the
+   working actually needs. */
+let workingStep = 0;
+
+function resetShowMe(){
+  workingStep = 0;
+  const panel = document.getElementById('workingPanel');
+  if(panel){ panel.hidden = true; panel.innerHTML = ''; }
+  const btn = document.getElementById('showMeBtn');
+  if(btn){
+    const q = session.currentQ;
+    const hasSteps = q && Array.isArray(q.steps) && q.steps.length;
+    btn.hidden = !hasSteps;
+    btn.disabled = false;
+    btn.textContent = '\u{1F440} Show me how';
+  }
+  const submit = document.getElementById('submitBtn');
+  if(submit) submit.disabled = false;
+}
+
+function showMe(){
+  const q = session.currentQ;
+  if(!q || !Array.isArray(q.steps) || !q.steps.length) return;
+  const panel = document.getElementById('workingPanel');
+  const btn = document.getElementById('showMeBtn');
+
+  if(workingStep === 0){
+    panel.hidden = false;
+    panel.innerHTML = '<div class="working-title">Working it through</div><ol></ol>';
+  }
+  const list = panel.querySelector('ol');
+
+  if(workingStep < q.steps.length){
+    const li = document.createElement('li');
+    li.innerHTML = q.steps[workingStep];
+    list.appendChild(li);
+    workingStep++;
+    btn.textContent = (workingStep < q.steps.length) ? 'Next step \u2192' : 'Show the answer \u2192';
+    if(li.scrollIntoView) li.scrollIntoView({ block: 'nearest' });
+    return;
+  }
+
+  const li = document.createElement('li');
+  li.className = 'working-answer';
+  li.innerHTML = 'So the answer is <strong>' + q.answer + '</strong>.';
+  list.appendChild(li);
+  if(li.scrollIntoView) li.scrollIntoView({ block: 'nearest' });
+  btn.hidden = true;
+
+  const p = progress[q.topicId];
+  if(p){
+    p.attempted += 1;
+    p.box = 1;
+    saveProgress();
+    renderTopics();
+  }
+
+  const input = document.getElementById('answerInput');
+  if(input) input.disabled = true;
+  const choices = document.getElementById('answerChoices');
+  if(choices) Array.prototype.forEach.call(choices.querySelectorAll('button'), b => b.disabled = true);
+  const submit = document.getElementById('submitBtn');
+  if(submit) submit.disabled = true;
+  document.getElementById('nextBtn').style.display = '';
+}
+
 function loadQuestionAt(i){
   if(i >= session.topicIds.length){ closeModal(); return; }
   const topicId = session.topicIds[i];
@@ -1109,6 +1200,7 @@ function loadQuestionAt(i){
   document.getElementById('sessionProgress').textContent = `Question ${i+1} of ${session.topicIds.length}`;
   document.getElementById('questionText').textContent = session.currentQ.text;
   document.getElementById('answerInput').value = '';
+  resetShowMe();
   // A phone's number keypad has no minus, slash or letters, so answers like
   // "-9", "3/4" or "8 remainder 5" simply cannot be typed on it. Pick the
   // keyboard from the answer this question actually expects.
