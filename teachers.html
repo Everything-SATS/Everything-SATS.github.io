@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* GoatCounter events: counts which features get used (sessions started and
+   finished, Show me, passages, downloads). Anonymous like the page counter:
+   no cookies, nothing about who clicked. Silently does nothing if count.js
+   hasn't loaded or is blocked, so it can never break the page. */
+function gcEvent(path){
+  try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: path, event: true}); }catch(e){}
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -1212,6 +1221,7 @@ function startQuiz(){
     quizQuestions.push(q);
   }
   quizIndex = 0;
+  gcEvent('classquiz/' + quizSubject + '/tier' + quizLevel + '/' + quizCount + 'q');
   document.getElementById('setupScreen').classList.add('hidden');
   document.getElementById('finishScreen').classList.add('hidden');
   document.getElementById('quizScreen').classList.remove('hidden');
@@ -1244,6 +1254,7 @@ function nextQuizQuestion(){
 }
 
 function finishQuiz(){
+  gcEvent('classquiz-finished/' + quizCount + 'q');
   document.getElementById('quizScreen').classList.add('hidden');
   document.getElementById('finishScreen').classList.remove('hidden');
 }

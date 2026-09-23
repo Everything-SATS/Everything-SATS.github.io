@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* GoatCounter events: counts which features get used (sessions started and
+   finished, Show me, passages, downloads). Anonymous like the page counter:
+   no cookies, nothing about who clicked. Silently does nothing if count.js
+   hasn't loaded or is blocked, so it can never break the page. */
+function gcEvent(path){
+  try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: path, event: true}); }catch(e){}
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -360,7 +369,7 @@ main section{scroll-margin-top:14px}
         <span class="tile-sub">Real SATs papers back to 2000, organised by year, free.</span>
         <span class="tile-status">Browse &rarr;</span>
       </a>
-      <a class="tile live t-green" href="reading-practice-pack.pdf" download="Everything-SATS-Reading-Practice-Pack.pdf">
+      <a class="tile live t-green" href="reading-practice-pack.pdf" onclick="gcEvent('download/reading-pack/from-home')" download="Everything-SATS-Reading-Practice-Pack.pdf">
         <div class="tile-header">
           <span class="tile-icon">🖨️</span>
           <span class="tile-name">Reading Pack (PDF)</span>

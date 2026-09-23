@@ -2,6 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* GoatCounter events: counts which features get used (sessions started and
+   finished, Show me, passages, downloads). Anonymous like the page counter:
+   no cookies, nothing about who clicked. Silently does nothing if count.js
+   hasn't loaded or is blocked, so it can never break the page. */
+function gcEvent(path){
+  try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: path, event: true}); }catch(e){}
+}
+// One listener for all the paper links: records which file was opened.
+document.addEventListener('click', function(e){
+  var a = e.target.closest && e.target.closest('a.paper-link');
+  if(a) gcEvent('past-paper/' + a.href.split('/').pop());
+});
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">

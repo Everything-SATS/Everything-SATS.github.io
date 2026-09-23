@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* GoatCounter events: counts which features get used (sessions started and
+   finished, Show me, passages, downloads). Anonymous like the page counter:
+   no cookies, nothing about who clicked. Silently does nothing if count.js
+   hasn't loaded or is blocked, so it can never break the page. */
+function gcEvent(path){
+  try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: path, event: true}); }catch(e){}
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -1088,6 +1097,8 @@ function startSession(kind){
   }
   session.index = 0;
   session.recentAnswers = [];
+  session.kind = kind;
+  gcEvent('start/arithmetic/' + kind + '/tier' + getDifficulty());
   openModal();
   loadQuestionAt(0);
 }
@@ -1148,6 +1159,7 @@ function showMe(){
   const btn = document.getElementById('showMeBtn');
 
   if(workingStep === 0){
+    gcEvent('showme/arithmetic/' + q.topicId);
     panel.hidden = false;
     panel.innerHTML = '<div class="working-title">Working it through</div><ol></ol>';
   }
@@ -1188,7 +1200,7 @@ function showMe(){
 }
 
 function loadQuestionAt(i){
-  if(i >= session.topicIds.length){ closeModal(); return; }
+  if(i >= session.topicIds.length){ gcEvent('finish/arithmetic/' + session.kind); closeModal(); return; }
   const topicId = session.topicIds[i];
   const topic = TOPICS.find(t => t.id === topicId);
   session.currentQ = drawQuestion(topicId, getDifficulty());

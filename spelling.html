@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+/* GoatCounter events: counts which features get used (sessions started and
+   finished, Show me, passages, downloads). Anonymous like the page counter:
+   no cookies, nothing about who clicked. Silently does nothing if count.js
+   hasn't loaded or is blocked, so it can never break the page. */
+function gcEvent(path){
+  try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: path, title: path, event: true}); }catch(e){}
+}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -910,12 +919,13 @@ function startSession(kind){
   session.words = buildWordQueue(band, appSettings.sessionLength);
   session.index = 0;
   session.results = [];
+  gcEvent('start/spelling/' + band);
   openModal();
   loadWordAt(0);
 }
 
 function loadWordAt(i){
-  if(i >= session.words.length){ showReview(); return; }
+  if(i >= session.words.length){ gcEvent('finish/spelling'); showReview(); return; }
   document.getElementById('modalTopicTag').classList.remove('hidden');
   document.getElementById('sessionProgress').classList.remove('hidden');
   document.getElementById('lookStage').classList.remove('hidden');
