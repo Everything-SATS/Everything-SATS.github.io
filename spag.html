@@ -635,30 +635,30 @@ const WC_ALL = WC_SIMPLE.concat(WC_RICH);
 /* The real papers love a word that changes class depending on how it is used
    ("light the candle" / "a light bag"). Each use here is a whole sentence. */
 const WC_MULTI = [
-  { word:"light", uses:[["Please light the candles.","verb"],["Her suitcase was surprisingly light.","adjective"],["The light was too bright.","noun"]] },
-  { word:"before", uses:[["I have seen that film before.","adverb"],["Wash your hands before lunch.","preposition"],["We tidied up before Mum got home.","conjunction"]] },
-  { word:"after", uses:[["We played football after school.","preposition"],["After we had eaten, we played cards.","conjunction"],["They arrived soon after.","adverb"]] },
-  { word:"round", uses:[["The table in the hall is round.","adjective"],["The car sped round the corner.","preposition"],["Our team won the first round.","noun"]] },
-  { word:"hard", uses:[["The ground was hard and dry.","adjective"],["She worked hard all day.","adverb"]] },
-  { word:"fast", uses:[["It was a very fast train.","adjective"],["Cheetahs can run incredibly fast.","adverb"]] },
-  { word:"that", uses:[["That bag is mine.","determiner"],["That was amazing!","pronoun"],["I think that you are right.","conjunction"]] },
-  { word:"since", uses:[["We have lived here since 2019.","preposition"],["Since it was raining, we stayed indoors.","conjunction"]] },
-  { word:"outside", uses:[["The children played outside.","adverb"],["We waited outside the shop.","preposition"],["The outside of the house needs painting.","noun"]] },
-  { word:"well", uses:[["She sings really well.","adverb"],["They drew water from the well.","noun"]] },
-  { word:"walk", uses:[["We walk to school every day.","verb"],["We went for a long walk.","noun"]] },
-  { word:"this", uses:[["This is delicious.","pronoun"],["This pen has run out.","determiner"]] },
-  { word:"close", uses:[["Please close the door.","verb"],["Our house is close to the park.","adjective"]] },
-  { word:"until", uses:[["Wait here until the bell rings.","conjunction"],["The shop is open until six o'clock.","preposition"]] },
-  { word:"down", uses:[["She ran down the hill.","preposition"],["Please sit down.","adverb"]] },
-  { word:"present", uses:[["We bought a present for Harry.","noun"],["The mayor will present the prizes.","verb"]] },
-  { word:"water", uses:[["Please water the plants.","verb"],["Drink plenty of water.","noun"]] },
-  { word:"early", uses:[["We arrived early.","adverb"],["I caught the early train.","adjective"]] },
-  { word:"kind", uses:[["It was kind of you to help.","adjective"],["What kind of dog is that?","noun"]] },
-  { word:"paint", uses:[["We will paint the fence.","verb"],["The paint is still wet.","noun"]] },
-  { word:"those", uses:[["Those are my trainers.","pronoun"],["Those trainers are mine.","determiner"]] },
-  { word:"quick", uses:[["That was a quick game.","adjective"],["Come here, quick!","adverb"]] },
-  { word:"train", uses:[["We caught the train to Leeds.","noun"],["The athletes train every morning.","verb"]] },
-  { word:"inside", uses:[["The cat is hiding inside the box.","preposition"],["Let's go inside.","adverb"]] },
+  { word:"light", uses:[["Please light the candles.","verb"],["Her suitcase was surprisingly light.","adjective"],["The light was too bright.","noun"],["She wore a light jacket.","adjective"]] },
+  { word:"before", uses:[["I have seen that film before.","adverb"],["Wash your hands before lunch.","preposition"],["We tidied up before Mum got home.","conjunction"],["Harry arrived before the others.","preposition"]] },
+  { word:"after", uses:[["We played football after school.","preposition"],["After we had eaten, we played cards.","conjunction"],["They arrived soon after.","adverb"],["The dog ran after the ball.","preposition"]] },
+  { word:"round", uses:[["The table in the hall is round.","adjective"],["The car sped round the corner.","preposition"],["Our team won the first round.","noun"],["She has round glasses.","adjective"]] },
+  { word:"hard", uses:[["The ground was hard and dry.","adjective"],["She worked hard all day.","adverb"],["That puzzle was really hard.","adjective"],["It rained hard all night.","adverb"]] },
+  { word:"fast", uses:[["It was a very fast train.","adjective"],["Cheetahs can run incredibly fast.","adverb"],["He is a fast swimmer.","adjective"],["Don't drive so fast!","adverb"]] },
+  { word:"that", uses:[["That bag is mine.","determiner"],["That was amazing!","pronoun"],["I think that you are right.","conjunction"],["Look at that rainbow!","determiner"]] },
+  { word:"since", uses:[["We have lived here since 2019.","preposition"],["Since it was raining, we stayed indoors.","conjunction"],["I have not seen her since Monday.","preposition"],["Since you asked nicely, you can have one.","conjunction"]] },
+  { word:"outside", uses:[["The children played outside.","adverb"],["We waited outside the shop.","preposition"],["The outside of the house needs painting.","noun"],["The outside wall is damp.","adjective"]] },
+  { word:"well", uses:[["She sings really well.","adverb"],["They drew water from the well.","noun"],["The team played well.","adverb"],["I don't feel very well.","adjective"]] },
+  { word:"walk", uses:[["We walk to school every day.","verb"],["We went for a long walk.","noun"],["Dogs love to walk in the park.","verb"],["The walk took two hours.","noun"]] },
+  { word:"this", uses:[["This is delicious.","pronoun"],["This pen has run out.","determiner"],["I love this song.","determiner"],["Is this yours?","pronoun"]] },
+  { word:"close", uses:[["Please close the door.","verb"],["Our house is close to the park.","adjective"],["The shop will close at five.","verb"],["It was a close race.","adjective"]] },
+  { word:"until", uses:[["Wait here until the bell rings.","conjunction"],["The shop is open until six o'clock.","preposition"],["Keep stirring until the sauce thickens.","conjunction"],["We stayed until the end.","preposition"]] },
+  { word:"down", uses:[["She ran down the hill.","preposition"],["Please sit down.","adverb"],["Water trickled down the window.","preposition"],["The price went down.","adverb"]] },
+  { word:"present", uses:[["We bought a present for Harry.","noun"],["The mayor will present the prizes.","verb"],["Everyone was present for the photo.","adjective"],["Thank you for the lovely present.","noun"]] },
+  { word:"water", uses:[["Please water the plants.","verb"],["Drink plenty of water.","noun"],["We water the garden every evening.","verb"],["The water was freezing.","noun"]] },
+  { word:"early", uses:[["We arrived early.","adverb"],["I caught the early train.","adjective"],["The flowers bloomed early this year.","adverb"],["It was an early start.","adjective"]] },
+  { word:"kind", uses:[["It was kind of you to help.","adjective"],["What kind of dog is that?","noun"],["She has a kind smile.","adjective"],["This kind of weather is unusual.","noun"]] },
+  { word:"paint", uses:[["We will paint the fence.","verb"],["The paint is still wet.","noun"],["Ocean likes to paint animals.","verb"],["We need more blue paint.","noun"]] },
+  { word:"those", uses:[["Those are my trainers.","pronoun"],["Those trainers are mine.","determiner"],["Can I have those sweets?","determiner"],["Are those yours?","pronoun"]] },
+  { word:"last", uses:[["We caught the last bus.","adjective"],["The film will last two hours.","verb"],["Harry finished last.","adverb"],["This is the last biscuit.","adjective"]] },
+  { word:"train", uses:[["We caught the train to Leeds.","noun"],["The athletes train every morning.","verb"],["The train was late.","noun"],["They train their dog to sit.","verb"]] },
+  { word:"inside", uses:[["The cat is hiding inside the box.","preposition"],["Let's go inside.","adverb"],["The inside of the shell was pink.","noun"],["Keep your coat inside your bag.","preposition"]] },
 ];
 
 function parseTagged(s){
@@ -751,9 +751,12 @@ function genWordClass(diff){
 
 function wordClassMulti(diff){
   const item = bagChoice('wc-multi', WC_MULTI);
-  const [target, cls] = choice(item.uses);
   const explain = item.uses.map(([s, c]) => `"${s}" — here "${item.word}" is ${withArticle(c)}.`);
-  if(Math.random() < 0.5){
+  /* "In which sentence..." needs exactly one right answer, so the class asked
+     about must be one that only one of the four sentences uses. */
+  const once = item.uses.filter(u => item.uses.filter(v => v[1] === u[1]).length === 1);
+  if(once.length && Math.random() < 0.5){
+    const [target, cls] = choice(once);
     return {
       text: `In which sentence is the word "${item.word}" used as ${withArticle(cls)}?`,
       options: shuffleCopy(item.uses.map(u => u[0])),
@@ -761,8 +764,9 @@ function wordClassMulti(diff){
       steps: [`The same word can belong to different word classes, depending on the job it does in the sentence.`].concat(explain),
     };
   }
+  const [target, cls] = choice(item.uses);
   const others = shuffleCopy(Object.values(WC_TAGS).filter(c => c !== cls && !item.uses.some(u => u[1] === c)));
-  const decoys = item.uses.map(u => u[1]).filter(c => c !== cls).concat(others).slice(0, 3);
+  const decoys = [...new Set(item.uses.map(u => u[1]).filter(c => c !== cls))].concat(others).slice(0, 3);
   return {
     text: `What word class is "${item.word}" in this sentence? — "${target}"`,
     options: shuffleCopy(decoys.concat([cls])),
@@ -830,7 +834,11 @@ function genSentenceType(diff){
   if(format === 'pick'){
     /* One sentence of the asked-for type, one of each other type. */
     const target = pickSentence(type, false);
-    const decoys = types.filter(t => t !== type).map(t => {
+    /* Always four sentences: at Pre-SATS only three types are in play, so one
+       type gets a second sentence. */
+    const decoyTypes = types.filter(t => t !== type);
+    while(decoyTypes.length < 3) decoyTypes.push(choice(types.filter(t => t !== type)));
+    const decoys = decoyTypes.map(t => {
       /* the trap that fits: asking for an exclamation -> offer a What/How question;
          asking for a question -> offer a statement that reports a question */
       const wantTrap = traps && ((type === 'exclamation' && t === 'question') || (type === 'question' && t === 'statement'));
@@ -850,14 +858,14 @@ function genSentenceType(diff){
     const mark = type === 'question' ? '?' : type === 'exclamation' ? '!' : '.';
     return {
       text: `Which punctuation mark should go at the end of this sentence? — "${stripEnd(s)}"`,
-      options: shuffleCopy(['.', '?', '!']),
+      options: shuffleCopy(['.', '?', '!', ',']),
       answer: mark,
       steps: [SENTENCE_TIP[type], `So it ends with "${mark}": "${s}"`],
     };
   }
   return {
     text: `What type of sentence is this? — "${stripEnd(s)}"`,
-    options: types.slice(),
+    options: ['statement', 'question', 'exclamation', 'command'],
     answer: type,
     steps: [`Ignore the missing punctuation and look at how the sentence is built.`, SENTENCE_TIP[type], `"${stripEnd(s)}" is ${ST_ARTICLE[type]} ${type}.`],
   };
@@ -1270,7 +1278,12 @@ function genClauses(diff){
   if(format === 'subpart' || format === 'mainpart'){
     const q = parseSub(bagChoice('cl-sub-part', SUB_CLAUSE_SENTENCES));
     const isSub = format === 'subpart';
-    const opts = isSub ? [q.sub, q.main, q.subNoConj] : [q.main, q.sub, q.subNoConj];
+    /* a fourth option that splits the sentence in the wrong place */
+    const firstMainWord = q.main.split(' ')[0];
+    const badSplit = q.fronted
+      ? (isSub ? `${q.sub}, ${firstMainWord}` : `${q.subNoConj}, ${q.main}`)
+      : `${q.main} ${q.conj}`;
+    const opts = isSub ? [q.sub, q.main, q.subNoConj, badSplit] : [q.main, q.sub, q.subNoConj, badSplit];
     return {
       text: `Which part of this sentence is the ${isSub ? 'subordinate' : 'main'} clause? — "${q.plain}"`,
       options: shuffleCopy([...new Set(opts)]),
@@ -1286,10 +1299,10 @@ function genClauses(diff){
   if(format === 'coordsub'){
     const useCoord = Math.random() < 0.5;
     const q = useCoord ? parseCoord(bagChoice('cl-coord-cs', COORD_SENTENCES)) : parseSub(bagChoice('cl-sub-cs', SUB_CLAUSE_SENTENCES));
-    const ans = useCoord ? 'co-ordinating' : 'subordinating';
+    const ans = useCoord ? 'co-ordinating conjunction' : 'subordinating conjunction';
     return {
-      text: `Is "${q.conj.toLowerCase()}" a co-ordinating or a subordinating conjunction in this sentence? — "${q.plain}"`,
-      options: ['co-ordinating', 'subordinating'],
+      text: `What type of word is "${q.conj.toLowerCase()}" in this sentence? — "${q.plain}"`,
+      options: ['co-ordinating conjunction', 'subordinating conjunction', 'preposition', 'adverb'],
       answer: ans,
       steps: [CLAUSE_DEFS.coord, CLAUSE_DEFS.sub, `"${q.conj.toLowerCase()}" is ${ans} here.`],
     };
@@ -1323,7 +1336,8 @@ function genClauses(diff){
     const other = q.after.split(' ').length >= 2 ? q.after : q.before;
     return {
       text: `Which part of this sentence is the relative clause? — "${q.plain}"`,
-      options: shuffleCopy([...new Set([q.rel, other, q.relNoPronoun])]),
+      options: shuffleCopy([...new Set([q.rel, other, q.relNoPronoun,
+        q.after ? `${q.rel} ${q.after.split(' ')[0]}` : `${q.before.split(' ').pop()} ${q.rel}`])]),
       answer: q.rel,
       steps: [CLAUSE_DEFS.rel, `Here it is "${q.rel}" — it tells us more about the noun just before it, and starts with "${q.pronoun}".`],
     };
@@ -1500,10 +1514,9 @@ function genStandardEnglish(diff){
     const fixed = item.s.replace(item.wrong, item.correct);
     /* Half the time, tick the Standard English sentence -- the papers ask both ways. */
     if(Math.random() < 0.5){
-      const other = choice(STANDARD_ENGLISH_BANK.filter(x => x !== item));
       return {
         text: `Which sentence is written in Standard English?`,
-        options: shuffleCopy([fixed, item.s, other.s]),
+        options: shuffleCopy([fixed, item.s].concat(shuffleCopy(STANDARD_ENGLISH_BANK.filter(x => x !== item)).slice(0, 2).map(x => x.s))),
         answer: fixed,
         steps: [ `Standard English is the formal English used in writing and in exams.`, `"${item.wrong}" is not Standard English here — it should be "${item.correct}".`, `So "${fixed}" is the Standard English sentence.` ],
       };
@@ -1521,7 +1534,7 @@ function genStandardEnglish(diff){
     const [informal, formal] = bagChoice('stdeng3-formal', FORMAL_PAIRS);
     return {
       text: `Which word or phrase is the more formal choice?`,
-      options: Math.random() < 0.5 ? [informal, formal] : [formal, informal],
+      options: shuffleCopy([informal, formal].concat(shuffleCopy(FORMAL_PAIRS.filter(p => p[1] !== formal)).slice(0, 2).map(p => p[0]))),
       answer: formal,
       steps: [
         `Formal writing avoids everyday, conversational wording.`,
@@ -1529,29 +1542,24 @@ function genStandardEnglish(diff){
       ],
     };
   }
-  const item = genVoicePair();
-  if(Math.random() < 0.35){
-    return {
-      text: `Which sentence is written in the passive voice?`,
-      options: shuffleCopy([item.active, item.passive]),
-      answer: item.passive,
-      steps: [ `In the passive voice, the thing the action happens to comes first: "${item.passive}"`, `"${item.active}" is active — the one doing the action comes first.` ],
-    };
-  }
-  const showActive = Math.random() < 0.5;
-  if(showActive){
-    return {
-      text: `Is this sentence written in the active or passive voice? — "${item.active}"`,
-      options: ['active', 'passive'],
-      answer: "active",
-      steps: [ `In the active voice, the subject does the action: "${item.active}"`, `(The passive version would be: "${item.passive}")` ],
-    };
-  }
+  /* Four sentences, only one in the voice asked about: the others are
+     different sentences in the other voice. */
+  const pairs = shuffleCopy(VOICE_PAIRS).slice(0, 4).map(([subject, verb, object]) => ({
+    active: `${subject} ${verb} ${object}.`,
+    passive: `${capFirst(object)} was ${verb} by ${lowerFirst(subject)}.`,
+  }));
+  const askPassive = Math.random() < 0.6;
+  const want = askPassive ? pairs[0].passive : pairs[0].active;
+  const rest = pairs.slice(1).map(p => askPassive ? p.active : p.passive);
   return {
-    text: `Is this sentence written in the active or passive voice? — "${item.passive}"`,
-    options: ['active', 'passive'],
-    answer: "passive",
-    steps: [ `In the passive voice, the subject has the action done to it: "${item.passive}"`, `(The active version would be: "${item.active}")` ],
+    text: `Which sentence is written in the ${askPassive ? 'passive' : 'active'} voice?`,
+    options: shuffleCopy([want].concat(rest)),
+    answer: want,
+    steps: [
+      `Active: the one doing the action comes first ("${pairs[0].active}").`,
+      `Passive: the thing the action happens to comes first, often followed by "by…" ("${pairs[0].passive}").`,
+      `So "${want}" is the ${askPassive ? 'passive' : 'active'} one.`,
+    ],
   };
 }
 
@@ -2014,6 +2022,20 @@ function apostropheDistractors(answer){
   if(/'s\b/.test(a)) out.add(a.replace(/'s\b/, "s'"));  // s' instead of 's
   if(/s'(?!\w)/.test(a)) out.add(a.replace(/s'/, "'s")); // 's instead of s'
   if(/s'(?!\w)/.test(a)) out.add(a.replace(/s'/, "s's"));  // the common double-s slip
+  /* the apostrophe on the wrong word ("Sams bike's") */
+  const words = a.split(' ');
+  if(words.length > 1 && !/'/.test(words[words.length - 1]))
+    out.add(words.map((w, i) => i === words.length - 1 ? w + "'s" : w.replace(/'/g, '')).join(' '));
+  /* then the apostrophe in the wrong place in its own word ("do'nt", "dont'") */
+  const at = a.indexOf("'");
+  const bare = a.replace("'", "");
+  [at - 1, at + 1, at - 2, at + 2].forEach(j => {
+    if(j > 0 && j <= bare.length && bare[j - 1] !== ' ' && bare[j] !== ' ') out.add(bare.slice(0, j) + "'" + bare.slice(j));
+  });
+  /* last resort for short words (I'm, I'd): the apostrophe added without
+     dropping any letters -- "I'am" */
+  const full = (CONTRACTIONS.find(c => c[1] === a) || [])[0];
+  if(full) out.add(full.replace(' ', "'"));
   out.delete(a);
   return [...out].filter(Boolean).slice(0, 3);
 }
