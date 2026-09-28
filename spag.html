@@ -921,7 +921,7 @@ function genApostrophes(diff){
     const item = bagChoice('apo-items-2', POSSESSION_ITEMS);
     const owner = bagChoice('apo-plural-owners', PLURAL_S_OWNERS);
     return {
-      text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe. (${owner} already ends in 's'.)`,
+      text: `Rewrite "the ${item} belonging to ${owner}" using a possessive apostrophe. ("${owner.replace(/^the /, '')}" already ends in s.)`,
       answer: `${owner}' ${item}`,
       steps: [ `${owner} is already plural and ends in 's', so just add an apostrophe after the s — no extra s needed.`, `So it becomes "${owner}' ${item}".` ],
     };
@@ -1433,14 +1433,14 @@ function synAntDistractors(row){
 }
 const STANDARD_ENGLISH_BANK = [
   { s:"We was late for the bus.", wrong:"was", correct:"were" },
-  { s:"I done my homework already.", wrong:"done", correct:"did" },
+  { s:"I done my homework last night.", wrong:"done", correct:"did" },
   { s:"They was playing in the garden.", wrong:"was", correct:"were" },
   { s:"She done her best in the race.", wrong:"done", correct:"did" },
   { s:"He don't like vegetables.", wrong:"don't", correct:"doesn't" },
   { s:"There are less biscuits in the tin than yesterday.", wrong:"less", correct:"fewer" },
   { s:"She is the goodest player on the team.", wrong:"goodest", correct:"best" },
   { s:"We done really well in the match.", wrong:"done", correct:"did" },
-  { s:"I seen that film already.", wrong:"seen", correct:"saw" },
+  { s:"I seen that film yesterday.", wrong:"seen", correct:"saw" },
   { s:"She writes good.", wrong:"good", correct:"well" },
   { s:"I have went there before.", wrong:"went", correct:"gone" },
   { s:"He should of asked first.", wrong:"of", correct:"have" },
