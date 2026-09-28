@@ -511,141 +511,355 @@ function bagChoice(key, arr){
 
 /* ---------- Word Classes ----------
    Curriculum source: DfE English Appendix 2 (grammar terminology by year).
-   Sentences are built procedurally from word banks so they're always new. */
+
+   Rebuilt 2026-09-28. The old version slotted random words into four fixed
+   templates, which made every question the same shape and produced sentences
+   like "The gloomy postman slid around the nervous teacher". These are whole
+   sentences written by hand, with every word tagged, so any word class can be
+   asked of any sentence and the answer is always exactly right.
+
+   Tags: n noun, v verb, adj adjective, adv adverb, p preposition,
+   c conjunction, d determiner, pr pronoun. "pd" marks my/his/her/our/their/
+   your/its: the DfE glossary calls these a determiner in one place and a
+   possessive pronoun in another, so a sentence containing one is never used
+   for a determiner or pronoun question. */
 const CLASS_DEF = {
   noun: "a naming word — a person, place, animal or thing.",
   verb: "a doing or being word — it shows an action or a state.",
   adjective: "a describing word — it tells you more about a noun.",
-  adverb: "a word that describes a verb, often saying how, when or where something happens.",
-  preposition: "a word that shows where or when something is, in relation to something else.",
-  conjunction: "a joining word — it links two clauses or ideas together.",
-  determiner: "a word that comes before a noun to make its meaning more specific (like 'the', 'a', 'this').",
-  pronoun: "a word used in place of a noun (like 'she', 'they', 'it').",
+  adverb: "a word that describes a verb (or an adjective), often saying how, when, where or how often something happens.",
+  preposition: "a word that shows where or when something is, in relation to something else — it comes before a noun or pronoun.",
+  conjunction: "a joining word — it links two words, phrases or clauses together.",
+  determiner: "a word that comes before a noun to make its meaning more specific (like 'the', 'a', 'this', 'some', 'every' or 'three').",
+  pronoun: "a word used in place of a noun (like 'she', 'they', 'it', 'us' or 'everyone').",
 };
+const WC_TAGS = { n:'noun', v:'verb', adj:'adjective', adv:'adverb', p:'preposition', c:'conjunction', d:'determiner', pr:'pronoun' };
 
-/* Combinatorial generator: fixed grammatical templates with curated word
-   banks per slot. Every bank member is chosen so it's compatible with
-   every other bank at that template position, so every combination
-   produces a grammatically correct sentence -- this is not word-salad,
-   it's the same principle as varying the numbers in a maths question.
-   Because each word is inserted from a known slot, the class tags are
-   always exactly right with no manual per-sentence tagging needed. */
-const WC_ANIMATE_NOUNS = ["firefighter","kitten","hiker","farmer","teacher","puppy","mouse","athlete","doctor","dancer","chef","artist","pilot","gardener","builder","scientist","explorer","swimmer","runner","singer","painter","baker","librarian","postman","vet","coach","nurse","driver","sailor","climber","fox","owl","squirrel","wasp","bee","rabbit","otter","wolf","eagle","deer"];
-const WC_ADJ = ["brave","tired","curious","gentle","clever","proud","nervous","excited","patient","kind","calm","happy","wise","bold","shy","cheerful","careful","honest","quiet","busy","frightened","confident","determined","exhausted","anxious","stubborn","playful","sleepy","eager","gloomy"];
-const WC_VERB_T0 = ["helped","watched","followed","greeted","found","joined","thanked","noticed","approached","visited","spotted","called","hugged","warned","taught","trusted","admired","comforted","congratulated","welcomed"];
-const WC_ADVERB = ["quietly","quickly","slowly","carefully","cautiously","nervously","happily","calmly","bravely","gently","eagerly","patiently","silently","cheerfully","anxiously","confidently","reluctantly","gracefully","hastily","steadily","proudly","kindly","gratefully","warily"];
-const WC_VERB_T1 = ["greeted","thanked","warned","helped","comforted","congratulated","welcomed","questioned","reassured","surprised"];
-const WC_PREP = ["down","behind","beneath","towards","inside","through","beyond","near","across","around","above","below","alongside","past","over"];
-const WC_VERB_T2 = ["slid","stood","rested","ran","peered","bolted","pushed","curled","sailed","floated","crept","hurried","wandered","climbed","dashed","strolled","ventured","hovered","darted","waited"];
-const WC_PRONOUNS = ["He","She","They","We"];
-const WC_VERB1_T3 = ["smiled","laughed","cheered","apologised","waited","trained","whispered","arrived","relaxed","celebrated","worried","hesitated","paused","sighed","nodded"];
-const WC_CONJ = ["because","since","although","while","until","so","when"];
-const WC_VERB2_T3 = ["won","made","fixed","found","lost","finished","started","missed","caught","opened","solved","chose","saved","forgot","remembered"];
-const WC_OBJ_NOUNS = ["prize","mistake","match","race","game","puzzle","trophy","ticket","present","competition","challenge","test","secret","plan","key"];
+/* Short sentences, no conjunctions: tier 0 draws only from these. */
+const WC_SIMPLE = [
+  "The|d hungry|adj fox|n crept|v into|p the|d garden|n.",
+  "Ella|n painted|v a|d bright|adj rainbow|n.",
+  "The|d tired|adj children|n slept|v soundly|adv.",
+  "A|d huge|adj wave|n crashed|v onto|p the|d rocks|n.",
+  "We|pr ate|v warm|adj pancakes|n for|p breakfast|n.",
+  "The|d old|adj clock|n ticked|v loudly|adv.",
+  "Grandad|n grows|v enormous|adj pumpkins|n.",
+  "They|pr cheered|v wildly|adv at|p the|d end|n.",
+  "A|d small|adj bird|n landed|v on|p the|d fence|n.",
+  "The|d baker|n sells|v delicious|adj bread|n.",
+  "She|pr quickly|adv packed|v a|d heavy|adj bag|n.",
+  "The|d river|n flowed|v gently|adv under|p the|d bridge|n.",
+  "Some|d rabbits|n were|v hiding|v in|p the|d long|adj grass|n.",
+  "This|d puzzle|n is|v really|adv tricky|adj.",
+  "Harry|n kicked|v the|d muddy|adj ball|n.",
+  "He|pr gave|v me|pr a|d shiny|adj coin|n.",
+  "The|d cold|adj wind|n howled|v outside|adv.",
+  "Tilly|n found|v three|d smooth|adj pebbles|n.",
+  "The|d nervous|adj actor|n forgot|v his|pd lines|n.",
+  "Two|d owls|n hooted|v softly|adv.",
+  "Our|pd teacher|n read|v a|d funny|adj poem|n.",
+  "The|d brave|adj firefighter|n rescued|v a|d frightened|adj kitten|n.",
+  "It|pr rained|v heavily|adv yesterday|adv.",
+  "Millie|n carefully|adv carried|v the|d wobbly|adj tower|n.",
+  "The|d dog|n chased|v its|pd tail|n happily|adv.",
+  "Those|d shoes|n are|v too|adv small|adj.",
+  "Ocean|n danced|v gracefully|adv across|p the|d stage|n.",
+  "Every|d pupil|n wrote|v a|d short|adj story|n.",
+  "They|pr built|v a|d tall|adj snowman|n.",
+  "The|d kettle|n whistled|v in|p the|d kitchen|n.",
+  "Edie|n whispered|v a|d secret|n to|p her|pd friend|n.",
+  "A|d cheeky|adj seagull|n stole|v my|pd chips|n.",
+  "The|d lazy|adj cat|n yawned|v.",
+  "A|d gentle|adj breeze|n blew|v.",
+  "We|pr visited|v a|d busy|adj market|n.",
+  "Mum|n baked|v a|d delicious|adj cake|n.",
+  "The|d frog|n leapt|v high|adv.",
+  "Five|d ducks|n swam|v across|p the|d pond|n.",
+  "He|pr sang|v loudly|adv.",
+  "Grandma|n knitted|v a|d woolly|adj scarf|n.",
+  "The|d kind|adj stranger|n helped|v us|pr.",
+  "A|d strange|adj noise|n came|v from|p the|d attic|n.",
+  "The|d scientist|n examined|v the|d rare|adj beetle|n closely|adv.",
+  "Nobody|pr noticed|v the|d tiny|adj crack|n in|p the|d window|n.",
+  "My|pd brother|n rarely|adv eats|v vegetables|n.",
+  "The|d puppy|n slept|v peacefully|adv beside|p the|d fire|n.",
+  "We|pr found|v a|d crab|n under|p a|d slimy|adj rock|n.",
+  "They|pr giggled|v quietly|adv during|p the|d film|n.",
+  "The|d explorers|n trudged|v through|p the|d deep|adj snow|n.",
+  "She|pr always|adv reads|v before|p bedtime|n.",
+  "Tilly|n opened|v the|d present|n eagerly|adv.",
+  "That|d bus|n is|v always|adv late|adj.",
+  "Several|d geese|n flew|v over|p the|d lake|n.",
+  "I|pr lost|v my|pd glove|n somewhere|adv in|p the|d park|n.",
+];
 
-/* "a"/"an" depends on the sound of the word immediately after it, not just
-   the determiner's own random pick -- honest/hour/honour have a silent h
-   and need "an" even though they start with a consonant letter. */
-function articleFor(word){
-  const w = word.toLowerCase();
-  if(w === 'honest' || w === 'hour' || w === 'honour') return 'an';
-  return /^[aeiou]/.test(w) ? 'an' : 'a';
+/* Longer sentences with conjunctions, trickier adverbs and prepositions. */
+const WC_RICH = [
+  "We|pr stayed|v indoors|adv because|c the|d storm|n was|v fierce|adj.",
+  "Although|c it|pr was|v late|adj, the|d children|n played|v outside|adv.",
+  "The|d cat|n hid|v under|p the|d bed|n when|c the|d thunder|n started|v.",
+  "William|n will|v wait|v by|p the|d gate|n until|c the|d bus|n arrives|v.",
+  "She|pr smiled|v proudly|adv as|c she|pr collected|v the|d trophy|n.",
+  "The|d path|n was|v steep|adj, but|c we|pr reached|v the|d top|n.",
+  "After|c we|pr had|v eaten|v, we|pr walked|v along|p the|d beach|n.",
+  "If|c you|pr listen|v carefully|adv, you|pr can|v hear|v the|d sea|n.",
+  "Harry|n usually|adv cycles|v to|p school|n, but|c today|adv he|pr walked|v.",
+  "Before|c the|d show|n began|v, the|d audience|n waited|v silently|adv.",
+  "The|d ancient|adj castle|n stood|v on|p a|d rocky|adj hill|n above|p the|d village|n.",
+  "Some|d people|n were|v queuing|v outside|p the|d cinema|n.",
+  "Everyone|pr clapped|v when|c the|d curtain|n fell|v.",
+  "The|d museum|n was|v full|adj, so|c we|pr went|v to|p the|d park|n instead|adv.",
+  "While|c Mum|n cooked|v dinner|n, Ocean|n laid|v the|d table|n.",
+  "He|pr was|v extremely|adv tired|adj after|p the|d long|adj journey|n.",
+  "You|pr must|v finish|v your|pd work|n before|p lunch|n.",
+  "I|pr had|v never|adv seen|v snow|n before|adv.",
+  "They|pr left|v early|adv because|c the|d roads|n were|v icy|adj.",
+  "The|d fox|n darted|v across|p the|d road|n and|c disappeared|v.",
+  "Since|c it|pr was|v sunny|adj, we|pr ate|v our|pd lunch|n outside|adv.",
+  "The|d alarm|n rang|v loudly|adv during|p the|d assembly|n.",
+  "Edie|n and|c Millie|n raced|v down|p the|d hill|n.",
+  "Ocean|n practised|v her|pd routine|n until|c it|pr was|v perfect|adj.",
+  "If|c it|pr rains|v, we|pr will|v play|v indoors|adv.",
+  "Nobody|pr knew|v the|d answer|n, so|c the|d teacher|n explained|v it|pr.",
+  "The|d swimmers|n shivered|v as|c they|pr climbed|v out|p of|p the|d pool|n.",
+  "We|pr could|v take|v the|d bus|n or|c we|pr could|v walk|v.",
+  "Unless|c we|pr hurry|v, we|pr will|v miss|v the|d start|n.",
+  "The|d hedgehog|n curled|v up|adv when|c it|pr heard|v the|d dog|n.",
+  "Grandad|n often|adv tells|v us|pr stories|n about|p the|d war|n.",
+  "These|d strawberries|n taste|v incredibly|adv sweet|adj.",
+  "Tilly|n stayed|v calm|adj, although|c everyone|pr else|adv panicked|v.",
+  "The|d choir|n sang|v beautifully|adv, and|c the|d audience|n stood|v up|adv.",
+];
+const WC_ALL = WC_SIMPLE.concat(WC_RICH);
+
+/* The real papers love a word that changes class depending on how it is used
+   ("light the candle" / "a light bag"). Each use here is a whole sentence. */
+const WC_MULTI = [
+  { word:"light", uses:[["Please light the candles.","verb"],["Her suitcase was surprisingly light.","adjective"],["The light was too bright.","noun"]] },
+  { word:"before", uses:[["I have seen that film before.","adverb"],["Wash your hands before lunch.","preposition"],["We tidied up before Mum got home.","conjunction"]] },
+  { word:"after", uses:[["We played football after school.","preposition"],["After we had eaten, we played cards.","conjunction"],["They arrived soon after.","adverb"]] },
+  { word:"round", uses:[["The table in the hall is round.","adjective"],["The car sped round the corner.","preposition"],["Our team won the first round.","noun"]] },
+  { word:"hard", uses:[["The ground was hard and dry.","adjective"],["She worked hard all day.","adverb"]] },
+  { word:"fast", uses:[["It was a very fast train.","adjective"],["Cheetahs can run incredibly fast.","adverb"]] },
+  { word:"that", uses:[["That bag is mine.","determiner"],["That was amazing!","pronoun"],["I think that you are right.","conjunction"]] },
+  { word:"since", uses:[["We have lived here since 2019.","preposition"],["Since it was raining, we stayed indoors.","conjunction"]] },
+  { word:"outside", uses:[["The children played outside.","adverb"],["We waited outside the shop.","preposition"],["The outside of the house needs painting.","noun"]] },
+  { word:"well", uses:[["She sings really well.","adverb"],["They drew water from the well.","noun"]] },
+  { word:"walk", uses:[["We walk to school every day.","verb"],["We went for a long walk.","noun"]] },
+  { word:"this", uses:[["This is delicious.","pronoun"],["This pen has run out.","determiner"]] },
+  { word:"close", uses:[["Please close the door.","verb"],["Our house is close to the park.","adjective"]] },
+  { word:"until", uses:[["Wait here until the bell rings.","conjunction"],["The shop is open until six o'clock.","preposition"]] },
+  { word:"down", uses:[["She ran down the hill.","preposition"],["Please sit down.","adverb"]] },
+  { word:"present", uses:[["We bought a present for Harry.","noun"],["The mayor will present the prizes.","verb"]] },
+  { word:"water", uses:[["Please water the plants.","verb"],["Drink plenty of water.","noun"]] },
+  { word:"early", uses:[["We arrived early.","adverb"],["I caught the early train.","adjective"]] },
+  { word:"kind", uses:[["It was kind of you to help.","adjective"],["What kind of dog is that?","noun"]] },
+  { word:"paint", uses:[["We will paint the fence.","verb"],["The paint is still wet.","noun"]] },
+  { word:"those", uses:[["Those are my trainers.","pronoun"],["Those trainers are mine.","determiner"]] },
+  { word:"quick", uses:[["That was a quick game.","adjective"],["Come here, quick!","adverb"]] },
+  { word:"train", uses:[["We caught the train to Leeds.","noun"],["The athletes train every morning.","verb"]] },
+  { word:"inside", uses:[["The cat is hiding inside the box.","preposition"],["Let's go inside.","adverb"]] },
+];
+
+function parseTagged(s){
+  const tokens = s.split(' ').map(tok => {
+    const m = tok.match(/^([^|]+)\|([a-z]+)(.*)$/);
+    return { word:m[1], tag:m[2], tail:m[3] };
+  });
+  return { tokens, plain: tokens.map(t => t.word + t.tail).join(' ') };
 }
-function detWord(type, nextWord, capitalize){
-  const word = type === 'the' ? 'the' : articleFor(nextWord);
-  return capitalize ? word.charAt(0).toUpperCase() + word.slice(1) : word;
+function shuffleCopy(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){ const j = randInt(0, i); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function withArticle(cls){ return (/^[aeiou]/.test(cls) ? 'an ' : 'a ') + cls; }
+
+/* Classes each tier may ask about. */
+const WC_TIER_CLASSES = [
+  ['noun','verb','adjective'],
+  ['noun','verb','adjective','adverb','determiner','pronoun'],
+  ['noun','verb','adjective','adverb','determiner','pronoun','preposition','conjunction'],
+  ['noun','verb','adjective','adverb','determiner','pronoun','preposition','conjunction'],
+];
+const _wcRecent = [];
+function pickTaggedSentence(pool, cls){
+  const parsed = pool.map(parseTagged).filter(p => {
+    if(!p.tokens.some(t => WC_TAGS[t.tag] === cls)) return false;
+    if((cls === 'determiner' || cls === 'pronoun') && p.tokens.some(t => t.tag === 'pd')) return false;
+    return true;
+  });
+  const fresh = parsed.filter(p => !_wcRecent.includes(p.plain));
+  const p = choice(fresh.length ? fresh : parsed);
+  _wcRecent.push(p.plain);
+  if(_wcRecent.length > 12) _wcRecent.shift();
+  return p;
 }
 
-function pickWordClassQuestion(s, classes){
-  const classNames = Object.keys(classes);
-  const targetClass = choice(classNames);
-  const options = classes[targetClass];
-  const primary = options[0];
-  const article = (targetClass === 'adjective' || targetClass === 'adverb') ? 'an' : 'a';
-  const wordList = options.length > 1 ? `"${options.join('" or "')}"` : `"${primary}"`;
+function genWordClass(diff){
+  const classes = WC_TIER_CLASSES[diff];
+  const pool = diff === 0 ? WC_SIMPLE : WC_ALL;
+  const r = Math.random();
+  const format = diff === 0 ? (r < 0.65 ? 'click' : 'which')
+               : diff === 1 ? (r < 0.5 ? 'click' : 'which')
+               : diff === 2 ? (r < 0.35 ? 'click' : r < 0.7 ? 'which' : 'multi')
+               :              (r < 0.25 ? 'click' : r < 0.55 ? 'which' : 'multi');
+
+  if(format === 'multi') return wordClassMulti(diff);
+
+  const cls = bagChoice('wc-class-' + diff, classes);
+  const p = pickTaggedSentence(pool, cls);
+
+  if(format === 'click'){
+    const hits = p.tokens.filter(t => WC_TAGS[t.tag] === cls).map(t => t.word);
+    const uniq = [...new Set(hits.map(w => w.toLowerCase()))];
+    const many = uniq.length > 1;
+    return {
+      /* The real papers say "Circle the adverb", so the sentence is offered as
+         clickable words rather than asking the child to retype one of them. */
+      text: many ? `Click one of the ${cls}s in this sentence.` : `Click the ${cls} in this sentence.`,
+      sentence: p.plain,
+      targets: uniq,
+      answer: uniq[0],
+      answerAliases: uniq,
+      steps: [
+        `${capFirst(withArticle(cls))} is ${CLASS_DEF[cls]}`,
+        many ? `The ${cls}s in this sentence are: ${uniq.map(w => '"' + w + '"').join(', ')}. Any one of them is right.`
+             : `The ${cls} in this sentence is "${uniq[0]}".`,
+      ],
+    };
+  }
+
+  /* "What word class is the word X?" -- tick one of four, as in the papers.
+     Skip any word that appears twice in the sentence with different classes. */
+  const candidates = p.tokens.filter(t => WC_TAGS[t.tag] === cls &&
+    !p.tokens.some(o => o.word.toLowerCase() === t.word.toLowerCase() && o.tag !== t.tag));
+  const tok = choice(candidates.length ? candidates : p.tokens.filter(t => WC_TAGS[t.tag] === cls));
+  const optionPool = diff === 0 ? ['noun','verb','adjective','adverb'] : Object.values(WC_TAGS);
+  const others = shuffleCopy(optionPool.filter(c => c !== cls)).slice(0, 3);
   return {
-    text: `Click the word in this sentence that is ${article} ${targetClass}.`,
-    /* The real papers say "Circle the adverb", so the sentence is offered as
-       clickable words rather than asking the child to retype one of them. */
-    sentence: s,
-    targets: options.map(o => o.toLowerCase()),
-    answer: primary.toLowerCase(),
-    answerAliases: options.map(o => o.toLowerCase()),
+    text: `What word class is the word "${tok.word}" in this sentence? — "${p.plain}"`,
+    options: shuffleCopy(others.concat([cls])),
+    answer: cls,
     steps: [
-      `${article.charAt(0).toUpperCase()}${article.slice(1)} ${targetClass} is ${CLASS_DEF[targetClass]}`,
-      `In "${s}", ${wordList} ${options.length > 1 ? 'are' : 'is'} the ${targetClass}${options.length > 1 ? 's' : ''}.`,
+      `Look at the job "${tok.word}" is doing in this sentence, not just the word on its own.`,
+      `${capFirst(withArticle(cls))} is ${CLASS_DEF[cls]}`,
+      `So "${tok.word}" is ${withArticle(cls)} here.`,
     ],
   };
 }
 
-function genWordClass(diff){
-  if(diff === 0){
-    const det1type = bagChoice('wc0-det1', ['the','a']), det2type = bagChoice('wc0-det2', ['the','a']);
-    const adj1 = bagChoice('wc0-adj1', WC_ADJ), adj2 = bagChoice('wc0-adj2', WC_ADJ);
-    const noun1 = bagChoice('wc0-noun1', WC_ANIMATE_NOUNS), noun2 = bagChoice('wc0-noun2', WC_ANIMATE_NOUNS);
-    const verb = bagChoice('wc0-verb', WC_VERB_T0);
-    const det1 = detWord(det1type, adj1, true), det2 = detWord(det2type, adj2, false);
-    const s = `${det1} ${adj1} ${noun1} ${verb} ${det2} ${adj2} ${noun2}.`;
-    return pickWordClassQuestion(s, { determiner:[det1,det2], adjective:[adj1,adj2], noun:[noun1,noun2], verb:[verb] });
+function wordClassMulti(diff){
+  const item = bagChoice('wc-multi', WC_MULTI);
+  const [target, cls] = choice(item.uses);
+  const explain = item.uses.map(([s, c]) => `"${s}" — here "${item.word}" is ${withArticle(c)}.`);
+  if(Math.random() < 0.5){
+    return {
+      text: `In which sentence is the word "${item.word}" used as ${withArticle(cls)}?`,
+      options: shuffleCopy(item.uses.map(u => u[0])),
+      answer: target,
+      steps: [`The same word can belong to different word classes, depending on the job it does in the sentence.`].concat(explain),
+    };
   }
-  if(diff === 1){
-    const det1type = bagChoice('wc1-det1', ['the','a']), det2type = bagChoice('wc1-det2', ['the','a']);
-    const adj = bagChoice('wc1-adj', WC_ADJ);
-    const noun1 = bagChoice('wc1-noun1', WC_ANIMATE_NOUNS), noun2 = bagChoice('wc1-noun2', WC_ANIMATE_NOUNS);
-    const verb = bagChoice('wc1-verb', WC_VERB_T1);
-    const adverb = bagChoice('wc1-adverb', WC_ADVERB);
-    const det1 = detWord(det1type, adj, true), det2 = detWord(det2type, noun2, false);
-    const s = `${det1} ${adj} ${noun1} ${verb} ${det2} ${noun2} ${adverb}.`;
-    return pickWordClassQuestion(s, { determiner:[det1,det2], adjective:[adj], noun:[noun1,noun2], verb:[verb], adverb:[adverb] });
-  }
-  if(diff === 2){
-    const det1type = bagChoice('wc2-det1', ['the','a']), det2type = bagChoice('wc2-det2', ['the','a']);
-    const adj1 = bagChoice('wc2-adj1', WC_ADJ), adj2 = bagChoice('wc2-adj2', WC_ADJ);
-    const noun1 = bagChoice('wc2-noun1', WC_ANIMATE_NOUNS), noun2 = bagChoice('wc2-noun2', WC_ANIMATE_NOUNS);
-    const verb = bagChoice('wc2-verb', WC_VERB_T2);
-    const prep = bagChoice('wc2-prep', WC_PREP);
-    const det1 = detWord(det1type, adj1, true), det2 = detWord(det2type, adj2, false);
-    const s = `${det1} ${adj1} ${noun1} ${verb} ${prep} ${det2} ${adj2} ${noun2}.`;
-    return pickWordClassQuestion(s, { determiner:[det1,det2], adjective:[adj1,adj2], noun:[noun1,noun2], verb:[verb], preposition:[prep] });
-  }
-  const pronoun1 = bagChoice('wc3-pronoun', WC_PRONOUNS);
-  const pronoun2 = pronoun1.toLowerCase();
-  const verb1 = bagChoice('wc3-verb1', WC_VERB1_T3);
-  const adverb = bagChoice('wc3-adverb', WC_ADVERB);
-  const conj = bagChoice('wc3-conj', WC_CONJ);
-  const verb2 = bagChoice('wc3-verb2', WC_VERB2_T3);
-  const noun = bagChoice('wc3-noun', WC_OBJ_NOUNS);
-  const dettype = bagChoice('wc3-det', ['the','a']);
-  const det = detWord(dettype, noun, false);
-  const s = `${pronoun1} ${verb1} ${adverb} ${conj} ${pronoun2} ${verb2} ${det} ${noun}.`;
-  return pickWordClassQuestion(s, { pronoun:[pronoun1,pronoun2], verb:[verb1,verb2], adverb:[adverb], conjunction:[conj], noun:[noun] });
+  const others = shuffleCopy(Object.values(WC_TAGS).filter(c => c !== cls && !item.uses.some(u => u[1] === c)));
+  const decoys = item.uses.map(u => u[1]).filter(c => c !== cls).concat(others).slice(0, 3);
+  return {
+    text: `What word class is "${item.word}" in this sentence? — "${target}"`,
+    options: shuffleCopy(decoys.concat([cls])),
+    answer: cls,
+    steps: [`The same word can belong to different word classes, depending on the job it does.`].concat(explain),
+  };
 }
 
-/* ---------- Sentence Types (statement / question / exclamation / command) ---------- */
+/* ---------- Sentence Types (statement / question / exclamation / command) ----------
+   Rebuilt 2026-09-28 to ask the way the real papers do: several sentences with
+   the end punctuation taken OFF, and "Which one is a question?" -- so the child
+   has to use the grammar, not spot the question mark. The trap sentences are
+   what the papers use: questions that start with What or How (which look like
+   exclamations) and statements that report a question ("I wonder where he went").
+
+   KS2 rule used throughout: an exclamation starts with What or How and contains
+   a verb ("What a mess this is!"), so the exclamation bank is filtered to those. */
 const SENTENCE_BANK = {
   statement: ["The kettle is boiling on the stove.", "Our class visited the science museum yesterday.", "Rain fell steadily throughout the afternoon.", "The old lighthouse still guides ships safely to harbour.", "Several dolphins swam alongside the boat.", "The bakery sells fresh bread every morning.", "My grandfather grows vegetables in his allotment.", "The train arrived exactly on time.", "A gentle breeze drifted through the open window.", "The museum recently added a new dinosaur exhibit.", "Autumn leaves covered the entire playground.", "The choir practises every Tuesday evening.", "Our neighbours are building a new garden shed.", "The river flows gently past the old mill.", "Scientists discovered a new species of frog.",
-    "The library closes early on Sundays.", "A flock of geese flew over the field.", "The bridge was repaired last month.", "My sister collects postcards from every country she visits.", "The farmer harvested the wheat before the storm arrived.", "Snow settled on the hills overnight.", "The orchestra performed for nearly two hours.", "Our cat sleeps on the windowsill every afternoon.", "The bakery on the corner sells the best bread in town.", "Volunteers cleared litter from the beach at the weekend.", "The play starts at seven o'clock.", "A spider had spun a web across the doorway.", "The recipe calls for three eggs and a cup of flour.", "The postman delivers our mail just after nine.", "The tide comes in quickly along this stretch of coast.", "Our school football team won their first match of the season.", "The old clock in the hallway keeps perfect time.", "A rainbow appeared after the storm passed.", "The museum's newest exhibit features ancient Egyptian artefacts.", "The garden was full of butterflies in the warm weather.", "The bus was ten minutes late this morning.", "Several new shops have opened on the high street.", "The baker starts work before dawn every day.", "The children built an enormous sandcastle on the beach.", "The forecast predicts sunshine for the rest of the week.", "Our neighbour's dog barks whenever the doorbell rings.", "The theatre was fully booked for opening night.", "A gentle stream runs through the bottom of the valley.", "The teacher wrote the homework on the whiteboard.", "The bakery smells of fresh bread every morning.", "The mountain peak was covered in cloud all day.", "Thousands of starlings gathered above the pier at dusk.", "The library added over two hundred new books this year.", "The train was delayed because of engineering works.", "Our allotment produced more tomatoes than we could eat."],
+    "The library closes early on Sundays.", "A flock of geese flew over the field.", "The bridge was repaired last month.", "My sister collects postcards from every country she visits.", "The farmer harvested the wheat before the storm arrived.", "Snow settled on the hills overnight.", "The orchestra performed for nearly two hours.", "Our cat sleeps on the windowsill every afternoon.", "Volunteers cleared litter from the beach at the weekend.", "The play starts at seven o'clock.", "A spider had spun a web across the doorway.", "The recipe calls for three eggs and a cup of flour.", "The postman delivers our mail just after nine.", "The tide comes in quickly along this stretch of coast.", "Our school football team won their first match of the season.", "The old clock in the hallway keeps perfect time.", "A rainbow appeared after the storm passed.", "The garden was full of butterflies in the warm weather.", "The bus was ten minutes late this morning.", "Several new shops have opened on the high street.", "The children built an enormous sandcastle on the beach.", "The forecast predicts sunshine for the rest of the week.", "Our neighbour's dog barks whenever the doorbell rings.", "The theatre was fully booked for opening night.", "The teacher wrote the homework on the whiteboard.", "Thousands of starlings gathered above the pier at dusk.", "The train was delayed because of engineering works.",
+    /* traps: these report a question but do not ask one */
+    "I wonder where the cat has gone.", "She asked me what time it was.", "I don't know why the lights went out.", "He wanted to know how the trick worked.", "We wondered who had left the gate open.", "Nobody knows what happened to the treasure.", "Mum asked whether we had finished our homework.", "I can't remember where I put my keys.", "They asked how far it was to the beach.", "What happened next is still a mystery."],
   question: ["Have you finished your homework yet?", "Why does the moon change shape?", "Where did you leave your football boots?", "Could you pass me the map, please?", "What time does the train leave?", "Do you know the way to the station?", "Why did the dinosaurs become extinct?", "Has anyone seen my library book?", "Which bus goes to the town centre?", "Can we visit the zoo this weekend?", "How far is it to the nearest beach?", "Who left this jacket on the chair?", "Did you remember to feed the fish?", "What causes the tides to change?", "Would you like to join our team?",
-    "Where did you put the car keys?", "Why is the sky blue?", "Have you ever been abroad?", "Could you help me carry these bags?", "What's the capital of France?", "Do you want chips or rice with that?", "Why did the meeting get cancelled?", "Has the postman been yet?", "Which one do you prefer?", "Can you hear that noise?", "How long does the flight take?", "Who's coming to the party on Saturday?", "Did you lock the back door?", "What happened to your bike?", "Would you rather walk or take the bus?", "Where does this road lead?", "Why won't the printer work?", "Have you met our new neighbours?", "Could this be the right address?", "What should we do if it rains?", "Do you remember her name?", "Why is everyone so quiet?", "Has your sister started school yet?", "Which way is the wind blowing?", "Can I borrow your umbrella?", "How much does this cost?", "Who wrote this poem?", "Did the parcel arrive today?", "What's for dinner tonight?", "Would you like a hand with that?", "Where were you at lunchtime?"],
-  exclamation: ["What an incredible sunset that was!", "How brave those firefighters were!", "That was such an unexpected surprise!", "What a mess this kitchen is!", "What a fantastic goal that was!", "How enormous that whale is!", "What a terrifying storm that turned out to be!", "How wonderful this cake tastes!", "What a brilliant idea you've had!", "How quickly the time has gone!", "What an astonishing view this is!", "How clever that trick was!", "What a disaster this morning has been!", "How proud we all are of you!", "What a spectacular firework display that was!",
-    "What a beautiful garden this is!", "How exhausted I am after that walk!", "What an enormous crowd turned up!", "How delicious this soup smells!", "What a relief that is!", "How strange that sounds!", "What a magnificent castle that was!", "How generous of you that was!", "What a shame we missed the bus!", "How lucky we are to see this!", "What a ridiculous thing to say!", "How marvellous the fireworks were!", "What a peculiar noise that was!", "How thrilling that ride was!", "What an awful smell that is!", "How impressive her painting is!", "What a wonderful surprise this is!", "How dreadful that storm sounded!", "What a triumph that performance was!", "How incredible the view is from up here!"],
+    "Where did you put the car keys?", "Why is the sky blue?", "Have you ever been abroad?", "Could you help me carry these bags?", "Do you want chips or rice with that?", "Why did the meeting get cancelled?", "Has the postman been yet?", "Which one do you prefer?", "Can you hear that noise?", "How long does the flight take?", "Who's coming to the party on Saturday?", "Did you lock the back door?", "Would you rather walk or take the bus?", "Where does this road lead?", "Have you met our new neighbours?", "What should we do if it rains?", "Do you remember her name?", "Why is everyone so quiet?", "Is your sister coming too?", "Are we allowed to play outside?", "Was the film any good?", "Will it snow tomorrow?", "Shall we meet at the park?",
+    /* traps: questions that start like an exclamation */
+    "How old is your brother?", "What is your favourite colour?", "How many sweets are left?", "What are you reading?", "How did you get here so quickly?", "What made that strange noise?", "How much does this cost?", "What time is it?", "How tall is the tallest tree in the world?", "What are we having for dinner?", "How do bees make honey?", "What colour is your new bike?"],
+  exclamation: ["What an incredible sunset that was!", "How brave those firefighters were!", "What a mess this kitchen is!", "What a fantastic goal that was!", "How enormous that whale is!", "What a terrifying storm that turned out to be!", "How wonderful this cake tastes!", "What a brilliant idea you've had!", "How quickly the time has gone!", "What an astonishing view this is!", "How clever that trick was!", "What a disaster this morning has been!", "How proud we all are of you!", "What a spectacular firework display that was!",
+    "What a beautiful garden this is!", "How exhausted I am after that walk!", "What an enormous crowd turned up!", "How delicious this soup smells!", "What a relief that is!", "How strange that sounds!", "What a magnificent castle that was!", "How lucky we are to see this!", "How marvellous the fireworks were!", "What a peculiar noise that was!", "How thrilling that ride was!", "What an awful smell that is!", "How impressive her painting is!", "What a wonderful surprise this is!", "How dreadful that storm sounded!", "What a triumph that performance was!", "How cold it is today!", "What a long way we have walked!", "How fast that cheetah runs!", "What a lot of homework we have!", "How tall you have grown!", "What a kind thing that was to do!"],
   command: ["Close the door quietly behind you.", "Please hand in your books by Friday.", "Take your seats and settle down.", "Remember to bring your PE kit tomorrow.", "Look both ways before you cross.", "Wash your hands before dinner.", "Please switch off the lights when you leave.", "Line up quietly outside the hall.", "Hand in your permission slips today.", "Keep off the grass near the flowerbeds.", "Turn to page twenty in your workbook.", "Please lower your voice in the library.", "Fasten your seatbelt before we set off.", "Bring an umbrella in case it rains.", "Finish your work before the bell rings.",
-    "Tidy your desk before you leave.", "Please walk, don't run, in the corridor.", "Sharpen your pencil before the lesson starts.", "Put your hand up if you have a question.", "Take off your shoes at the door.", "Feed the cat before you go to school.", "Please recycle the paper in the blue bin.", "Sit with your partner for this activity.", "Bring your reading book every day.", "Switch your phone to silent during the film.", "Water the plants twice a week.", "Read the instructions carefully before you start.", "Stay behind the white line, please.", "Hang your coat on the peg.", "Keep your voice down in the museum.", "Return your library book by next Monday.", "Wear your helmet when you ride your bike.", "Check your work before you hand it in.", "Please queue quietly at the counter.", "Save your work before you close the laptop.", "Wipe your feet before you come inside.", "Pack your bag the night before.", "Hold the handrail on the stairs.", "Set the table before dinner is ready.", "Wait for the green light before crossing."],
+    "Tidy your desk before you leave.", "Sharpen your pencil before the lesson starts.", "Put your hand up if you have a question.", "Take off your shoes at the door.", "Feed the cat before you go to school.", "Please recycle the paper in the blue bin.", "Sit with your partner for this activity.", "Bring your reading book every day.", "Water the plants twice a week.", "Read the instructions carefully before you start.", "Hang your coat on the peg.", "Return your library book by next Monday.", "Wear your helmet when you ride your bike.", "Check your work before you hand it in.", "Save your work before you close the laptop.", "Wipe your feet before you come inside.", "Pack your bag the night before.", "Hold the handrail on the stairs.", "Wait for the green light before crossing.", "Don't forget your coat.", "Be careful on the ice.", "Stir the mixture until it is smooth.", "Mix the flour and the butter together.", "Never touch a hot pan.", "Write your name at the top of the page."],
+};
+/* Guard the KS2 exclamation rule in code rather than trusting the list. */
+SENTENCE_BANK.exclamation = SENTENCE_BANK.exclamation.filter(s => /^(What|How)\b/.test(s));
+const SENTENCE_TRAPS = {
+  statement: new Set(SENTENCE_BANK.statement.slice(-10)),
+  question: new Set(SENTENCE_BANK.question.filter(s => /^(What|How)\b/.test(s))),
 };
 const SENTENCE_TIP = {
-  statement: "Statements tell you something and end with a full stop.",
-  question: "Questions ask something and end with a question mark.",
-  exclamation: "Exclamations show strong feeling and often start with 'What' or 'How', ending with an exclamation mark.",
-  command: "Commands tell someone to do something — they often start with the verb itself.",
+  statement: "A statement tells you something. Careful: \"I wonder where he went\" is still a statement — it talks about a question but doesn't ask one.",
+  question: "A question asks something. It usually starts with a question word (who, what, where, how…) or a verb like is, can, did or would.",
+  exclamation: "In the SATs, an exclamation starts with What or How, has a verb, and shows strong feeling — e.g. \"What a mess this is!\"",
+  command: "A command tells someone to do something. It usually starts with a bossy (imperative) verb, like Close, Remember or Don't.",
 };
+const ST_ARTICLE = { statement:'a', question:'a', exclamation:'an', command:'a' };
+function stripEnd(s){ return s.replace(/[.?!]+$/, ''); }
+function pickSentence(type, preferTrap){
+  const bank = SENTENCE_BANK[type];
+  const traps = SENTENCE_TRAPS[type];
+  if(preferTrap && traps && Math.random() < 0.65){
+    const t = [...traps];
+    return t[randInt(0, t.length - 1)];
+  }
+  return bagChoice('sentencetype-' + type + (preferTrap ? '-t' : ''), bank);
+}
+
 function genSentenceType(diff){
-  const types = diff <= 1 ? ['statement','question'] : ['statement','question','exclamation','command'];
-  const type = choice(types);
-  const sentence = bagChoice('sentencetype-' + type, SENTENCE_BANK[type]);
+  const types = diff === 0 ? ['statement','question','command'] : ['statement','question','exclamation','command'];
+  const traps = diff >= 2;
+  const r = Math.random();
+  const format = diff === 0 ? (r < 0.45 ? 'pick' : r < 0.8 ? 'classify' : 'endmark')
+               : diff === 1 ? (r < 0.5 ? 'pick' : r < 0.8 ? 'classify' : 'endmark')
+               :              (r < 0.6 ? 'pick' : 'classify');
+  const type = bagChoice('st-type-' + diff + '-' + (format === 'endmark' ? 'e' : 'a'), format === 'endmark' ? ['question','exclamation','statement'] : types);
+
+  if(format === 'pick'){
+    /* One sentence of the asked-for type, one of each other type. */
+    const target = pickSentence(type, false);
+    const decoys = types.filter(t => t !== type).map(t => {
+      /* the trap that fits: asking for an exclamation -> offer a What/How question;
+         asking for a question -> offer a statement that reports a question */
+      const wantTrap = traps && ((type === 'exclamation' && t === 'question') || (type === 'question' && t === 'statement'));
+      return [t, pickSentence(t, wantTrap)];
+    });
+    const lines = decoys.map(([t, s]) => `"${stripEnd(s)}" is ${ST_ARTICLE[t]} ${t}.`);
+    return {
+      text: `Which of these sentences is ${ST_ARTICLE[type]} ${type}? (The punctuation at the end has been taken off.)`,
+      options: shuffleCopy(decoys.map(d => stripEnd(d[1])).concat([stripEnd(target)])),
+      answer: stripEnd(target),
+      steps: [SENTENCE_TIP[type], `"${stripEnd(target)}" is the ${type}.`].concat(lines),
+    };
+  }
+
+  const s = pickSentence(type, traps);
+  if(format === 'endmark'){
+    const mark = type === 'question' ? '?' : type === 'exclamation' ? '!' : '.';
+    return {
+      text: `Which punctuation mark should go at the end of this sentence? — "${stripEnd(s)}"`,
+      options: shuffleCopy(['.', '?', '!']),
+      answer: mark,
+      steps: [SENTENCE_TIP[type], `So it ends with "${mark}": "${s}"`],
+    };
+  }
   return {
-    text: `Is this sentence a statement, question, exclamation, or command? — "${sentence}"`,
+    text: `What type of sentence is this? — "${stripEnd(s)}"`,
+    options: types.slice(),
     answer: type,
-    steps: [ `"${sentence}" is ${(type==='exclamation'?'an':'a')} ${type}.`, SENTENCE_TIP[type] ],
+    steps: [`Ignore the missing punctuation and look at how the sentence is built.`, SENTENCE_TIP[type], `"${stripEnd(s)}" is ${ST_ARTICLE[type]} ${type}.`],
   };
 }
 
@@ -909,175 +1123,302 @@ function genPunctuation(diff){
 }
 
 /* ---------- Clauses & connectives ----------
-   Combinatorial: an actions bank crossed with a reasons/conditions bank per
-   conjunction. The grammar being tested (identifying the conjunction) holds
-   regardless of the specific pairing, same principle as the other rebuilt
-   generators -- some pairings are more surprising than others, but none
-   are nonsensical or ungrammatical. */
-const CL_ACTIONS = ["I wanted to play outside","We stayed inside","She packed an umbrella","He tidied his room","I switched on the light","He wore a coat","We cancelled the picnic","She felt tired","They stayed indoors","I laughed","We hurried","He felt proud","She smiled","The dog barked","We celebrated","She left early","He hurried home","They waited outside","I made a cup of tea","She apologised","He called his friend","We looked out of the window","She checked her phone","He locked the door","They turned back"];
-const CL_BECAUSE_REASONS = ["the sun was shining","it was raining heavily","rain was forecast","his friends were visiting","the room was dark","it was cold outside","it started to rain","she had woken up early","the wind was strong","the joke was funny","we were running late","he had scored a goal","she had passed her test","a stranger knocked on the door","our team had won","the shop was closing","he had forgotten his keys","the bus didn't come","he had homework to finish","they wanted to help","the phone rang","something felt wrong","the battery was low","it was getting late","she felt unwell"];
-const CL_IF_CONDITIONS = ["the weather stays fine","you promise to return it","you hurry","you stay out in the rain","anything changes","we finish our homework first","it doesn't rain","you ask nicely","there's time afterwards","the shop is still open","you remember your kit","the bus is on time","she agrees","the ground isn't too muddy","we leave early enough"];
-const CL_UNTIL_CONDITIONS = ["you finish your homework","everyone is ready","he felt confident","the rain stops","the bell rings","she arrives","the game ends","the paint dries","the storm passes","dinner is ready","the guests leave","she calls back","the lesson finishes","the bus comes","it gets dark"];
-const CL_SO_PURPOSES = ["they would arrive on time","she would improve","everyone could understand","they could get good seats","nobody would go hungry","he could buy a bike","she wouldn't be late","they could see better","he wouldn't forget","everyone could join in","the team could practise","she could finish in time","he could catch the bus","they could keep warm","nobody would get lost"];
-const CL_ALTHOUGH_CLAUSES = ["the match was cancelled","it was raining","he was nervous","the film was long","she was exhausted","the queue was long","the journey was tiring","the room was crowded","the test was hard","he was younger than the others","the weather was cold","she had never done it before","the instructions were confusing","the path was steep","it was getting late"];
-const CL_WHILE_CLAUSES = ["the cake was baking","the adults chatted","the bread was rising","the plane was landing","she waited","the kettle boiled","the rain fell","the match was on","he practised his lines","the paint dried","the sun set","they queued outside","the film played","the class worked quietly","the storm passed"];
-const CL_SINCE_CLAUSES = ["you asked so nicely","the bridge was closed","the shop had closed early","nobody answered the door","the weather had improved","she was already awake","the tickets sold out","he had finished early","the road was blocked","everyone agreed","the rain had stopped","the shop was empty","the bus was late","she offered to help","the lesson had ended"];
-const CL_WHENEVER_CLAUSES = ["it snows","she visits","the bell rings","the tide comes in","he tells that joke","the holidays start","the team scores","it rains at the weekend","the post arrives","the market opens","a storm rolls in","the leaves start falling","she plays that song","the bus is late","the shop has a sale"];
-const CL_WHENEVER_RESULTS = ["the whole town seems to slow down","she brings a gift for everyone","the dog starts barking","the beach empties quickly","everyone groans","the shops get busy","the crowd goes wild","the roads get slippery","the whole street gets excited","the car park fills up fast","people rush indoors","the garden looks beautiful","the whole class sings along","tempers get short","there's a queue out the door"];
-const CL_WHO_PEOPLE = ["scientist","author","dentist","teacher","artist","firefighter","pilot","doctor","gardener","librarian","builder","vet","chef","coach","postman"];
-const CL_WHO_DEEDS = ["discovered the fossil","wrote this book","treated me last week","inspired me the most","painted this mural","rescued the kitten","flew us to Spain","gave me the injection","planted these roses","recommended this book","built the treehouse","looked after our dog","cooked the school dinners","trained the team","delivered the parcel"];
-const CL_WHO_RESULTS = ["worked at the museum","visited our school","was very gentle","retired last year","won a prize for it","became a local hero","had flown for twenty years","specialises in animals","has the best garden on the street","knows every book by heart","learned the trade from her father","volunteers every weekend","trained in Paris","used to play professionally","has done the job for years"];
-const CL_WHICH_THINGS = ["The bridge","The car","The painting","The statue","The clock tower","The library","The theatre","The stadium","The lighthouse","The castle","The garden","The fountain","The mural","The windmill","The tower"];
-const CL_WHICH_DESCRIPTIONS = ["was built in 1920","was completely rebuilt","hangs in the hallway","stands in the square","stopped working years ago","opened last summer","was designed by a famous architect","survived the fire","took ten years to build","was recently restored","is the oldest in the country","was donated by a local family","was damaged in the storm","attracts visitors from miles around","was painted over a century ago"];
-const CL_WHICH_RESULTS = ["is still standing today","looked brand new","is over a century old","honours local heroes","is now a popular landmark","remains a mystery to historians","is visited by thousands each year","has become the town's symbol","is protected by law","still works perfectly","was featured in a documentary","is the pride of the village","draws crowds every weekend","is now fully restored","stands exactly where it always has"];
-const CL_WHERE_PLACES = ["house","park","beach","classroom","garden","street","village","forest","harbour","school","farm","bridge","cottage","market","library"];
-const CL_WHERE_CONNECTIONS = ["I grew up","we used to play","the shipwreck was found","we had our first lesson","my grandparents met","the treasure was buried","the accident happened","she learned to swim","the festival takes place","the dog got lost","they filmed the movie","the battle was fought","we first met","the fire started","the concert was held"];
-const CL_WHY_REASONS = ["the trip was postponed","she was late this morning","the concert was cancelled","the match was delayed","he missed the bus","the shop closed early","the picnic was moved indoors","she couldn't come","the flight was grounded","the game was abandoned","they turned back early","the lesson overran","the parcel never arrived","the road was closed","the event sold out"];
+   Rebuilt 2026-09-28. The old version glued a random main clause to a random
+   subordinate clause, which gave nonsense ("Although she was exhausted, he felt
+   proud") and tense clashes ("I laughed until you finish your homework"), and it
+   only ever asked for the conjunction. These are whole sentences written by
+   hand, with the subordinate or relative clause in [brackets] and a
+   co-ordinating conjunction in {braces}, so the generator can ask what the real
+   papers ask: find the conjunction, pick out the subordinate clause, pick out
+   the main clause, co-ordinating or subordinating, and relative clauses. */
+const SUB_CLAUSE_SENTENCES = [
+  "We stayed inside [because it was pouring with rain].",
+  "[When the bell rang], everyone hurried back to class.",
+  "Harry fell asleep [before the film had finished].",
+  "[Although she was nervous], Ocean sang beautifully.",
+  "You can have a biscuit [if you finish your homework].",
+  "[After the storm passed], a rainbow appeared over the hills.",
+  "The dog barked [until the postman had gone].",
+  "[While Dad was cooking], Tilly set the table.",
+  "[Since the bus was late], we missed the start of the match.",
+  "The ice cream melted [because the sun was so hot].",
+  "[If it snows tomorrow], we will build a snowman.",
+  "Mum checked the map [before we set off].",
+  "[As the sun set], the sky turned orange.",
+  "The crowd cheered [when the winning goal went in].",
+  "Keep stirring the sauce [until it starts to bubble].",
+  "William smiled [although he had lost the game].",
+  "[Whenever it rains], the path gets muddy.",
+  "We ate our sandwiches [while we waited for the train].",
+  "[Before you cross the road], look both ways.",
+  "The plants grew quickly [because we watered them every day].",
+  "[Unless we hurry], we will miss the bus.",
+  "Millie was allowed to stay up late [since it was a special occasion].",
+  "[Once the paint was dry], we hung the picture on the wall.",
+  "The hedgehog curled into a ball [when it heard the dog].",
+  "[Because the river had flooded], the road was shut.",
+  "I will call you [when I get home].",
+  "The birds flew south [before winter arrived].",
+  "[Although the test was hard], everyone tried their best.",
+  "Edie laughed [until her sides ached].",
+  "[If you feel cold], put on a jumper.",
+  "The shop was empty [because everyone had gone to the carnival].",
+  "[After we had finished our lunch], we went rock-pooling.",
+  "Harry practised his spellings [so that he would do well in the test].",
+  "[As soon as the whistle blew], the players ran onto the pitch.",
+  "The baby slept soundly [even though the fireworks were loud].",
+  "[Wherever we went], the little dog followed us.",
+];
+const COORD_SENTENCES = [
+  "We wanted to go to the beach, {but} it started to rain.",
+  "Harry played the drums {and} Tilly played the piano.",
+  "You can have an apple {or} you can have a banana.",
+  "The shop was shut, {so} we went home.",
+  "Ocean loves dancing {and} she practises every day.",
+  "I knocked on the door, {but} nobody answered.",
+  "The cake was delicious, {so} we asked for another slice.",
+  "We could walk to the park {or} we could catch the bus.",
+  "The sun came out {and} the puddles began to dry.",
+  "Edie tried to catch the ball, {but} it slipped through her fingers.",
+  "It was getting dark, {so} we switched on our torches.",
+  "Millie wanted a puppy, {but} her mum said no.",
+];
+const REL_CLAUSE_SENTENCES = [
+  "The girl [who lives next door] has a pet tortoise.",
+  "The cake [that Gran baked] was delicious.",
+  "Our school, [which was built in 1910], has a bell tower.",
+  "That is the park [where we had the picnic].",
+  "The boy [whose bike was stolen] told a police officer.",
+  "I still remember the day [when we moved house].",
+  "The film [that we watched last night] was very funny.",
+  "My aunt, [who is a vet], looked after our rabbit.",
+  "The book [which I borrowed from the library] is overdue.",
+  "The beach [where we found the fossils] is near Whitby.",
+  "The man [whose dog barks all night] lives at number six.",
+  "Harry, [who is the fastest runner in our class], won the race.",
+  "The key [that opens the shed] is under the mat.",
+  "We visited the castle, [which is over 800 years old].",
+  "The teacher [who taught my mum] still works at our school.",
+  "The café [where Millie works] sells amazing cakes.",
+  "The tree [which fell in the storm] had stood for a hundred years.",
+  "Tilly, [whose painting won first prize], was delighted.",
+];
+/* Sentences with no relative clause that a child might think have one. */
+const REL_DECOYS = [
+  "Which coat is yours?", "Who left the gate open?", "Where did you find that shell?",
+  "Whose turn is it to wash up?", "Which way is the station?", "Who wants to play football?",
+];
+const COORD_CONJ = ['and','but','or','so'];
 
-/* Tier-0 clause banks. Past tense, third or first person, so they sit with the
-   existing CL_ACTIONS openings without any agreement problems. */
-const CL_WHEN_EVENTS = [
-  "the bell rang", "it started to rain", "the film finished", "the sun came out",
-  "the lights went off", "her name was called", "the whistle blew", "the door opened",
-  "the music stopped", "the kettle boiled", "the bus finally arrived", "the storm passed"
-];
-const CL_AFTER_EVENTS = [
-  "the match had finished", "we had eaten", "the rain had stopped", "she had said sorry",
-  "the guests had gone home", "he had finished his homework", "the bell had gone",
-  "the tide had turned", "everyone had left", "the cake had cooled"
-];
-const CL_BEFORE_EVENTS = [
-  "the shop closed", "it got dark", "the others arrived", "the rain started",
-  "the film began", "anyone noticed", "the bus came", "her mum got home",
-  "the ice melted", "the whistle went"
-];
+function parseSub(s){
+  const m = s.match(/\[([^\]]+)\]/);
+  const sub = m[1];
+  const plain = s.replace(/[\[\]]/g, '');
+  const conjWords = sub.match(/^(as soon as|even though|so that)\b/i);
+  const conj = conjWords ? conjWords[1] : sub.split(' ')[0];
+  const main = s.replace(/\[[^\]]+\],?\s*/, '').replace(/[\s,.!?]+$/, '').replace(/\s+,/, ',').trim();
+  const subNoConj = sub.slice(conj.length).trim();
+  return { plain, sub, conj, main: main.replace(/\s{2,}/g, ' '), subNoConj, fronted: s.startsWith('[') };
+}
+function parseCoord(s){
+  const conj = s.match(/\{(\w+)\}/)[1];
+  return { plain: s.replace(/[{}]/g, ''), conj };
+}
+function parseRel(s){
+  const m = s.match(/\[([^\]]+)\]/);
+  const rel = m[1];
+  const plain = s.replace(/[\[\]]/g, '');
+  const pronoun = rel.split(' ')[0];
+  const after = s.slice(s.indexOf(']') + 1).replace(/^[\s,]+/, '').replace(/[\s,.!?]+$/, '');
+  const before = s.slice(0, s.indexOf('[')).replace(/[\s,]+$/, '');
+  return { plain, rel, pronoun, after, before, relNoPronoun: rel.slice(pronoun.length).trim() };
+}
+const CLAUSE_DEFS = {
+  sub: "A subordinate clause starts with a subordinating conjunction (like because, when, if, although, until) and does not make sense on its own — it depends on the main clause.",
+  main: "A main clause makes sense on its own as a sentence.",
+  coord: "Co-ordinating conjunctions (and, but, or, so) join two main clauses that are equally important.",
+  rel: "A relative clause gives extra information about a noun. It starts with a relative pronoun such as who, which, that, whose, where or when.",
+};
 
 function genClauses(diff){
-  if(diff === 0){
-    /* All subordinating conjunctions, so the explanation holds for each. */
-    const action = bagChoice('cl0-action', CL_ACTIONS);
-    const kind = choice(['because', 'when', 'if', 'after', 'before']);
-    let clause;
-    if(kind === 'because')    clause = bagChoice('cl0-because', CL_BECAUSE_REASONS);
-    else if(kind === 'when')  clause = bagChoice('cl0-when', CL_WHEN_EVENTS);
-    else if(kind === 'if')    clause = bagChoice('cl0-if', CL_IF_CONDITIONS);
-    else if(kind === 'after') clause = bagChoice('cl0-after', CL_AFTER_EVENTS);
-    else                      clause = bagChoice('cl0-before', CL_BEFORE_EVENTS);
-    return clauseResult(`${action} ${kind} ${clause}.`, kind, false);
-  }
-  if(diff === 1){
-    const kind = choice(['if','until','so']);
-    let s;
-    if(kind === 'if'){ s = `${bagChoice('cl1-action-if', CL_ACTIONS)} if ${bagChoice('cl1-if', CL_IF_CONDITIONS)}.`; }
-    else if(kind === 'until'){ s = `${bagChoice('cl1-action-until', CL_ACTIONS)} until ${bagChoice('cl1-until', CL_UNTIL_CONDITIONS)}.`; }
-    else { s = `${bagChoice('cl1-action-so', CL_ACTIONS)} so ${bagChoice('cl1-so', CL_SO_PURPOSES)}.`; }
-    return clauseResult(s, kind, false);
-  }
-  if(diff === 2){
-    const kind = choice(['although','while','since','whenever']);
-    let s;
-    const lowerFirst = w => w.charAt(0).toLowerCase() + w.slice(1);
-    if(kind === 'although'){ s = `Although ${bagChoice('cl2-although', CL_ALTHOUGH_CLAUSES)}, ${lowerFirst(bagChoice('cl2-action-although', CL_ACTIONS))}.`; }
-    else if(kind === 'while'){ s = `While ${bagChoice('cl2-while', CL_WHILE_CLAUSES)}, ${lowerFirst(bagChoice('cl2-action-while', CL_ACTIONS))}.`; }
-    else if(kind === 'since'){ s = `Since ${bagChoice('cl2-since', CL_SINCE_CLAUSES)}, ${lowerFirst(bagChoice('cl2-action-since', CL_ACTIONS))}.`; }
-    else { s = `Whenever ${bagChoice('cl2-whenever', CL_WHENEVER_CLAUSES)}, ${bagChoice('cl2-whenever-result', CL_WHENEVER_RESULTS)}.`; }
-    return clauseResult(s, kind, false);
-  }
-  const kind = choice(['who','which','where','why']);
-  let s;
-  if(kind === 'who'){
-    const person = bagChoice('cl3-who-person', CL_WHO_PEOPLE);
-    s = `The ${person} who ${bagChoice('cl3-who-deed', CL_WHO_DEEDS)} ${bagChoice('cl3-who-result', CL_WHO_RESULTS)}.`;
-  } else if(kind === 'which'){
-    s = `${bagChoice('cl3-which-thing', CL_WHICH_THINGS)}, which ${bagChoice('cl3-which-desc', CL_WHICH_DESCRIPTIONS)}, ${bagChoice('cl3-which-result', CL_WHICH_RESULTS)}.`;
-  } else if(kind === 'where'){
-    s = `This is the ${bagChoice('cl3-where-place', CL_WHERE_PLACES)} where ${bagChoice('cl3-where-conn', CL_WHERE_CONNECTIONS)}.`;
-  } else {
-    s = `That's the reason why ${bagChoice('cl3-why-reason', CL_WHY_REASONS)}.`;
-  }
-  return clauseResult(s, kind, true);
-}
-function clauseResult(s, conj, isRelative){
-  const kind = isRelative ? "relative pronoun that starts the relative clause" : "conjunction that joins the two clauses";
-  /* The real papers say "Underline the subordinate clause" as often as they ask
-     a question about it, so about half the time the sentence is offered as
-     clickable words instead of a question to answer in writing. */
-  if(Math.random() < 0.5){
+  const r = Math.random();
+  let format;
+  if(diff === 0)      format = r < 0.75 ? 'clickconj' : 'typeconj';
+  else if(diff === 1) format = r < 0.4 ? 'clickconj' : r < 0.8 ? 'subpart' : 'coordsub';
+  else if(diff === 2) format = r < 0.25 ? 'subpart' : r < 0.5 ? 'mainpart' : r < 0.75 ? 'whichsub' : 'coordsub';
+  else                format = r < 0.25 ? 'relclick' : r < 0.5 ? 'relpart' : r < 0.75 ? 'whichrel' : choice(['mainpart','whichsub','coordsub']);
+
+  if(format === 'clickconj' || format === 'typeconj'){
+    const useCoord = diff === 0 && Math.random() < 0.35;
+    const q = useCoord ? parseCoord(bagChoice('cl-coord', COORD_SENTENCES)) : parseSub(bagChoice('cl-sub', SUB_CLAUSE_SENTENCES));
+    const conj = q.conj.toLowerCase();
+    const why = useCoord ? CLAUSE_DEFS.coord : CLAUSE_DEFS.sub;
+    if(format === 'clickconj' && conj.indexOf(' ') === -1){
+      return {
+        text: `Click the conjunction in this sentence.`,
+        sentence: q.plain, targets: [conj], answer: conj,
+        steps: [`A conjunction is a joining word that links two clauses.`, why, `The conjunction here is "${conj}".`],
+      };
+    }
     return {
-      text: `Click the ${kind} in this sentence.`,
-      sentence: s,
-      targets: [String(conj).toLowerCase()],
+      text: `Which word or words join the two clauses in this sentence? — "${q.plain}"`,
       answer: conj,
+      steps: [`A conjunction is a joining word that links two clauses.`, why, `The conjunction here is "${conj}".`],
+    };
+  }
+
+  if(format === 'subpart' || format === 'mainpart'){
+    const q = parseSub(bagChoice('cl-sub-part', SUB_CLAUSE_SENTENCES));
+    const isSub = format === 'subpart';
+    const opts = isSub ? [q.sub, q.main, q.subNoConj] : [q.main, q.sub, q.subNoConj];
+    return {
+      text: `Which part of this sentence is the ${isSub ? 'subordinate' : 'main'} clause? — "${q.plain}"`,
+      options: shuffleCopy([...new Set(opts)]),
+      answer: isSub ? q.sub : q.main,
       steps: [
-        isRelative
-          ? `A relative clause gives extra information about a noun, and starts with a relative pronoun like who, which, where or why.`
-          : `This sentence has a main clause and a subordinate clause, joined by a conjunction.`,
-        `"${conj}" is the answer here.`,
+        isSub ? CLAUSE_DEFS.sub : CLAUSE_DEFS.main,
+        `"${q.main}" could be a sentence on its own, so it is the main clause.`,
+        `"${q.sub}" starts with the conjunction "${q.conj}" and doesn't make sense alone, so it is the subordinate clause. The conjunction is part of the subordinate clause.`,
       ],
     };
   }
+
+  if(format === 'coordsub'){
+    const useCoord = Math.random() < 0.5;
+    const q = useCoord ? parseCoord(bagChoice('cl-coord-cs', COORD_SENTENCES)) : parseSub(bagChoice('cl-sub-cs', SUB_CLAUSE_SENTENCES));
+    const ans = useCoord ? 'co-ordinating' : 'subordinating';
+    return {
+      text: `Is "${q.conj.toLowerCase()}" a co-ordinating or a subordinating conjunction in this sentence? — "${q.plain}"`,
+      options: ['co-ordinating', 'subordinating'],
+      answer: ans,
+      steps: [CLAUSE_DEFS.coord, CLAUSE_DEFS.sub, `"${q.conj.toLowerCase()}" is ${ans} here.`],
+    };
+  }
+
+  if(format === 'whichsub'){
+    const target = parseSub(bagChoice('cl-sub-which', SUB_CLAUSE_SENTENCES));
+    const coords = shuffleCopy(COORD_SENTENCES).slice(0, 2).map(s => parseCoord(s).plain);
+    const simple = parseTagged(choice(WC_SIMPLE)).plain;
+    return {
+      text: `Which sentence contains a subordinate clause?`,
+      options: shuffleCopy([target.plain, simple].concat(coords)),
+      answer: target.plain,
+      steps: [
+        CLAUSE_DEFS.sub,
+        `In "${target.plain}", the subordinate clause is "${target.sub}".`,
+        `The sentences joined by and, but, or or so have two main clauses and no subordinate clause.`,
+      ],
+    };
+  }
+
+  const q = parseRel(bagChoice('cl-rel-' + format, REL_CLAUSE_SENTENCES));
+  if(format === 'relclick'){
+    return {
+      text: `Click the word that begins the relative clause in this sentence.`,
+      sentence: q.plain, targets: [q.pronoun.toLowerCase()], answer: q.pronoun.toLowerCase(),
+      steps: [CLAUSE_DEFS.rel, `The relative clause is "${q.rel}", so it begins with "${q.pronoun}".`],
+    };
+  }
+  if(format === 'relpart'){
+    const other = q.after.split(' ').length >= 2 ? q.after : q.before;
+    return {
+      text: `Which part of this sentence is the relative clause? — "${q.plain}"`,
+      options: shuffleCopy([...new Set([q.rel, other, q.relNoPronoun])]),
+      answer: q.rel,
+      steps: [CLAUSE_DEFS.rel, `Here it is "${q.rel}" — it tells us more about the noun just before it, and starts with "${q.pronoun}".`],
+    };
+  }
+  /* whichrel: the decoys are real trap sentences -- a question starting with
+     Which or Who, and a sentence with an ordinary subordinate clause. */
+  const decoyQ = choice(REL_DECOYS);
+  const decoySub = parseSub(choice(SUB_CLAUSE_SENTENCES)).plain;
+  const simple = parseTagged(choice(WC_SIMPLE)).plain;
   return {
-    text: `What is the ${kind} in this sentence? — "${s}"`,
-    answer: conj,
+    text: `Which sentence contains a relative clause?`,
+    options: shuffleCopy([q.plain, decoyQ, decoySub, simple]),
+    answer: q.plain,
     steps: [
-      isRelative
-        ? `A relative clause gives extra information about a noun, and starts with a relative pronoun like who, which, where or why.`
-        : `This sentence has a main clause and a subordinate clause, joined by a conjunction.`,
-      `"${conj}" is the answer here.`,
+      CLAUSE_DEFS.rel,
+      `In "${q.plain}", the relative clause is "${q.rel}".`,
+      `"${decoyQ}" starts with a question word, not a relative pronoun — it is a question, and has no relative clause.`,
     ],
   };
 }
 
-/* ---------- Words & Standard English ---------- */
+/* ---------- Words & Standard English ----------
+   Synonym/antonym rows: [word, synonym, antonym, meaning-groups]. The groups
+   stop a wrong option from accidentally meaning the same thing -- "bright" and
+   "clever" share a group, so "intelligent" is never offered as a WRONG answer
+   for "bright". Real papers give four options, not two. */
 const SYN_ANT_BANK = [
-  ["happy","joyful","sad"],
-  ["angry","furious","calm"],
-  ["big","enormous","tiny"],
-  ["quick","rapid","slow"],
-  ["scared","frightened","fearless"],
-  ["tired","exhausted","energetic"],
-  ["brave","courageous","cowardly"],
-  ["generous","kind","selfish"],
-  ["difficult","challenging","simple"],
-  ["ancient","old","modern"],
-  ["beautiful","gorgeous","hideous"],
-  ["dangerous","risky","safe"],
-  ["delicious","tasty","disgusting"],
-  ["gloomy","miserable","cheerful"],
-  ["huge","enormous","miniature"],
-  ["polite","courteous","rude"],
-  ["wealthy","rich","poor"],
-  ["narrow","slim","wide"],
-  ["strong","powerful","weak"],
-  ["bright","brilliant","dim"],
-  ["loud","noisy","quiet"],
-  ["fast","speedy","sluggish"],
-  ["clean","spotless","filthy"],
-  ["fresh","new","stale"],
-  ["strange","odd","ordinary"],
-  ["fierce","ferocious","gentle"],
-  ["tiny","minuscule","gigantic"],
-  ["cheerful","jolly","gloomy"],
-  ["clever","intelligent","foolish"],
-  ["cruel","harsh","kind"],
-  ["dull","boring","exciting"],
-  ["eager","keen","reluctant"],
-  ["fair","just","unfair"],
-  ["fragile","delicate","sturdy"],
-  ["gentle","tender","rough"],
-  ["honest","truthful","dishonest"],
-  ["mighty","powerful","feeble"],
-  ["nervous","anxious","relaxed"],
-  ["obedient","compliant","rebellious"],
-  ["silent","hushed","noisy"],
+  ["happy","joyful","sad",["mood"]],
+  ["angry","furious","calm",["anger"]],
+  ["big","enormous","tiny",["size"]],
+  ["quick","rapid","slow",["speed"]],
+  ["scared","frightened","fearless",["fear"]],
+  ["tired","exhausted","energetic",["energy"]],
+  ["brave","courageous","cowardly",["fear"]],
+  ["generous","giving","selfish",["kind"]],
+  ["difficult","challenging","simple",["hard"]],
+  ["ancient","old","modern",["age"]],
+  ["beautiful","gorgeous","hideous",["looks"]],
+  ["dangerous","risky","safe",["danger"]],
+  ["delicious","tasty","disgusting",["taste"]],
+  ["gloomy","miserable","cheerful",["mood"]],
+  ["huge","gigantic","miniature",["size"]],
+  ["polite","courteous","rude",["manners"]],
+  ["wealthy","rich","poor",["money"]],
+  ["wide","broad","narrow",["width"]],
+  ["strong","powerful","weak",["strength"]],
+  ["bright","brilliant","dim",["bright"]],
+  ["loud","noisy","quiet",["sound"]],
+  ["fast","speedy","sluggish",["speed"]],
+  ["clean","spotless","filthy",["clean"]],
+  ["fresh","new","stale",["age"]],
+  ["strange","odd","ordinary",["strange"]],
+  ["fierce","ferocious","gentle",["fierce"]],
+  ["tiny","minuscule","enormous",["size"]],
+  ["cheerful","jolly","gloomy",["mood"]],
+  ["clever","intelligent","foolish",["bright"]],
+  ["cruel","heartless","kind",["kind","fierce"]],
+  ["dull","boring","exciting",["bright","interest"]],
+  ["eager","keen","reluctant",["eager"]],
+  ["fair","just","unfair",["fair"]],
+  ["fragile","delicate","sturdy",["strength"]],
+  ["gentle","tender","rough",["fierce"]],
+  ["honest","truthful","dishonest",["fair"]],
+  ["mighty","powerful","feeble",["strength"]],
+  ["nervous","anxious","relaxed",["fear","anger"]],
+  ["obedient","well-behaved","naughty",["manners"]],
+  ["silent","hushed","noisy",["sound"]],
+  ["hungry","starving","full",["food"]],
+  ["begin","start","finish",["time"]],
+  ["shout","yell","whisper",["sound"]],
+  ["enormous","massive","tiny",["size"]],
+  ["damp","moist","dry",["wet"]],
+  ["peculiar","weird","normal",["strange"]],
+  ["timid","shy","bold",["fear"]],
+  ["lazy","idle","hard-working",["energy"]],
+  ["freezing","icy","boiling",["temp"]],
+  ["famous","well-known","unknown",["fame"]],
 ];
+function synAntDistractors(row){
+  const groups = row[3];
+  const pool = [];
+  SYN_ANT_BANK.forEach(r => {
+    if(r[3].some(g => groups.includes(g))) return;
+    pool.push(r[0], r[1], r[2]);
+  });
+  const clean = [...new Set(pool)].filter(w => !row.slice(0, 3).includes(w));
+  return shuffleCopy(clean).slice(0, 2);
+}
 const STANDARD_ENGLISH_BANK = [
   { s:"We was late for the bus.", wrong:"was", correct:"were" },
   { s:"I done my homework already.", wrong:"done", correct:"did" },
   { s:"They was playing in the garden.", wrong:"was", correct:"were" },
-  { s:"She never done nothing wrong.", wrong:"done", correct:"did" },
+  { s:"She done her best in the race.", wrong:"done", correct:"did" },
   { s:"He don't like vegetables.", wrong:"don't", correct:"doesn't" },
-  { s:"There's less biscuits in the tin than yesterday.", wrong:"less", correct:"fewer" },
+  { s:"There are less biscuits in the tin than yesterday.", wrong:"less", correct:"fewer" },
   { s:"She is the goodest player on the team.", wrong:"goodest", correct:"best" },
   { s:"We done really well in the match.", wrong:"done", correct:"did" },
   { s:"I seen that film already.", wrong:"seen", correct:"saw" },
@@ -1087,8 +1428,7 @@ const STANDARD_ENGLISH_BANK = [
   { s:"There is many reasons to celebrate.", wrong:"is", correct:"are" },
   { s:"Them shoes are mine.", wrong:"Them", correct:"Those" },
   { s:"She don't know the answer.", wrong:"don't", correct:"doesn't" },
-  { s:"He runs quicker than what I do.", wrong:"than what I do", correct:"than I do" },
-  { s:"I could of helped if you'd asked.", wrong:"could of", correct:"could have" },
+  { s:"I could of helped if you'd asked.", wrong:"of", correct:"have" },
   { s:"That's the bestest present ever.", wrong:"bestest", correct:"best" },
   { s:"She sings beautiful.", wrong:"beautiful", correct:"beautifully" },
   { s:"He plays football good.", wrong:"good", correct:"well" },
@@ -1097,29 +1437,39 @@ const STANDARD_ENGLISH_BANK = [
   { s:"I have wrote a letter to my cousin.", wrong:"wrote", correct:"written" },
   { s:"This is more better than the last one.", wrong:"more better", correct:"better" },
   { s:"He is the most tallest boy in the class.", wrong:"most tallest", correct:"tallest" },
-  { s:"I never done my chores this morning.", wrong:"done", correct:"did" },
   { s:"She has less friends than she used to.", wrong:"less", correct:"fewer" },
   { s:"We was hoping to win the match.", wrong:"was", correct:"were" },
-  { s:"He don't want no dinner.", wrong:"don't want no", correct:"doesn't want any" },
-  { s:"That book is more interesting than what this one is.", wrong:"than what this one is", correct:"than this one" },
+  { s:"Me and Harry went to the park.", wrong:"Me and Harry", correct:"Harry and I" },
+  { s:"I ain't finished yet.", wrong:"ain't", correct:"haven't" },
+  { s:"You was right all along.", wrong:"was", correct:"were" },
+  { s:"Can I lend your pencil?", wrong:"lend", correct:"borrow" },
+  { s:"He has broke the window.", wrong:"broke", correct:"broken" },
+  { s:"Them apples are delicious.", wrong:"Them", correct:"Those" },
+  { s:"She come to my house yesterday.", wrong:"come", correct:"came" },
+  { s:"We is going on holiday soon.", wrong:"is", correct:"are" },
+  { s:"I'm more happier today.", wrong:"more happier", correct:"happier" },
 ];
-/* Voice is fully combinatorial and mechanically correct: passive-voice
-   transformation is a deterministic grammar rule (subject and object swap,
-   "was/were [verb] by" is inserted), not something that needs semantic
-   matching, so any subject+verb+object combination transforms correctly. */
-const VOICE_SUBJECTS = ["The dog","The wind","A famous artist","The chef","Lightning","The librarian","A huge wave","The gardener","A sudden storm","The architect","Volunteers","The teacher","A talented photographer","The council","An experienced pilot","The scientist","A local charity","The builder","An enthusiastic crowd","The postman"];
-const VOICE_VERBS = ["chased","knocked down","painted","prepared","struck","organised","capsized","planted","designed","cleaned","delayed","repaired","cheered","praised","launched","damaged","rescued","discovered","protected","inspected"];
-/* Deliberately all singular ("the cat", not "the cats") -- passive voice
-   needs "was" vs "were" to agree with whichever noun becomes the new
-   subject, and keeping every object singular sidesteps that agreement
-   entirely rather than risking it. */
-const VOICE_OBJECTS = ["the cat","the fence","this mural","a delicious meal","the old oak tree","the bookshelf","the small boat","the flower bed","the new library","the entire street","the whole class","a rare butterfly","the ancient statue","the flooded field","the injured bird","the missing treasure","the wildlife reserve","the historic bridge","the local team","the abandoned house"];
+/* Voice: hand-written so every pair makes sense ("The ancient statue was
+   cheered by a huge wave" came out of the old mix-and-match version). Every
+   verb's past tense and past participle are the same word, so the passive is
+   built mechanically and is always right. */
+const VOICE_PAIRS = [
+  ["The dog","chased","the cat"], ["The chef","prepared","a delicious meal"],
+  ["A huge wave","capsized","the small boat"], ["The gardener","planted","the rose bush"],
+  ["Lightning","struck","the old oak tree"], ["A famous architect","designed","the new library"],
+  ["The mechanic","repaired","the car"], ["A local artist","painted","this mural"],
+  ["The storm","damaged","the roof"], ["The lifeguard","rescued","the swimmer"],
+  ["The children","decorated","the classroom"], ["The cat","caught","a mouse"],
+  ["Volunteers","cleaned","the beach"], ["The headteacher","praised","the choir"],
+  ["A scientist","discovered","the fossil"], ["The wind","knocked down","the fence"],
+  ["The postman","delivered","the parcel"], ["The referee","stopped","the match"],
+  ["Our class","won","the quiz"], ["A kind stranger","found","the lost purse"],
+  ["The vet","treated","the injured bird"], ["The builders","finished","the new bridge"],
+];
 function capFirst(w){ return w.charAt(0).toUpperCase() + w.slice(1); }
 function lowerFirst(w){ return w.charAt(0).toLowerCase() + w.slice(1); }
 function genVoicePair(){
-  const subject = bagChoice('voice-subj', VOICE_SUBJECTS);
-  const verb = bagChoice('voice-verb', VOICE_VERBS);
-  const object = bagChoice('voice-obj', VOICE_OBJECTS);
+  const [subject, verb, object] = bagChoice('voice-pair', VOICE_PAIRS);
   return {
     active: `${subject} ${verb} ${object}.`,
     passive: `${capFirst(object)} was ${verb} by ${lowerFirst(subject)}.`,
@@ -1127,28 +1477,41 @@ function genVoicePair(){
 }
 function genStandardEnglish(diff){
   if(diff === 0 || diff === 1){
-    const [word, syn, ant] = bagChoice('synant', SYN_ANT_BANK);
+    const row = bagChoice('synant', SYN_ANT_BANK);
+    const [word, syn, ant] = row;
+    const extra = synAntDistractors(row);
     if(diff === 1 && Math.random() < 0.5){
       return {
         text: `Which word means the OPPOSITE of "${word}"?`,
-        options: Math.random() < 0.5 ? [syn, ant] : [ant, syn],
+        options: shuffleCopy([syn, ant].concat(extra)),
         answer: ant,
         steps: [ `"${syn}" means almost the same as "${word}" — that's a synonym.`, `"${ant}" means the opposite of "${word}" — that's an antonym, and the answer here.` ],
       };
     }
     return {
       text: `Which word means almost the SAME as "${word}"?`,
-      options: Math.random() < 0.5 ? [syn, ant] : [ant, syn],
+      options: shuffleCopy([syn, ant].concat(extra)),
       answer: syn,
       steps: [ `"${syn}" means almost the same as "${word}" — this is called a synonym.`, `"${ant}" means the opposite, so it isn't the answer.` ],
     };
   }
   if(diff === 2){
     const item = bagChoice('stdeng', STANDARD_ENGLISH_BANK);
+    const fixed = item.s.replace(item.wrong, item.correct);
+    /* Half the time, tick the Standard English sentence -- the papers ask both ways. */
+    if(Math.random() < 0.5){
+      const other = choice(STANDARD_ENGLISH_BANK.filter(x => x !== item));
+      return {
+        text: `Which sentence is written in Standard English?`,
+        options: shuffleCopy([fixed, item.s, other.s]),
+        answer: fixed,
+        steps: [ `Standard English is the formal English used in writing and in exams.`, `"${item.wrong}" is not Standard English here — it should be "${item.correct}".`, `So "${fixed}" is the Standard English sentence.` ],
+      };
+    }
     return {
-      text: `This sentence uses informal, non-Standard English: "${item.s}" — which word should replace "${item.wrong}" in Standard English?`,
+      text: `This sentence is not written in Standard English: "${item.s}" — what should replace "${item.wrong}"?`,
       answer: item.correct,
-      steps: [ `In Standard English, "${item.wrong}" should be "${item.correct}" here.`, `Correct sentence: "${item.s.replace(item.wrong, item.correct)}"` ],
+      steps: [ `In Standard English, "${item.wrong}" should be "${item.correct}" here.`, `Correct sentence: "${fixed}"` ],
     };
   }
   /* Passive voice appears about once in every real paper, so it stays - but it
@@ -1167,16 +1530,26 @@ function genStandardEnglish(diff){
     };
   }
   const item = genVoicePair();
+  if(Math.random() < 0.35){
+    return {
+      text: `Which sentence is written in the passive voice?`,
+      options: shuffleCopy([item.active, item.passive]),
+      answer: item.passive,
+      steps: [ `In the passive voice, the thing the action happens to comes first: "${item.passive}"`, `"${item.active}" is active — the one doing the action comes first.` ],
+    };
+  }
   const showActive = Math.random() < 0.5;
   if(showActive){
     return {
-      text: `Is this sentence written in the ACTIVE or PASSIVE voice? — "${item.active}"`,
+      text: `Is this sentence written in the active or passive voice? — "${item.active}"`,
+      options: ['active', 'passive'],
       answer: "active",
       steps: [ `In the active voice, the subject does the action: "${item.active}"`, `(The passive version would be: "${item.passive}")` ],
     };
   }
   return {
-    text: `Is this sentence written in the ACTIVE or PASSIVE voice? — "${item.passive}"`,
+    text: `Is this sentence written in the active or passive voice? — "${item.passive}"`,
+    options: ['active', 'passive'],
     answer: "passive",
     steps: [ `In the passive voice, the subject has the action done to it: "${item.passive}"`, `(The active version would be: "${item.active}")` ],
   };
@@ -1218,6 +1591,13 @@ const SUFFIX_FORMS = [
   ["comfort","able","comfortable","adjective"],["sense","ible","sensible","adjective"],
   ["wood","en","wooden","adjective"],["nation","al","national","adjective"]
 ];
+/* Other correct answers: "harm" + a suffix makes harmful as well as harmless. */
+const SUFFIX_ALSO = {
+  enjoy:[], treat:[], punish:[], kind:[], dark:[], happy:[],
+  act:["actor","activity","acting"], decide:["decider"], teach:["teaching"], invent:["invention"],
+  care:["careless"], hope:["hopeless"], harm:["harmful"], end:[], child:["childlike","childless"],
+  danger:[], comfort:["comforting","comfortless"], sense:["senseless"], wood:["woody","wooded"], nation:[]
+};
 const SUFFIX_TRICKY = [
   ["rely","able","reliable"],["possible","ly","possibly"],["beauty","ful","beautiful"],
   ["courage","ous","courageous"],["happy","ly","happily"],["gentle","ly","gently"],
@@ -1238,13 +1618,17 @@ const PROGRESSIVE_FRAMES = [
   ["We","wait","for the bus"],["He","read","his library book"],
   ["They","paint","the fence"],["The children","play","in the garden"],
   ["I","write","a letter"],["The cat","sleep","on the windowsill"],
-  ["My brother","practise","the piano"],["The team","train","for the match"]
+  ["My brother","practise","the piano"],["The players","train","for the match"],
+  ["Mum","bake","a birthday cake"],["The birds","sing","in the trees"],
+  ["Ocean","dance","on the stage"],["You","shout","very loudly"]
 ];
 const PERFECT_FRAMES = [
   ["They","finish","their homework"],["We","eat","all the sandwiches"],
   ["She","forget","her packed lunch"],["The builders","build","a new wall"],
   ["I","lose","my reading book"],["He","break","the world record"],
-  ["The class","write","their reports"],["You","grow","so much this year"]
+  ["The pupils","write","their reports"],["You","grow","so much this year"],
+  ["Harry","finish","his model"],["The farmers","plant","their seeds"],
+  ["Millie","visit","the museum"],["The sun","go","down"]
 ];
 const MODAL_SENTENCES = [
   ["You must remember to lock the door.","must"],
@@ -1254,8 +1638,12 @@ const MODAL_SENTENCES = [
   ["They will arrive at six o'clock.","will"],
   ["I can hear the sea from here.","can"],
   ["You may borrow my umbrella.","may"],
-  ["The parcel would have come today.","would"],
-  ["Children shall be collected at three.","shall"],
+  ["I would love to come to your party.","would"],
+  ["Shall we go to the park later?","shall"],
+  ["It might snow tonight.","might"],
+  ["You should wear a helmet on your bike.","should"],
+  ["We must be home by six.","must"],
+  ["Can you help me lift this box?","can"],
   ["We ought to apologise.","ought"]
 ];
 const FORMAL_PAIRS = [
@@ -1268,7 +1656,8 @@ function genPrefixSuffix(diff){
   if(diff === 0){
     const [word, prefix] = bagChoice('pfx0', PREFIX_OPPOSITES);
     return {
-      text: `Which prefix makes the opposite of "${word}"? Write just the prefix.`,
+      text: `Which prefix makes the opposite of "${word}"?`,
+      options: Math.random() < 0.6 ? shuffleCopy([prefix].concat(shuffleCopy(["un","dis","im","in","ir","il","mis","non"].filter(x => x !== prefix)).slice(0, 3))) : undefined,
       answer: prefix,
       answerAliases: [prefix + "-"],
       steps: [
@@ -1279,10 +1668,12 @@ function genPrefixSuffix(diff){
   }
   if(diff === 1){
     const [root, suffix, result, type] = bagChoice('sfx1', SUFFIX_FORMS);
+    const also = SUFFIX_ALSO[root] || [];
     const article = /^[aeiou]/i.test(type) ? 'an' : 'a';
     return {
       text: `Add a suffix to "${root}" to make ${article} ${type}. Write the whole new word.`,
       answer: result,
+      answerAliases: also,
       steps: [
         `A suffix goes on the end of a word and often changes its word class.`,
         `"${root}" + "-${suffix}" makes "${result}", which is a ${type}.`
@@ -1291,8 +1682,11 @@ function genPrefixSuffix(diff){
   }
   if(diff === 2){
     const [prefix, meaning, example] = bagChoice('pfx2', PREFIX_MEANINGS);
+    /* Always tick-one: "by itself or by oneself" is not something to type. */
+    const wrongMeanings = shuffleCopy(PREFIX_MEANINGS.map(m => m[1]).filter(m => m !== meaning)).slice(0, 3);
     return {
       text: `What does the prefix "${prefix}-" mean, as in the word "${example}"?`,
+      options: shuffleCopy(wrongMeanings.concat([meaning])),
       answer: meaning,
       steps: [
         `Think about what "${example}" means, and which part of that meaning the prefix supplies.`,
@@ -1325,7 +1719,7 @@ function genVerbForms(diff){
   }
   if(diff === 1){
     const [subject, verb, rest] = bagChoice('vf1', PROGRESSIVE_FRAMES);
-    const past = (subject === 'We' || subject === 'They' || subject === 'The children' || subject === 'The team') ? 'were' : (subject === 'I' ? 'was' : 'was');
+    const past = ['We','They','The children','The players','The birds','You'].includes(subject) ? 'were' : 'was';
     const ing = verb.endsWith('e') ? verb.slice(0, -1) + 'ing' : verb + 'ing';
     return {
       text: `Write the past progressive form of the verb in brackets: "${subject} ___ (${verb}) ${rest}."`,
@@ -1338,9 +1732,9 @@ function genVerbForms(diff){
   }
   if(diff === 2){
     const [subject, verb, rest] = bagChoice('vf2', PERFECT_FRAMES);
-    const singular = !(subject === 'They' || subject === 'We' || subject === 'You' || subject === 'The builders' || subject === 'The class');
+    const singular = !['They','We','You','I','The builders','The pupils','The farmers'].includes(subject);
     const aux = singular ? 'has' : 'have';
-    const PP = { finish:'finished', eat:'eaten', forget:'forgotten', build:'built', lose:'lost', break:'broken', write:'written', grow:'grown' };
+    const PP = { finish:'finished', eat:'eaten', forget:'forgotten', build:'built', lose:'lost', break:'broken', write:'written', grow:'grown', plant:'planted', visit:'visited', go:'gone' };
     const pp = PP[verb] || (verb + 'ed');
     return {
       text: `Write the present perfect form of the verb in brackets: "${subject} ___ (${verb}) ${rest}."`,
@@ -1368,7 +1762,14 @@ function genVerbForms(diff){
     ["The head teacher insists that every child ___ on time.", "be"],
     ["I wish it ___ the summer holidays.", "were"],
     ["It is essential that he ___ told immediately.", "be"],
-    ["If she ___ here, she would know what to do.", "were"]
+    ["If she ___ here, she would know what to do.", "were"],
+    ["If I ___ taller, I could reach the top shelf.", "were"],
+    ["The doctor recommended that she ___ in bed for a day.", "stay"],
+    ["We asked that the music ___ turned down.", "be"],
+    ["If he ___ to try harder, he would win.", "were"],
+    ["The coach insists that every player ___ on time.", "arrive"],
+    ["I wish I ___ able to fly.", "were"],
+    ["It is vital that everyone ___ the rules.", "follow"]
   ]);
   return {
     text: `Write the subjunctive form that belongs in the gap: "${sub[0]}"`,
@@ -1575,13 +1976,13 @@ const MODAL_POOL = ["must", "might", "should", "could", "will", "can", "may", "w
 const ANSWER_POOLS = {
   punctuation: [",", ".", "?", "!", "'", ":", ";", "-"],
   sentencetype: ["statement", "question", "command", "exclamation"],
-  clauses: ["because", "when", "if", "after", "before", "until", "so",
-            "although", "while", "since", "whenever", "who", "which", "where", "why"],
+  clauses: ["because", "when", "if", "after", "before", "until", "while", "although",
+            "since", "as", "unless", "once", "whenever", "and", "but", "or", "so"],
   /* Broad on purpose. The membership test in applyAnswerFormat means these only
      take effect on the tiers whose answer really is one of the listed items --
      the tiers that ask for a spelling keep the text box, which is what the real
      papers do for that kind of question too. */
-  prefixsuffix: PREFIX_POOL.concat(PREFIX_MEANING_POOL),
+  prefixsuffix: ["un", "dis", "im", "in", "ir", "il", "mis", "non"],
   verbforms: MODAL_POOL,
 };
 const TICK_ONE_SHARE = 0.55;   // the rest keep the text box

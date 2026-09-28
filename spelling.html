@@ -898,8 +898,30 @@ const INCORRECT_MESSAGES = [
 /* ---------- Session logic ---------- */
 let session = { words:[], index:0, currentWord:null, results:[] };
 
+/* No word comes back until at least 50 other words have been shown (asked for
+   2026-09-28). Remembered across sessions on this device; each band has over
+   100 words, so there are always enough left to fill a session. */
+const SPELL_GAP = 50;
+function loadRecentWords(){
+  try {
+    const r = JSON.parse(localStorage.getItem('sats_spelling_recent') || '[]');
+    return Array.isArray(r) ? r.filter(w => typeof w === 'string') : [];
+  } catch(e){ return []; }
+}
+function noteWordShown(w){
+  try {
+    const r = loadRecentWords().filter(x => x !== w);
+    r.push(w);
+    localStorage.setItem('sats_spelling_recent', JSON.stringify(r.slice(-SPELL_GAP)));
+  } catch(e){}
+}
+
 function buildWordQueue(bandId, length){
-  const words = bandWords(bandId);
+  const all = bandWords(bandId);
+  const recent = loadRecentWords();
+  let words = all.filter(w => !recent.includes(w));
+  // only if a band were ever smaller than the gap: top up with the longest-ago words
+  if(words.length < length) words = words.concat(recent.filter(w => all.includes(w)).slice(0, length - words.length));
   words.forEach(ensureWord);
   const weights = words.map(w => ({ w, weight: 6 - progress[w].box }));
   const totalW = weights.reduce((s,x)=>s+x.weight, 0);
@@ -932,6 +954,7 @@ function loadWordAt(i){
   document.getElementById('modalActions').classList.remove('hidden');
   document.getElementById('reviewStage').classList.add('hidden');
   session.currentWord = session.words[i];
+  noteWordShown(session.currentWord);
   const band = BANDS.find(b => bandWords(b.id).includes(session.currentWord)) || BANDS[0];
 
   document.getElementById('modalTopicTag').textContent = `${band.icon} ${band.name}`;
