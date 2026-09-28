@@ -1043,6 +1043,10 @@ const PUNCT_PARENTHETICAL = [
 function genPunctuation(diff){
   const collapse = s => s.replace(/ {2,}/g, ' ');
   let s, mark, why;
+  /* Between two clauses a colon, semi-colon or dash can all be right, and the
+     STA mark schemes accept any of them there. So these questions accept all
+     three, and none of them is ever offered as a WRONG tick-box option. */
+  let also = [];
   if(diff === 0){
     /* comma (list), full stop, question mark, exclamation mark */
     const kind = choice(['list', 'list', 'question', 'statement', 'exclaim']);
@@ -1098,7 +1102,7 @@ function genPunctuation(diff){
     } else {
       const [before, after] = bagChoice('p2-dash', PUNCT_DASH_PAIRS);
       s = `${before}{{b}} ${after}.`;
-      mark = '-'; why = "A dash can introduce a dramatic pause before the rest of the sentence.";
+      mark = '-'; why = "A dash can introduce a dramatic pause before the rest of the sentence."; also = [':'];
     }
   } else {
     /* colon, semicolon, dash, parenthetical commas */
@@ -1111,11 +1115,11 @@ function genPunctuation(diff){
     } else if(kind === 'colon'){
       const [c1, c2] = bagChoice('p3-colonpair', PUNCT_COLON_PAIRS);
       s = `${c1}{{b}} ${c2}.`;
-      mark = ':'; why = "A colon introduces an explanation or elaboration of what came before it.";
+      mark = ':'; why = "A colon introduces an explanation or elaboration of what came before it."; also = [';', '-'];
     } else if(kind === 'semicolon'){
       const [c1, c2] = bagChoice('p3-semicolonpair', PUNCT_SEMICOLON_PAIRS);
       s = `${c1}{{b}} ${c2}.`;
-      mark = ';'; why = "A semicolon can join two independent clauses that are closely related, instead of starting a new sentence.";
+      mark = ';'; why = "A semicolon can join two independent clauses that are closely related, instead of starting a new sentence."; also = [':', '-'];
     } else {
       const [before, middle, after] = bagChoice('p3-parenthesis', PUNCT_PARENTHETICAL);
       s = `${before}{{b}} ${middle}, ${after}.`;
@@ -1126,7 +1130,8 @@ function genPunctuation(diff){
   return {
     text: `What punctuation mark belongs in the gap? — "${displaySentence}"`,
     answer: mark,
-    steps: [ why, `The full sentence reads: "${collapse(s.replace('{{b}}', mark + ' '))}"` ],
+    answerAliases: also,
+    steps: [ why + (also.length ? ` (A ${also.map(m => ({':':'colon',';':'semi-colon','-':'dash'})[m]).join(' or ')} would also be correct here.)` : ''), `The full sentence reads: "${collapse(s.replace('{{b}}', mark + ' '))}"` ],
   };
 }
 
@@ -2058,7 +2063,9 @@ function applyAnswerFormat(q, topicId){
   if(!pool) return q;
   // only offer a choice when the answer really is one of the pool
   if(!pool.some(x => String(x).toLowerCase() === String(q.answer).toLowerCase())) return q;
-  if(Math.random() < TICK_ONE_SHARE) q.options = buildOptions(q.answer, pool);
+  /* another correct answer must never appear as a wrong option */
+  const alsoRight = (q.answerAliases || []).map(a => String(a).toLowerCase());
+  if(Math.random() < TICK_ONE_SHARE) q.options = buildOptions(q.answer, pool.filter(x => !alsoRight.includes(String(x).toLowerCase())));
   return q;
 }
 
