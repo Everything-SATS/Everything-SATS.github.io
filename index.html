@@ -250,6 +250,13 @@ function gcEvent(path){
   :root[data-reading-bg="green"]{ --bg-alt:#EAF7EC; }
   :root[data-reading-bg="rose"]{ --bg-alt:#FCEAEF; }
   :root[data-reading-bg="grey"]{ --bg-alt:#EDEEF0; }
+  :root[data-reading-bg="yellow"]{ --bg-alt:#FFF6C2; }
+  :root[data-reading-bg="peach"]{ --bg-alt:#FDE6D4; }
+  :root[data-reading-bg="orange"]{ --bg-alt:#FBDDBB; }
+  :root[data-reading-bg="lilac"]{ --bg-alt:#ECE3F9; }
+  :root[data-reading-bg="aqua"]{ --bg-alt:#D9F3F1; }
+  /* pale tints need dark text, even in dark mode */
+  :root[data-reading-bg]{ --ink:#1E2A3A; --ink-soft:#5C6B7E; }
 
   .colour-swatches{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0}
   .colour-swatch{
@@ -855,6 +862,11 @@ document.addEventListener('click', (e) => {
       <div class="colour-swatch" style="background:#EAF7EC" onclick="setReadingBg('green')" data-bg="green">Green</div>
       <div class="colour-swatch" style="background:#FCEAEF" onclick="setReadingBg('rose')" data-bg="rose">Rose</div>
       <div class="colour-swatch" style="background:#EDEEF0" onclick="setReadingBg('grey')" data-bg="grey">Grey</div>
+      <div class="colour-swatch" style="background:#FFF6C2" onclick="setReadingBg('yellow')" data-bg="yellow">Yellow</div>
+      <div class="colour-swatch" style="background:#FDE6D4" onclick="setReadingBg('peach')" data-bg="peach">Peach</div>
+      <div class="colour-swatch" style="background:#FBDDBB" onclick="setReadingBg('orange')" data-bg="orange">Orange</div>
+      <div class="colour-swatch" style="background:#ECE3F9" onclick="setReadingBg('lilac')" data-bg="lilac">Lilac</div>
+      <div class="colour-swatch" style="background:#D9F3F1" onclick="setReadingBg('aqua')" data-bg="aqua">Aqua</div>
     </div>
     <p class="colour-note">Honest note: research on coloured backgrounds and reading is actually mixed — they're not a proven fix for dyslexia specifically, but they're completely harmless and some people genuinely find them more comfortable. Worth trying if white feels too bright or "busy" to read.</p>
     <button class="btn btn-primary" style="width:100%; margin-top:16px" onclick="closeColourPicker()">Done</button>
